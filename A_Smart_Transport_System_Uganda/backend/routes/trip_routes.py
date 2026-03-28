@@ -23,11 +23,22 @@ def estimate_fare():
         return jsonify({'error': 'distance_km required'}), 400
 
     distance = float(data['distance_km'])
-    predicted = predict_fare(distance)
+    v_type = data.get('vehicle_type', 'Taxi')
+    
+    # We can also pass traffic_level and weather if the frontend provides it,
+    # otherwise predict_fare will simulate them.
+    predicted = predict_fare(
+        distance_km=distance,
+        vehicle_type=v_type,
+        traffic_level=data.get('traffic_level'),
+        weather=data.get('weather')
+    )
 
     return jsonify({
         'distance_km': distance,
-        'estimated_fare_ugx': predicted
+        'estimated_fare_ugx': predicted,
+        'vehicle_type': v_type,
+        'ai_powered': True
     }), 200
 
 
