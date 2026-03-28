@@ -1,0 +1,80 @@
+<div class="srv-hero">
+  <div class="srv-hero-inner">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:20px;">
+      <div>
+        <div class="hero-live" style="margin-bottom:14px; background:rgba(255,194,0,0.1); border-color:rgba(255,194,0,0.25); color:var(--yellow);"><span></span>LIVE · Driver Partner</div>
+        <h1 style="font-size: 2.2rem; margin-bottom: 4px;">Driver Command Center</h1>
+        <p id="driver-welcome" style="margin:0; opacity:0.8;">Welcome back. Your assigned vehicles and recent trips will sync here.</p>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div class="otog">
+          <div class="odot on" id="odot" style="background:var(--yellow);"></div>
+          <span class="olbl" id="olbl">Online</span>
+          <button class="togbtn" onclick="togOnline()" style="background:rgba(255,194,0,0.2); color:var(--yellow);">Toggle Status</button>
+        </div>
+        <button class="btn-o-sm" style="background:var(--yellow); color:#000; border:none; padding:10px 18px; font-weight:800;" onclick="showT('<i class=&quot;fas fa-wallet&quot;></i>','Withdrawal integration is the next backend step.','var(--yellow)')">
+          <i class="fas fa-hand-holding-dollar"></i> Withdraw Earnings
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="dstats reveal reveal-stagger" style="margin-top: -30px; position: relative; z-index: 10; margin-bottom: 30px;">
+    <div class="dsc">
+      <div class="dsc-ico"><i class="fas fa-route"></i></div>
+      <div class="dsc-v" id="driver-rides-today">0</div>
+      <div class="dsc-l">Rides Today</div>
+      <div class="dsc-ch">Live from completed trips</div>
+    </div>
+    <div class="dsc">
+      <div class="dsc-ico" style="background:var(--yellow-l); color:var(--yellow);"><i class="fas fa-money-bill-trend-up"></i></div>
+      <div class="dsc-v" id="driver-earnings">0</div>
+      <div class="dsc-l">Earnings (UGX)</div>
+      <div class="dsc-ch">Backend-calculated revenue</div>
+    </div>
+    <div class="dsc">
+      <div class="dsc-ico" style="background:rgba(0,0,0,0.05); color:var(--text);"><i class="fas fa-star"></i></div>
+      <div class="dsc-v" id="driver-rating">0.0</div>
+      <div class="dsc-l">Avg Rating</div>
+      <div class="dsc-ch">Based on submitted feedback</div>
+    </div>
+    <div class="dsc">
+      <div class="dsc-ico" style="background:var(--navy-l); color:#fff;"><i class="fas fa-car"></i></div>
+      <div class="dsc-v" id="driver-active-vehicles">0</div>
+      <div class="dsc-l">Active Vehicles</div>
+      <div class="dsc-ch">Current availability state</div>
+    </div>
+  </div>
+
+  <div class="dgrid reveal">
+    <div>
+      <div class="sh" style="display:flex; justify-content:space-between; align-items:center;">
+        <h3><i class="fas fa-satellite-dish"></i> Fleet and Recent Trips</h3>
+        <span class="chip ct" id="driver-request-chip">Syncing backend data</span>
+      </div>
+      <div id="rreqs">
+        <div class="rc" style="border: 1.5px solid var(--border); border-radius:12px; padding:16px; background:var(--white); box-shadow:var(--shadow-md); margin-bottom:12px;">
+          <div class="rr" style="font-weight:700; color:var(--navy); margin-bottom:4px;">Driver dashboard is loading...</div>
+          <div class="rm" style="display:flex; gap:12px; font-size:.74rem; color:var(--text3);">
+            <span><i class="fas fa-database"></i> Connecting to ASTS backend</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sh"><h3><i class="fas fa-map-marked-alt"></i> Area Coverage</h3></div>
+      <div class="map-surface">
+        <div class="map-surface-head">
+          <div>
+            <div class="map-surface-title">Live Coverage Map</div>
+            <div class="map-surface-note">A cleaner daylight map so routes, roads, and nearby service points stay easy to read.</div>
+          </div>
+          <span class="map-surface-chip"><i class="fas fa-sun"></i> Clear View</span>
+        </div>
+        <div id="driver-map" style="height:350px;"></div>
+      </div>
+    </div>
+  </div>
+</div>

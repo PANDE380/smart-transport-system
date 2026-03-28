@@ -1,0 +1,17 @@
+<div class="txw">
+    <div class="txtop">
+      <h2>Transaction History</h2>
+      <div class="bbal"><span>SmartCard Balance</span><b id="balbadge">0 UGX</b></div>
+    </div>
+    <div class="txsum">
+      <div class="txsc"><div class="txsv" id="tspent" style="color:var(--text3)">0 UGX</div><div class="txsl">Total Spent</div></div>
+      <div class="txsc"><div class="txsv" id="ttopup" style="color:var(--yellow)">0 UGX</div><div class="txsl">Total Topped Up</div></div>
+      <div class="txsc"><div class="txsv" id="trides">0</div><div class="txsl">Total Rides</div></div>
+    </div>
+    <div class="txfs">
+      <button class="fbtn active" onclick="filtTx('all',this)">All</button>
+      <button class="fbtn" onclick="filtTx('ride',this)">Rides</button>
+      <button class="fbtn" onclick="filtTx('topup',this)">Top-ups</button>
+    </div>
+    <div id="txlist"></div>
+  </div>

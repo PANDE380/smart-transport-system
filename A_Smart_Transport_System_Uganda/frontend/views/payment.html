@@ -1,0 +1,124 @@
+<div class="srv-hero" style="background: linear-gradient(rgba(11,13,23,0.85), rgba(11,13,23,0.85)), url('https://images.unsplash.com/photo-1556742049-0c64c7604a11?q=80&w=2000&auto=format&fit=crop');">
+  <div class="srv-hero-inner">
+    <div class="hero-live" style="margin-bottom:14px; background: rgba(0,242,255,0.1); border-color: rgba(0,242,255,0.25); color: var(--cyan);"><span></span>SECURE GATEWAY · active</div>
+    <h1>Secure Payment Portal</h1>
+    <p>Flexible top-ups for your STS SmartCard. Choose from local mobile money or international payment methods.</p>
+  </div>
+</div>
+
+<div class="wrap" style="max-width: 1000px;">
+  <div class="booking-layout" style="grid-template-columns: 1fr 400px; gap: 30px;">
+    <!-- LEFT: Payment Details -->
+    <div>
+      <!-- CARD PREVIEW -->
+      <div class="sc-card" style="margin-bottom: 30px; padding: 30px; min-height: 200px; background: linear-gradient(135deg, var(--navy-h), var(--navy-d)); border: 1px solid var(--yellow); cursor: default;">
+        <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <span style="color: var(--yellow); font-weight: 800; letter-spacing: 1px; font-size: 1.1rem;"><i class="fas fa-microchip"></i> STS SmartCard</span>
+              <i class="fab fa-nfc-symbol" style="color: rgba(255,255,255,0.3); font-size: 1.5rem;"></i>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text3); text-transform: uppercase;">Available Balance</div>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #fff; margin-top: 5px;" id="pmt-bal">0 UGX</div>
+          </div>
+          <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="font-family: 'monospace'; color: rgba(255,255,255,0.6); font-size: 1rem; letter-spacing: 2px;" id="pmt-card-num">**** **** **** ****</div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.6rem; color: var(--text3); text-transform: uppercase;">Valid Thru</div>
+              <div style="color: #fff; font-weight: 600; font-size: 0.85rem;">12 / 28</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AMOUNT SELECTION -->
+      <div class="sh"><h3><i class="fas fa-wallet"></i> Choose Amount (UGX)</h3></div>
+      <div class="amtg" style="grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 30px;">
+        <div class="ao" onclick="selAmtP(this, 10000)">10k</div>
+        <div class="ao" onclick="selAmtP(this, 25000)">25k</div>
+        <div class="ao" onclick="selAmtP(this, 50000)">50k</div>
+        <div class="ao" onclick="selAmtP(this, 100000)">100k</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Custom Amount</label>
+        <div class="field-icon">
+          <span class="ico" style="color: var(--yellow);">UGX</span>
+          <input class="fi" id="custom-amt" type="number" placeholder="Enter amount..." oninput="clearPills()"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Payment Methods -->
+    <div class="bpanel" style="border-color: var(--yellow); padding: 24px;">
+      <h3 style="margin-bottom: 24px;"><i class="fas fa-credit-card"></i> Payment Method</h3>
+      
+      <div id="method-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 30px;">
+        <!-- MOBILE MONEY -->
+        <div class="pm-opt active" onclick="selMethod(this, 'MTN')">
+          <div class="pm-ico" style="background: #ffcc00; color: #000;">MTN</div>
+          <div class="pm-info"><b>Mobile Money (MTN)</b><span>Instant · Local</span></div>
+          <i class="fas fa-check-circle pm-check"></i>
+        </div>
+        <div class="pm-opt" onclick="selMethod(this, 'AIRTEL')">
+          <div class="pm-ico" style="background: #ff0000; color: #fff;">Airtel</div>
+          <div class="pm-info"><b>Mobile Money (Airtel)</b><span>Instant · Local</span></div>
+          <i class="fas fa-check-circle pm-check"></i>
+        </div>
+
+        <!-- BANK / CARDS -->
+        <div class="pm-opt" onclick="selMethod(this, 'CARD')">
+          <div class="pm-ico" style="background: #1a1a1b; color: #fff;"><i class="fas fa-credit-card"></i></div>
+          <div class="pm-info"><b>Credit / Debit Card</b><span>Visa, Mastercard, Amex</span></div>
+          <i class="fas fa-check-circle pm-check"></i>
+        </div>
+
+        <!-- INTERNATIONAL -->
+        <div class="pm-opt" onclick="selMethod(this, 'PAYPAL')">
+          <div class="pm-ico" style="background: #169bd5; color: #fff;"><i class="fab fa-paypal"></i></div>
+          <div class="pm-info"><b>PayPal</b><span>International Checkout</span></div>
+          <i class="fas fa-check-circle pm-check"></i>
+        </div>
+        <div class="pm-opt" onclick="selMethod(this, 'BANK')">
+          <div class="pm-ico" style="background: #004a99; color: #fff;"><i class="fas fa-building-columns"></i></div>
+          <div class="pm-info"><b>Bank Transfer</b><span>Swift · EFT · RTGS</span></div>
+          <i class="fas fa-check-circle pm-check"></i>
+        </div>
+      </div>
+
+      <div class="ai-hint" style="margin-bottom: 24px; border-color: var(--yellow); color: var(--yellow);">
+        <i class="fas fa-shield-check"></i>
+        <span>All transactions are encrypted with 256-bit SSL security and monitored for fraud prevention.</span>
+      </div>
+
+      <button id="pay-btn" class="btn-full" style="background: var(--yellow); color: #000; font-weight: 800; height: 55px;" onclick="processFinalPayment()">Confirm & Pay</button>
+      <button class="btn-out" style="width: 100%; margin-top: 12px;" onclick="showPg('booking')">Back to Booking</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pm-opt {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--rs);
+    cursor: pointer;
+    transition: var(--tr);
+    background: var(--white);
+    position: relative;
+  }
+  .pm-opt:hover { border-color: var(--yellow); transform: translateX(5px); }
+  .pm-opt.active { border-color: var(--yellow); background: rgba(255,194,0,0.03); }
+  .pm-ico { width: 42px; height: 42px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pm-info { flex: 1; }
+  .pm-info b { display: block; font-size: 0.88rem; color: var(--text); }
+  .pm-info span { font-size: 0.72rem; color: var(--text3); }
+  .pm-check { position: absolute; right: 18px; color: var(--yellow); opacity: 0; transition: var(--tr); }
+  .pm-opt.active .pm-check { opacity: 1; }
+  
+  .ao{border: 1.5px solid var(--border); padding: 15px; text-align: center; border-radius: var(--rs); cursor: pointer; transition: var(--tr); font-weight: 700; background: var(--white);}
+  .ao:hover{border-color: var(--yellow); color: var(--yellow);}
+  .ao.sel{background: var(--yellow); color: #000; border-color: var(--yellow);}
+</style>

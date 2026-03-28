@@ -1,0 +1,125 @@
+<div class="srv-hero">
+  <div class="srv-hero-inner">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:20px;">
+      <div>
+        <div class="hero-live" style="margin-bottom:14px; background: rgba(255,194,0,0.1); border-color: rgba(255,194,0,0.25); color: var(--yellow);"><span></span>SYSTEM OPERATIONAL · ASTS CORE</div>
+        <h1 style="font-size: 2.2rem; margin-bottom: 4px;">System Intelligence Center</h1>
+        <p style="margin:0; opacity:0.8;">Platform surveillance, driver oversight, and automated network optimization.</p>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div class="chip ct" style="padding: 8px 16px; font-size: .8rem; background: rgba(0,255,100,0.1); color: #00ff64; border: 1.5px solid rgba(0,255,100,0.2);">
+          <i class="fas fa-circle-check"></i> All Services Green
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="dstats reveal reveal-stagger" style="margin-top: -30px; position: relative; z-index: 10; margin-bottom: 30px;">
+    <div class="dsc">
+      <div class="dsc-ico"><i class="fas fa-microchip"></i></div>
+      <div class="dsc-v" id="admin-active-vehicles">0</div>
+      <div class="dsc-l">Active Vehicles</div>
+      <div class="dsc-ch">Live fleet status</div>
+    </div>
+    <div class="dsc">
+      <div class="dsc-ico" style="background:var(--yellow-l); color:var(--yellow);"><i class="fas fa-users"></i></div>
+      <div class="dsc-v" id="admin-total-passengers">0</div>
+      <div class="dsc-l">Total Passengers</div>
+      <div class="dsc-ch">Registered passenger accounts</div>
+    </div>
+    <div class="dsc">
+      <div class="dsc-ico" style="background:var(--navy-l); color:#fff;"><i class="fas fa-user-clock"></i></div>
+      <div class="dsc-v" id="admin-pending-count">0</div>
+      <div class="dsc-l">Pending Approval</div>
+      <div class="dsc-ch">Drivers awaiting admin review</div>
+    </div>
+    <div class="dsc">
+      <div class="dsc-ico" style="background:var(--yellow-l); color:#000;"><i class="fas fa-coins"></i></div>
+      <div class="dsc-v" id="admin-revenue">0</div>
+      <div class="dsc-l">Revenue (UGX)</div>
+      <div class="dsc-ch">Completed ride totals</div>
+    </div>
+  </div>
+
+  <div class="alyt reveal">
+    <div>
+      <div class="sh" style="display:flex; justify-content:space-between; align-items:center;">
+        <h3><i class="fas fa-satellite"></i> Network Surveillance Map</h3>
+        <span class="chip co"><i class="fas fa-location-crosshairs"></i> Global Tracking Active</span>
+      </div>
+      <div class="map-surface">
+        <div class="map-surface-head">
+          <div>
+            <div class="map-surface-title">Operations Map</div>
+            <div class="map-surface-note">Improved daytime cartography for faster monitoring of vehicle positions, alerts, and routing activity.</div>
+          </div>
+          <span class="map-surface-chip"><i class="fas fa-layer-group"></i> Professional Basemap</span>
+        </div>
+        <div id="admin-map" style="height:450px;"></div>
+      </div>
+    </div>
+    <div>
+      <div class="sh"><h3><i class="fas fa-bell"></i> Critical Alerts</h3></div>
+      <div id="admin-alerts">
+        <div class="alert-c danger" style="border: 1.5px solid #ff4444; border-radius:12px; padding:20px; background:rgba(255,68,68,0.05); margin-bottom:16px;">
+          <div class="at-t" style="color:#ff4444; font-weight:800; font-size:1rem; margin-bottom:4px;"><i class="fas fa-triangle-exclamation"></i> Alert feed is syncing</div>
+          <div class="at-d" style="font-size:.8rem; color:var(--text2);">Live SOS alerts from the backend will appear here.</div>
+        </div>
+      </div>
+
+      <div class="sh" style="margin-top:24px;"><h3><i class="fas fa-bolt"></i> System Health</h3></div>
+      <div class="tech-card" style="padding:16px; border-left: 4px solid var(--yellow);">
+        <div style="font-size:.84rem; margin-bottom:8px; display:flex; justify-content:space-between;"><span>API Gateway</span><span style="color:var(--yellow); font-weight:800;">Healthy</span></div>
+        <div style="font-size:.84rem; margin-bottom:8px; display:flex; justify-content:space-between;"><span>Database (SQL)</span><span style="color:var(--yellow); font-weight:800;">Healthy</span></div>
+        <div style="font-size:.84rem; display:flex; justify-content:space-between;"><span>GPS Latency</span><span style="color:var(--text3);">Low</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sh reveal" style="margin-top:30px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+    <h3><i class="fas fa-id-card-clip"></i> Driver Verification Queue</h3>
+    <span class="chip co" id="admin-queue-chip">0 Applications Pending</span>
+  </div>
+  <div class="reveal" style="background:var(--white); border:1.5px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-md); margin-bottom:40px;">
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:.9rem;">
+        <thead style="background:var(--navy); color:#fff;">
+          <tr>
+            <th style="padding:14px; text-align:left;">DRIVER PARTNER</th>
+            <th style="padding:14px; text-align:left;">LICENSE</th>
+            <th style="padding:14px; text-align:left;">VEHICLE DATA</th>
+            <th style="padding:14px; text-align:left;">SERVICE</th>
+            <th style="padding:14px; text-align:left;">STATUS</th>
+            <th style="padding:14px; text-align:center;">ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="admin-queue-body" style="color:var(--navy);">
+          <tr style="border-bottom:1px solid var(--border);">
+            <td colspan="6" style="padding:18px; text-align:center; color:var(--text3);">Pending driver approvals will appear here once loaded from the backend.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sh reveal" style="margin-bottom:16px;"><h3><i class="fas fa-brain"></i> Platform Intelligence and Forecasts</h3></div>
+  <div class="aigrid reveal reveal-stagger" style="margin-bottom:50px;">
+    <div class="aic" style="border-top: 4px solid var(--yellow);">
+      <div class="aico"><i class="fas fa-chart-line" style="color:var(--yellow);"></i></div>
+      <div class="ait">Demand Optimization</div>
+      <div class="aib" id="admin-demand-forecast" style="line-height:1.5;">Forecasts will reflect the current active fleet and completed rides.</div>
+    </div>
+    <div class="aic" style="border-top: 4px solid var(--navy);">
+      <div class="aico"><i class="fas fa-route" style="color:var(--navy);"></i></div>
+      <div class="ait">Network Rerouting</div>
+      <div class="aib" id="admin-routing-note" style="line-height:1.5;">Vehicle positions on the map are being hydrated from the backend feed.</div>
+    </div>
+    <div class="aic" style="border-top: 4px solid var(--yellow);">
+      <div class="aico"><i class="fas fa-money-bill-trend-up" style="color:var(--yellow);"></i></div>
+      <div class="ait">Revenue Prediction</div>
+      <div class="aib" id="admin-revenue-note" style="line-height:1.5;">Revenue cards now derive from completed trip totals instead of static demo values.</div>
+    </div>
+  </div>
+</div>

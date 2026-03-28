@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Transport System Uganda — Ultra-Premium Transport</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  
+  <!-- Icons & Maps -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+  
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="top-bar">
+  <div class="social-links-ref">
+    <span class="top-bar-note">Connect &amp; Support</span>
+    <a id="top-whatsapp-link" href="#" target="_blank" rel="noopener noreferrer" title="Share STS on WhatsApp" aria-label="Share STS on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    <a id="top-x-link" href="#" target="_blank" rel="noopener noreferrer" title="Share STS on X" aria-label="Share STS on X"><i class="fab fa-x-twitter"></i></a>
+    <a href="mailto:support@sts.ug?subject=STS%20Support%20Request" title="Email STS support" aria-label="Email STS support"><i class="fas fa-envelope"></i></a>
+    <a href="tel:+256800123456" title="Call STS helpline" aria-label="Call STS helpline"><i class="fas fa-phone"></i></a>
+  </div>
+  <div class="lang-cur-ref">
+    <div class="top-pref">
+      <button class="top-pref-btn" type="button" aria-expanded="false" aria-controls="currency-menu" title="Select currency" onclick="toggleTopPrefMenu('currency')">
+        <span class="top-pref-label">Currency</span>
+        <span id="currency-current">UGX</span>
+        <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
+      </button>
+      <div class="top-pref-menu" id="currency-menu"></div>
+    </div>
+    <div class="top-pref">
+      <button class="top-pref-btn" type="button" aria-expanded="false" aria-controls="language-menu" title="Select language" onclick="toggleTopPrefMenu('language')">
+        <span class="top-pref-label">Language</span>
+        <span id="language-current">ENG</span>
+        <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
+      </button>
+      <div class="top-pref-menu" id="language-menu"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav style="background:#fff; height:85px; border-bottom:1px solid #eee;">
+  <div class="nav-inner" style="justify-content: space-between; position:relative; max-width:1440px;">
+    <!-- LEFT SECTION: Logo + Main Links -->
+    <div style="display:flex; align-items:center; gap:28px;">
+      <!-- PROPER LOGO -->
+      <a class="logo" onclick="showPg('home')" style="cursor:pointer; text-decoration:none;">
+        <div class="logo-icon" style="width:44px; height:44px; background:var(--yellow); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:900; color:#000; box-shadow:0 4px 15px rgba(252,194,0,0.35);">
+          <i class="fas fa-road"></i>
+        </div>
+        <div class="logo-text" style="font-family:'Plus Jakarta Sans',sans-serif; line-height:1.15;">
+          <span style="font-size:1.05rem; font-weight:900; color:#000; letter-spacing:-0.5px;">
+            STS</span>
+          <small style="display:block; font-size:0.52rem; font-weight:700; color:#888; letter-spacing:1.5px; text-transform:uppercase;">Uganda</small>
+        </div>
+      </a>
+
+      <div id="navlinks-main" style="display:flex; align-items:center; gap:5px;"></div>
+    </div>
+
+    <!-- RIGHT SECTION: Action Links + Auth -->
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div id="navlinks-right" style="display:flex; align-items:center; gap:5px;"></div>
+      <div id="navlinks-drop" style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; justify-content:flex-end;"></div>
+      <div class="nav-right" id="nav-right" style="display:flex; align-items:center; gap:12px;">
+        <!-- Auth buttons or User Profile will be injected here by app.js -->
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HOME ═══ -->
+<div id="home-page" class="page active">
+<!-- Content moved to views/home.html -->
+</div>
+
+<!-- ═══ SERVICES ═══ -->
+<div id="services-page" class="page"></div>
+
+<!-- ═══ BOOKING ═══ -->
+<div id="booking-page" class="page"></div>
+
+<!-- ═══ DRIVER ═══ -->
+<div id="driver-page" class="page">
+<!-- Content moved to views/driver.html -->
+</div>
+
+<!-- ═══ ADMIN ═══ -->
+<div id="admin-page" class="page">
+<!-- Content moved to views/admin.html -->
+</div>
+
+<!-- ═══ TRANSACTIONS ═══ -->
+<div id="history-page" class="page">
+<!-- Content moved to views/history.html -->
+</div>
+
+<!-- ═══ USSD PAGE ═══ -->
+<div id="ussd-page" class="page">
+<!-- Content moved to views/ussd.html -->
+</div>
+
+<!-- ═══ SERVICE PAGES ═══ -->
+<div id="taxi-page" class="page"></div>
+<div id="boda-page" class="page"></div>
+<div id="special-page" class="page"></div>
+<div id="minibus-page" class="page"></div>
+<div id="marine-page" class="page"></div>
+  <div id="payment-page" class="page"></div>
+  <div id="safety-page" class="page"></div>
+  <div id="smart-tech-page" class="page"></div>
+<div id="bus-page" class="page"></div>
+<div id="about-page" class="page"></div>
+<div id="contact-page" class="page"></div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="main-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <a class="logo" onclick="showPg('home')" style="cursor:pointer; text-decoration:none; margin-bottom:16px; display:inline-flex;">
+        <div class="logo-icon" style="width:36px; height:36px; background:var(--yellow); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900; color:#000;">
+          <i class="fas fa-road"></i>
+        </div>
+        <div class="logo-text" style="font-family:'Plus Jakarta Sans',sans-serif; line-height:1.15;">
+          <span style="font-size:0.95rem; font-weight:900; color:#fff; letter-spacing:-0.5px;">STS</span>
+          <small style="display:block; font-size:0.48rem; font-weight:700; color:#888; letter-spacing:1.5px; text-transform:uppercase;">Uganda</small>
+        </div>
+      </a>
+      <p style="color:var(--text3); font-size:0.8rem; line-height:1.6; margin-bottom:20px; max-width:280px;">A Smart Transport System Uganda is the nation's leading AI-driven mobility platform, dedicated to safe, reliable, and accessible transport for all citizens.</p>
+      <div class="ft-socials">
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#" onclick="showPg('about')">About Us</a>
+      <a href="#" onclick="showPg('services')">Services</a>
+      <a href="#" onclick="showPg('smart-tech')">Smart Tech</a>
+      <a href="#" onclick="showPg('contact')">Contact Support</a>
+    </div>
+    <div class="footer-col">
+      <h4>Transport</h4>
+      <a href="#" onclick="showPg('taxi')">Standard Taxi</a>
+      <a href="#" onclick="showPg('boda')">Boda Boda</a>
+      <a href="#" onclick="showPg('bus')">Smart Bus</a>
+      <a href="#" onclick="showPg('marine')">Marine Transport</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal & Policies</h4>
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#" onclick="showPg('safety')">Safety Guidelines</a>
+      <a href="#">Driver Agreement</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; <span id="current-year">2026</span> STS Uganda. All rights reserved. Registered with Uganda Transport Authority.</p>
+  </div>
+</footer>
+
+<!-- ═══ CHATBOT WIDGET ═══ -->
+<div id="chatbot-widget" class="chatbot-widget">
+  <div id="chatbot-window" class="chatbot-window">
+    <div class="chatbot-header">
+      <div class="cb-agent">
+        <div class="cb-avatar"><i class="fas fa-robot"></i><span class="cb-status"></span></div>
+        <div class="cb-info">
+          <h5>STS Assistant</h5>
+          <p>Typically replies instantly</p>
+        </div>
+      </div>
+      <button class="cb-close" onclick="toggleChatbot()"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="chatbot-messages" class="chatbot-messages">
+      <div class="cb-msg bot">
+        <div class="cb-bubble">Hello! 👋 I'm your STS Assistant. How can I help you today? E.g., You can ask about "booking", "pricing", or "safety".</div>
+      </div>
+    </div>
+    <div class="chatbot-input-area">
+      <input type="text" id="chatbot-input" placeholder="Type a message..." onkeypress="handleChatbotKey(event)"/>
+      <button onclick="sendChatbotMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+  <button id="chatbot-toggle-btn" class="chatbot-toggle-btn" onclick="toggleChatbot()">
+    <i class="fas fa-comment-dots"></i>
+  </button>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+<div class="mo" id="auth-m">
+  <div class="mb" style="max-width:480px; padding: 48px 40px;">
+    <button class="close-mo" onclick="closeM('auth-m')"><i class="fas fa-times"></i></button>
+    <div class="auth-tabs auth-tabs-ref">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-reg" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in to your STS Uganda account</p>
+      
+      <div class="fg">
+        <label class="fl">Phone Number or Email</label>
+        <div class="field-icon-ref">
+          <span class="ico-ref"><i class="fas fa-user"></i></span>
+          <input class="fi-ref" id="l-identifier" placeholder="e.g. 0772000000 or you@email.com"/>
+        </div>
+      </div>
+      
+      <div class="fg" style="margin-bottom:12px;">
+        <label class="fl">Password</label>
+        <div class="field-icon-ref">
+          <span class="ico-ref"><i class="fas fa-lock"></i></span>
+          <input class="fi-ref" id="l-password" type="password" placeholder="Your password"/>
+          <button class="pw-toggle-ref" onclick="togglePW('l-password',this)"><i class="far fa-eye"></i></button>
+        </div>
+      </div>
+
+      <div style="text-align:right; margin-bottom:32px;">
+        <a href="#" class="forgot-pw" onclick="handleForgotPassword()">Forgot password?</a>
+      </div>
+
+      <div id="login-err" class="form-err-ref" style="display:none;"></div>
+      
+      <button class="btn-full btn-auth-primary" id="loginBtn" onclick="doLogin()" style="margin-bottom:0;">Sign In</button>
+      
+      <div class="social-divider">
+        <span>or continue with</span>
+      </div>
+      
+      <div class="social-grid">
+        <button class="btn-social" onclick="doGoogleLogin()">
+          <span class="social-icon google"><i class="fab fa-google"></i></span>
+          Google
+        </button>
+        <button class="btn-social" onclick="showT('🟢','WhatsApp login simulation active','var(--whatsapp)')">
+          <span class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></span>
+          WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="reg-form" style="display:none;">
+      <h3>Create your account</h3>
+      <p class="sub">Join the network.It's completely free</p>
+      <div style="margin-bottom:18px;">
+        <label class="fl">Registering as</label>
+        <div class="role-select">
+          <div class="role-opt sel" onclick="selRegRole(this,'passenger')"><div class="role-opt-ico">🧍</div><div class="role-opt-lbl">Passenger</div></div>
+          <div class="role-opt" onclick="selRegRole(this,'driver')"><div class="role-opt-ico">🚗</div><div class="role-opt-lbl">Driver</div></div>
+        </div>
+      </div>
+      <div class="frow2">
+        <div class="fg"><label class="fl">Full Name</label><input class="fi" id="r-name" placeholder="John Okello"/></div>
+        <div class="fg"><label class="fl">Phone</label><input class="fi" id="r-phone" placeholder="0772..."/></div>
+      </div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" id="r-email" placeholder="you@example.com"/></div>
+      <div class="fg">
+        <label class="fl">Password</label>
+        <div class="field-icon" style="position:relative;">
+          <span class="ico"><i class="fas fa-lock"></i></span>
+          <input class="fi" id="r-password" type="password" placeholder="Use upper, lower, number, and symbol" oninput="handleRegisterPasswordInput()"/>
+          <button class="pw-toggle" type="button" onclick="togglePW('r-password',this)"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="pw-strength" id="reg-pw-strength"></div>
+        <div class="pw-strength-text" id="reg-pw-strength-text">Password strength: Very weak</div>
+      </div>
+      <div class="security-extra">
+        <label class="security-toggle"><input type="checkbox" id="r-two-factor" onchange="toggleRegisterTwoFactor()"/> Enable Two-Factor Authentication</label>
+        <div class="security-extra-body" id="r-two-factor-body" style="display:none;">
+          <label class="fl">Verification Method</label>
+          <select class="fs" id="r-two-factor-method">
+            <option value="sms">SMS to phone</option>
+            <option value="email">Email code</option>
+          </select>
+          <div class="driver-extra-note" style="margin-top:8px;">A 6-digit code will be required after the password during sign-in.</div>
+        </div>
+      </div>
+      <div class="driver-extra" id="driver-extra" style="display:none;">
+        <div class="driver-extra-title">Driver Details</div>
+        <div class="driver-extra-note" id="driver-extra-hint">Create a driver account for a taxi, boda, bus, mini bus, special hire, or marine vehicle.</div>
+        <div class="fg"><label class="fl">Driving License Number</label><input class="fi" id="r-license-number" placeholder="DL12345"/></div>
+        <div class="frow2">
+          <div class="fg">
+            <label class="fl">Vehicle Type</label>
+            <select class="fs" id="r-vehicle-type" onchange="updateDriverVehicleFields()">
+              <option value="Taxi">Standard Taxi</option>
+              <option value="Boda Boda">Boda Boda</option>
+              <option value="Special Hire">Special Hire</option>
+              <option value="Mini Bus">Mini Bus</option>
+              <option value="Bus">Smart Bus</option>
+              <option value="Marine">Marine Transport</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Passenger Capacity</label>
+            <input class="fi" id="r-vehicle-capacity" type="number" min="1" value="4" oninput="markVehicleCapacityManual()"/>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">Plate / Registration Number</label><input class="fi" id="r-number-plate" placeholder="UAA 123A"/></div>
+      </div>
+      <div id="reg-err" class="form-err" style="display:none;padding:8px 12px;background:var(--red-l);border-radius:var(--rs);"></div>
+      <button class="btn-full btn-full-o" id="registerBtn" onclick="doRegister()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- TWO-FACTOR MODAL -->
+<div class="mo" id="two-factor-m">
+  <div class="mb" style="max-width:420px;">
+    <button class="close-mo" onclick="cancelTwoFactor()"><i class="fas fa-times"></i></button>
+    <h3>Two-Factor Verification</h3>
+    <p class="sub" id="two-factor-sub">Enter the 6-digit code to finish signing in.</p>
+    <div class="fg">
+      <label class="fl">Verification Code</label>
+      <input class="fi" id="two-factor-code" inputmode="numeric" maxlength="6" placeholder="123456"/>
+    </div>
+    <div class="driver-extra-note" id="two-factor-demo" style="margin-bottom:14px;"></div>
+    <div id="two-factor-err" class="form-err" style="display:none;padding:8px 12px;background:var(--red-l);border-radius:var(--rs);"></div>
+    <button class="btn-full btn-full-o" type="button" onclick="submitTwoFactor()">Verify Code</button>
+    <button class="btn-out" style="width:100%;margin-top:10px;" type="button" onclick="cancelTwoFactor()">Back to Sign In</button>
+  </div>
+</div>
+
+<input id="profile-photo-input" type="file" accept="image/*" style="display:none" onchange="handleProfilePhotoSelected(event)"/>
+
+<!-- PROFILE PHOTO MODAL -->
+<div class="mo" id="profile-photo-m">
+  <div class="mb profile-photo-modal" style="max-width:460px;">
+    <button class="close-mo" onclick="closeProfilePhotoModal()"><i class="fas fa-times"></i></button>
+    <h3>Profile Photo</h3>
+    <p class="sub">Upload a clear professional photo. Your image will appear across the platform after saving.</p>
+    <div class="profile-photo-stage">
+      <div class="profile-photo-preview-shell" id="profile-photo-preview-shell"></div>
+      <div class="profile-photo-guidelines">
+        <div class="profile-photo-guideline"><i class="fas fa-image"></i> JPG, PNG, or WEBP</div>
+        <div class="profile-photo-guideline"><i class="fas fa-expand"></i> Up to 5 MB</div>
+        <div class="profile-photo-guideline"><i class="fas fa-user-check"></i> Best results with a centered headshot</div>
+      </div>
+    </div>
+    <div id="profile-photo-err" class="form-err" style="display:none;padding:8px 12px;background:var(--red-l);border-radius:var(--rs);margin-bottom:12px;"></div>
+    <div class="profile-photo-actions">
+      <button class="btn-out" type="button" onclick="chooseProfilePhoto()">Choose Photo</button>
+      <button class="btn-full btn-full-o" type="button" onclick="uploadProfilePhoto()">Save Photo</button>
+    </div>
+    <button class="btn-out profile-photo-remove" id="profile-photo-remove-btn" type="button" onclick="removeProfilePhoto()" style="width:100%;margin-top:10px;">Remove Current Photo</button>
+  </div>
+</div>
+
+<!-- SOS MODAL -->
+<div class="mo" id="sos-m">
+  <div class="mb">
+    <button class="close-mo" onclick="closeM('sos-m')"><i class="fas fa-times"></i></button>
+    <div class="sos-c"><i class="fas fa-circle-exclamation"></i></div>
+    <h3 style="text-align:center;color:var(--red);">Emergency SOS</h3>
+    <p class="sub" style="text-align:center;">Your GPS location will be sent to emergency services immediately.</p>
+    <button class="btn-full btn-full-r" onclick="trigSOS()">🚨 Send Emergency Alert Now</button>
+    <button class="btn-out" style="width:100%;margin-top:10px;" onclick="closeM('sos-m')">Cancel — I'm Safe</button>
+  </div>
+</div>
+
+<!-- TOP UP MODAL -->
+<div class="mo" id="topup-m">
+  <div class="mb">
+    <button class="close-mo" onclick="closeM('topup-m')"><i class="fas fa-times"></i></button>
+    <h3>💳 Top Up SmartCard</h3>
+    <p class="sub">Select an amount to add to your Nol SmartCard via Mobile Money.</p>
+    <div class="amtg">
+      <div class="ao" onclick="selAmt(this,10000)">10,000</div>
+      <div class="ao" onclick="selAmt(this,50000)">50,000</div>
+      <div class="ao" onclick="selAmt(this,100000)">100,000</div>
+    </div>
+    <div style="font-size:.74rem; margin-bottom:12px; text-align:center;"><a href="#" onclick="closeM('topup-m'); showPg('payment')" style="color:var(--yellow); font-weight:700;">More payment methods (PayPal, Card, Bank) →</a></div>
+    <div class="mact">
+      <button class="btn-out" style="flex:1;" onclick="closeM('topup-m')">Cancel</button>
+      <button class="btn-full btn-full-o" style="flex:2;" onclick="confTopup()">Confirm Top Up</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOST & FOUND MODAL -->
+<div class="mo" id="lost-m">
+  <div class="mb">
+    <button class="close-mo" onclick="closeM('lost-m')"><i class="fas fa-times"></i></button>
+    <h3>🔍 Lost & Found</h3>
+    <p class="sub">Report a lost item. Drivers will be notified.</p>
+    <div class="fg"><label class="fl">Item Description</label><input class="fi" placeholder="e.g. Black bag"/></div>
+    <div class="mact">
+      <button class="btn-out" style="flex:1;" onclick="closeM('lost-m')">Cancel</button>
+      <button class="btn-full btn-full-o" style="flex:2;" onclick="submitLostReport()">Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- RATING MODAL -->
+<div class="mo" id="rating-m">
+  <div class="mb">
+    <button class="close-mo" onclick="closeM('rating-m')"><i class="fas fa-times"></i></button>
+    <h3>⭐ Rate Your Driver</h3>
+    <p class="sub">How was your trip?</p>
+    <div style="text-align:center;margin:20px 0;font-size:2rem;">⭐⭐⭐⭐⭐</div>
+    <div class="mact">
+      <button class="btn-out" style="flex:1;" onclick="closeM('rating-m')">Skip</button>
+      <button class="btn-full btn-full-o" style="flex:2;" onclick="submitRating()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="ticon"></span><span id="tmsg"></span></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
