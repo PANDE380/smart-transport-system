@@ -1,32 +1,95 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
+
+try:
+    from ..utils.openai_service import (
+        ChatbotUnavailableError,
+        generate_chatbot_reply,
+        get_chatbot_runtime_status
+    )
+except ImportError:
+    from utils.openai_service import (
+        ChatbotUnavailableError,
+        generate_chatbot_reply,
+        get_chatbot_runtime_status
+    )
+
 
 chatbot_bp = Blueprint('chatbot_routes', __name__)
 
+
+def _build_fallback_reply(message):
+    lowered = str(message or '').lower().strip()
+
+    if any(greet in lowered for greet in ['hi', 'hello', 'hey']):
+        return (
+            'Hello. The OpenAI assistant is temporarily limited right now, '
+            'but I can still help with ASTS booking, payments, safety, and driver support.'
+        )
+    if any(word in lowered for word in ['book', 'ride', 'taxi', 'boda', 'trip']):
+        return (
+            'To book a ride, open the Book a Ride page, choose your service, set pickup and destination, '
+            'then confirm the request. The driver dashboard receives pending trips in real time.'
+        )
+    if any(word in lowered for word in ['wallet', 'top up', 'topup', 'pay', 'payment', 'fare', 'price', 'cost']):
+        return (
+            'Payments are handled from the wallet and trip flow. You can top up your balance, '
+            'pay for completed trips, and review payment history from the Payments page.'
+        )
+    if any(word in lowered for word in ['safe', 'safety', 'sos', 'emergency']):
+        return (
+            'ASTS safety tools include verified drivers, live vehicle tracking, and an SOS flow '
+            'for urgent incidents. The Safety page is the best place to manage those features.'
+        )
+    if any(word in lowered for word in ['driver', 'license', 'vehicle', 'dashboard']):
+        return (
+            'Drivers can register with their licence and vehicle details, then manage live ride requests '
+            'from the driver dashboard once approved.'
+        )
+    if any(word in lowered for word in ['ussd', 'offline', 'feature phone']):
+        return (
+            'Passengers can use the USSD flow by dialing *123# to book and check transport options '
+            'without internet access.'
+        )
+    if any(word in lowered for word in ['contact', 'support', 'help']):
+        return (
+            'You can reach support at +256800123456 or use the Contact page for more help.'
+        )
+    return (
+        'The OpenAI assistant is temporarily unavailable, so I can only give limited ASTS guidance right now. '
+        'Ask about booking, payments, safety, driver onboarding, services, or support.'
+    )
+
+
 @chatbot_bp.route('/', methods=['POST'])
 def chat():
-    data = request.get_json()
-    if not data or 'message' not in data:
+    data = request.get_json() or {}
+    message = str(data.get('message') or '').strip()
+    history = data.get('history') or []
+
+    if not message:
         return jsonify({'error': 'Message format invalid'}), 400
+    if not isinstance(history, list):
+        history = []
 
-    message = str(data['message']).lower().strip()
+    try:
+        result = generate_chatbot_reply(message, history=history)
+        return jsonify({
+            **result,
+            'fallback': False,
+            'status': get_chatbot_runtime_status()
+        }), 200
+    except ChatbotUnavailableError as error:
+        status = get_chatbot_runtime_status()
+        return jsonify({
+            'reply': _build_fallback_reply(message),
+            'sources': [],
+            'provider': 'Fallback Assistant',
+            'fallback': True,
+            'notice': str(error),
+            'status': status
+        }), 200
 
-    # Base NLP Logic translated from frontend
-    if any(greet in message for greet in ['hi', 'hello', 'hey']):
-        reply = "Hello! How can I assist you with your transport today?"
-    elif any(word in message for word in ['book', 'ride', 'taxi']):
-        reply = "To book a ride, go to the 'Book a Ride' page, enter your pickup/dropoff locations, select the vehicle type, and confirm. It's fast and easy!"
-    elif any(word in message for word in ['pay', 'cost', 'price', 'fare', 'wallet']):
-        reply = "We calculate fares transparently using GPS distance. You can pay seamlessly using Mobile Money, Card, or from your topped-up Wallet via the 'SmartCard'."
-    elif any(word in message for word in ['safe', 'security', 'sos']):
-        reply = "Safety is our priority. All drivers are verified, vehicles are GPS tracked in real-time, and you can share your trip with contacts. We also have an SOS emergency button!"
-    elif any(word in message for word in ['contact', 'support', 'help']):
-        reply = "You can reach our 24/7 support line at +256800123456 or email support@sts.ug."
-    elif 'driver' in message:
-        reply = "Are you a driver? You can register directly on our platform. Once approved, you can start accepting rides through the Driver Dashboard live."
-    elif any(word in message for word in ['ussd', 'offline']):
-        reply = "No smartphone? No problem! Dial *123# to access our USSD booking system and request a ride completely offline."
-    else:
-        # Fallback for unknown messages
-        reply = "I'm still learning! If you have a specific issue, please contact our human support team or visit the 'About Us' and 'Services' pages for more info."
 
-    return jsonify({'reply': reply}), 200
+@chatbot_bp.route('/status', methods=['GET'])
+def chatbot_status():
+    return jsonify(get_chatbot_runtime_status()), 200

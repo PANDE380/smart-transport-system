@@ -1,10 +1,14 @@
 import os
+import json
 import random
 import re
 import string
+import time
 import uuid
 from datetime import datetime, timedelta, timezone
-from flask import Blueprint, request, jsonify, current_app
+from flask import (
+    Blueprint, request, jsonify, current_app, Response, stream_with_context
+)
 from werkzeug.utils import secure_filename
 
 try:
@@ -12,6 +16,7 @@ try:
     from ..models.driver_model import Driver
     from ..models.vehicle_model import Vehicle
     from ..models.wallet_model import Wallet
+    from ..models.wallet_transaction_model import WalletTransaction
     from ..models.trip_model import Trip
     from ..models.two_factor_setting_model import TwoFactorSetting
     from ..models.two_factor_challenge_model import TwoFactorChallenge
@@ -23,6 +28,7 @@ except ImportError:
     from models.driver_model import Driver
     from models.vehicle_model import Vehicle
     from models.wallet_model import Wallet
+    from models.wallet_transaction_model import WalletTransaction
     from models.trip_model import Trip
     from models.two_factor_setting_model import TwoFactorSetting
     from models.two_factor_challenge_model import TwoFactorChallenge
@@ -310,7 +316,7 @@ def login():
 
     user = User.query.filter_by(email=data['email']).first()
 
-    if not user or user.password != data['password']:
+    if not user or not user.check_password(data['password']):
         return jsonify({'error': 'Invalid credentials'}), 401
 
     two_factor_setting = getattr(user, 'two_factor_setting', None)
@@ -482,13 +488,12 @@ def _as_utc(value):
     return value.astimezone(timezone.utc)
 
 
-@user_bp.route('/<int:user_id>/driver-dashboard', methods=['GET'])
-def driver_dashboard(user_id):
-    user = db.get_or_404(User, user_id)
-    driver_profile = user.driver_profile
+def _get_driver_dashboard_payload(user_id):
+    user = db.session.get(User, user_id)
+    driver_profile = user.driver_profile if user else None
 
-    if user.role != 'driver' or not driver_profile:
-        return jsonify({'error': 'Driver profile not found'}), 404
+    if not user or user.role != 'driver' or not driver_profile:
+        return None
 
     vehicles = list(driver_profile.vehicles)
     vehicle_ids = [vehicle.id for vehicle in vehicles]
@@ -503,31 +508,123 @@ def driver_dashboard(user_id):
         )
 
     today = datetime.now(timezone.utc).date()
-    completed_trips = [trip for trip in trips if trip.status == 'completed']
+    paid_completed_trips = [
+        trip for trip in trips
+        if trip.status == 'completed' and trip.payment and
+        trip.payment.status == 'success'
+    ]
     pending_trips = [trip for trip in trips if trip.status == 'pending']
     active_trips = [trip for trip in trips if trip.status == 'active']
-    rated_trips = [trip.rating for trip in completed_trips if trip.rating]
+    rated_trips = [trip.rating for trip in paid_completed_trips if trip.rating]
+    withdrawal_transactions = (
+        WalletTransaction.query
+        .filter_by(user_id=user.id, transaction_type='driver_withdrawal')
+        .order_by(WalletTransaction.created_at.desc())
+        .all()
+    )
 
-    return jsonify({
+    earnings_total = round(sum(trip.fare for trip in paid_completed_trips), 2)
+    withdrawn_total = round(
+        sum(txn.amount for txn in withdrawal_transactions), 2
+    )
+    available_earnings = round(
+        max(earnings_total - withdrawn_total, 0), 2
+    )
+
+    return {
         'driver': user.to_dict(),
         'pending_trips': [trip.to_dict() for trip in pending_trips],
         'active_trips': [trip.to_dict() for trip in active_trips],
-        'recent_trips': [trip.to_dict() for trip in completed_trips[:5]],
+        'recent_trips': [trip.to_dict() for trip in paid_completed_trips[:5]],
         'stats': {
             'rides_today': sum(
-                1 for trip in trips if _as_utc(trip.created_at).date() == today
+                1 for trip in paid_completed_trips
+                if _as_utc(trip.created_at).date() == today
             ),
-            'completed_rides': len(completed_trips),
-            'earnings_total': sum(trip.fare for trip in completed_trips),
+            'completed_rides': len(paid_completed_trips),
+            'earnings_total': earnings_total,
+            'available_earnings': available_earnings,
+            'withdrawn_total': withdrawn_total,
             'avg_rating': (
                 round(sum(rated_trips) / len(rated_trips), 1)
                 if rated_trips else 0
             ),
             'online': any(v.is_active for v in vehicles),
-            'active_vehicle_count': sum(1 for v in vehicles if v.is_active)
+            'active_vehicle_count': sum(1 for v in vehicles if v.is_active),
+            'pending_trip_count': len(pending_trips),
+            'active_trip_count': len(active_trips),
+            'live_record_count': (
+                len(pending_trips) + len(active_trips) +
+                min(len(paid_completed_trips), 5)
+            ),
+            'streamed_at': datetime.now(timezone.utc).isoformat()
         },
-        'vehicles': [v.to_dict() for v in vehicles]
-    }), 200
+        'vehicles': [v.to_dict() for v in vehicles],
+        'withdrawals': [
+            {
+                'id': txn.id,
+                'amount': txn.amount,
+                'payment_method': txn.payment_method,
+                'reference': txn.reference,
+                'created_at': txn.created_at.isoformat()
+            }
+            for txn in withdrawal_transactions[:5]
+        ]
+    }
+
+
+@user_bp.route('/<int:user_id>/driver-dashboard', methods=['GET'])
+def driver_dashboard(user_id):
+    user = db.get_or_404(User, user_id)
+    driver_profile = user.driver_profile
+
+    if user.role != 'driver' or not driver_profile:
+        return jsonify({'error': 'Driver profile not found'}), 404
+
+    payload = _get_driver_dashboard_payload(user.id)
+    return jsonify(payload), 200
+
+
+@user_bp.route('/<int:user_id>/driver-dashboard/stream', methods=['GET'])
+def driver_dashboard_stream(user_id):
+    user = db.get_or_404(User, user_id)
+    driver_profile = user.driver_profile
+
+    if user.role != 'driver' or not driver_profile:
+        return jsonify({'error': 'Driver profile not found'}), 404
+
+    def event_stream():
+        last_payload = None
+        last_heartbeat_at = time.monotonic()
+
+        try:
+            while True:
+                payload = _get_driver_dashboard_payload(user_id)
+                serialized = json.dumps(payload, sort_keys=True)
+
+                if serialized != last_payload:
+                    last_payload = serialized
+                    yield f'event: dashboard\ndata: {serialized}\n\n'
+                    last_heartbeat_at = time.monotonic()
+                elif time.monotonic() - last_heartbeat_at >= 15:
+                    heartbeat = json.dumps({
+                        'streamed_at': datetime.now(timezone.utc).isoformat()
+                    })
+                    yield f'event: heartbeat\ndata: {heartbeat}\n\n'
+                    last_heartbeat_at = time.monotonic()
+
+                time.sleep(2)
+        except GeneratorExit:
+            return
+
+    return Response(
+        stream_with_context(event_stream()),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no'
+        }
+    )
 
 
 @user_bp.route('/<int:user_id>/driver-status', methods=['POST'])
@@ -553,3 +650,74 @@ def update_driver_status(user_id):
         'online': active,
         'vehicles': [vehicle.to_dict() for vehicle in driver_profile.vehicles]
     }), 200
+
+
+@user_bp.route('/<int:user_id>/driver-withdrawals', methods=['POST'])
+def create_driver_withdrawal(user_id):
+    user = db.get_or_404(User, user_id)
+    driver_profile = user.driver_profile
+
+    if user.role != 'driver' or not driver_profile:
+        return jsonify({'error': 'Driver profile not found'}), 404
+
+    data = request.get_json() or {}
+    method = str(data.get('method') or '').strip()
+    account_reference = str(data.get('account_reference') or '').strip()
+    payout_note = str(data.get('note') or '').strip()
+
+    try:
+        amount = round(float(data.get('amount') or 0), 2)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Withdrawal amount must be a valid number'}), 400
+
+    if amount <= 0:
+        return jsonify({'error': 'Withdrawal amount must be greater than zero'}), 400
+
+    if method not in {'MTN Mobile Money', 'Airtel Money', 'Bank Transfer'}:
+        return jsonify({'error': 'Choose a valid withdrawal method'}), 400
+
+    if not account_reference:
+        return jsonify({
+            'error': 'Enter the mobile money number or bank account reference'
+        }), 400
+
+    dashboard = _get_driver_dashboard_payload(user.id) or {}
+    available_earnings = dashboard.get('stats', {}).get(
+        'available_earnings', 0
+    )
+
+    if amount > available_earnings:
+        return jsonify({
+            'error': 'Withdrawal amount exceeds available earnings',
+            'available_earnings': available_earnings
+        }), 400
+
+    stored_method = f'{method} ({account_reference})'[:50]
+    withdrawal = WalletTransaction(
+        user_id=user.id,
+        amount=amount,
+        transaction_type='driver_withdrawal',
+        payment_method=stored_method,
+        reference=f'PAYOUT_{uuid.uuid4().hex[:10].upper()}'
+    )
+    db.session.add(withdrawal)
+    db.session.commit()
+
+    updated_dashboard = _get_driver_dashboard_payload(user.id)
+
+    return jsonify({
+        'message': (
+            f'{amount:,.0f} UGX payout requested via {method}. '
+            'The finance queue has been updated.'
+        ),
+        'withdrawal': {
+            'id': withdrawal.id,
+            'amount': withdrawal.amount,
+            'payment_method': withdrawal.payment_method,
+            'reference': withdrawal.reference,
+            'created_at': withdrawal.created_at.isoformat(),
+            'account_reference': account_reference,
+            'note': payout_note
+        },
+        'dashboard': updated_dashboard
+    }), 201

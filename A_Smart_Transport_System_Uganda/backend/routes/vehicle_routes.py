@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify
 
 try:
@@ -22,6 +23,7 @@ def get_live_locations():
     active_trips = Trip.query.filter_by(status='active').all()
 
     return jsonify({
+        'generated_at': datetime.now(timezone.utc).isoformat(),
         'vehicles': [v.to_dict() for v in vehicles],
         'trips': [t.to_dict() for t in active_trips]
     }), 200

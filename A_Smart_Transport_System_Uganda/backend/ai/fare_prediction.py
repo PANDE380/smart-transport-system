@@ -1,5 +1,9 @@
-import joblib
-import pandas as pd
+try:
+    import joblib
+    import pandas as pd
+    AI_DEPS_AVAILABLE = True
+except ImportError:
+    AI_DEPS_AVAILABLE = False
 import os
 from datetime import datetime
 import random
@@ -9,11 +13,12 @@ BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.join(BASE_DIR, 'fare_model.pkl')
 
 model = None
-try:
-    if os.path.exists(MODEL_PATH):
-        model = joblib.load(MODEL_PATH)
-except Exception as e:
-    print(f"Error loading AI model: {e}")
+if AI_DEPS_AVAILABLE:
+    try:
+        if os.path.exists(MODEL_PATH):
+            model = joblib.load(MODEL_PATH)
+    except Exception as e:
+        print(f"Error loading AI model: {e}")
 
 def predict_fare(
     distance_km: float,

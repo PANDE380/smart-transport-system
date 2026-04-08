@@ -410,12 +410,51 @@
 <div class="mo" id="rating-m">
   <div class="mb">
     <button class="close-mo" onclick="closeM('rating-m')"><i class="fas fa-times"></i></button>
-    <h3>⭐ Rate Your Driver</h3>
-    <p class="sub">How was your trip?</p>
-    <div style="text-align:center;margin:20px 0;font-size:2rem;">⭐⭐⭐⭐⭐</div>
-    <div class="mact">
+    <h3><i class="fas fa-star" style="color:var(--yellow);"></i> Rate Your Driver</h3>
+    <p class="sub">Your feedback helps keep our drivers accountable and improves service quality.</p>
+    <div id="star-rating-container" style="text-align:center;margin:20px 0;font-size:2.2rem;display:flex;gap:8px;justify-content:center;">
+      <span class="star-btn" data-val="1" onclick="selectStar(1)" style="cursor:pointer;color:#d1d5db;transition:color 0.15s;">&#9733;</span>
+      <span class="star-btn" data-val="2" onclick="selectStar(2)" style="cursor:pointer;color:#d1d5db;transition:color 0.15s;">&#9733;</span>
+      <span class="star-btn" data-val="3" onclick="selectStar(3)" style="cursor:pointer;color:#d1d5db;transition:color 0.15s;">&#9733;</span>
+      <span class="star-btn" data-val="4" onclick="selectStar(4)" style="cursor:pointer;color:#d1d5db;transition:color 0.15s;">&#9733;</span>
+      <span class="star-btn" data-val="5" onclick="selectStar(5)" style="cursor:pointer;color:#d1d5db;transition:color 0.15s;">&#9733;</span>
+    </div>
+    <div id="star-label" style="text-align:center;font-size:.82rem;color:var(--text3);margin-bottom:16px;min-height:1.2em;">Tap a star to rate</div>
+    <div class="fg">
+      <label class="fl">Comments (optional)</label>
+      <textarea class="fi" id="rating-feedback" rows="3" placeholder="Tell us about your experience..." style="resize:none;"></textarea>
+    </div>
+    <div class="mact" style="margin-top:12px;">
       <button class="btn-out" style="flex:1;" onclick="closeM('rating-m')">Skip</button>
-      <button class="btn-full btn-full-o" style="flex:2;" onclick="submitRating()">Submit</button>
+      <button class="btn-full btn-full-o" style="flex:2;" onclick="submitRating()"><i class="fas fa-paper-plane"></i> Submit Rating</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT MODAL (REQ-27) -->
+<div class="mo" id="support-m">
+  <div class="mb">
+    <button class="close-mo" onclick="closeM('support-m')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-headset" style="color:var(--yellow);"></i> In-App Support</h3>
+    <p class="sub">Report an issue, lost item, or complaint. Our team responds within 24 hours.</p>
+    <div class="fg">
+      <label class="fl">Issue Category</label>
+      <select class="fi" id="support-category" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;width:100%;font-family:inherit;">
+        <option value="complaint">Driver Complaint</option>
+        <option value="lost_item">Lost & Found</option>
+        <option value="payment">Payment Issue</option>
+        <option value="safety">Safety Concern</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">Description</label>
+      <textarea class="fi" id="support-description" rows="4" placeholder="Describe your issue in detail..." style="resize:none;"></textarea>
+    </div>
+    <div id="support-err" class="form-err" style="display:none;padding:8px 12px;background:var(--red-l);border-radius:var(--rs);margin-bottom:12px;"></div>
+    <div class="mact" style="margin-top:12px;">
+      <button class="btn-out" style="flex:1;" onclick="closeM('support-m')">Cancel</button>
+      <button class="btn-full btn-full-o" style="flex:2;" onclick="submitSupport()"><i class="fas fa-paper-plane"></i> Send Report</button>
     </div>
   </div>
 </div>

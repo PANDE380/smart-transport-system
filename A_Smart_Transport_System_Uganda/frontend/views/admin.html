@@ -104,8 +104,13 @@
     </div>
   </div>
 
-  <div class="sh reveal" style="margin-bottom:16px;"><h3><i class="fas fa-brain"></i> Platform Intelligence and Forecasts</h3></div>
-  <div class="aigrid reveal reveal-stagger" style="margin-bottom:50px;">
+  <div class="sh reveal" style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+    <h3><i class="fas fa-brain"></i> Platform Intelligence and Forecasts</h3>
+    <button style="background:var(--yellow);color:#000;border:none;padding:9px 18px;border-radius:8px;font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit;" onclick="loadAdminReports()">
+      <i class="fas fa-chart-pie"></i> Generate Report
+    </button>
+  </div>
+  <div class="aigrid reveal reveal-stagger" style="margin-bottom:30px;">
     <div class="aic" style="border-top: 4px solid var(--yellow);">
       <div class="aico"><i class="fas fa-chart-line" style="color:var(--yellow);"></i></div>
       <div class="ait">Demand Optimization</div>
@@ -122,4 +127,32 @@
       <div class="aib" id="admin-revenue-note" style="line-height:1.5;">Revenue cards now derive from completed trip totals instead of static demo values.</div>
     </div>
   </div>
+
+  <!-- REPORTS PANEL (REQ-20) -->
+  <div id="admin-reports-panel" style="display:none; margin-bottom:50px;">
+    <div class="sh reveal" style="margin-bottom:16px;"><h3><i class="fas fa-chart-bar"></i> Operational Report</h3></div>
+    <div class="reveal" style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:28px;box-shadow:var(--shadow-md);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;margin-bottom:24px;">
+        <div style="text-align:center;padding:20px;background:rgba(255,194,0,0.06);border-radius:12px;border:1.5px solid rgba(255,194,0,0.2);">
+          <div style="font-size:1.6rem;font-weight:900;color:var(--yellow);" id="rpt-revenue">—</div>
+          <div style="font-size:.78rem;color:var(--text3);margin-top:4px;">Total Revenue</div>
+        </div>
+        <div style="text-align:center;padding:20px;background:rgba(0,0,0,0.03);border-radius:12px;border:1.5px solid var(--border);">
+          <div style="font-size:1.6rem;font-weight:900;" id="rpt-completed">—</div>
+          <div style="font-size:.78rem;color:var(--text3);margin-top:4px;">Completed Trips</div>
+        </div>
+        <div style="text-align:center;padding:20px;background:rgba(0,0,0,0.03);border-radius:12px;border:1.5px solid var(--border);">
+          <div style="font-size:1.6rem;font-weight:900;" id="rpt-rate">—</div>
+          <div style="font-size:.78rem;color:var(--text3);margin-top:4px;">Completion Rate</div>
+        </div>
+        <div style="text-align:center;padding:20px;background:rgba(0,0,0,0.03);border-radius:12px;border:1.5px solid var(--border);">
+          <div style="font-size:1.6rem;font-weight:900;" id="rpt-avg-fare">—</div>
+          <div style="font-size:.78rem;color:var(--text3);margin-top:4px;">Avg. Fare</div>
+        </div>
+      </div>
+      <div id="rpt-vehicle-breakdown" style="font-size:.84rem;color:var(--text2);line-height:1.8;"></div>
+      <div style="font-size:.72rem;color:var(--text3);margin-top:16px;border-top:1px solid var(--border);padding-top:12px;" id="rpt-generated-at"></div>
+    </div>
+  </div>
+
 </div>

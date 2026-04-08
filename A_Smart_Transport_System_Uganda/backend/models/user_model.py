@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
 try:
-    from ..database import db
+    from ..database import db, bcrypt
 except ImportError:
-    from database import db
+    from database import db, bcrypt
 
 
 class User(db.Model):
@@ -16,6 +16,14 @@ class User(db.Model):
     # passenger, driver, admin, traffic_officer
     role = db.Column(db.String(20), nullable=False, default='passenger')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    def __init__(self, **kwargs):
+        if 'password' in kwargs:
+            kwargs['password'] = bcrypt.generate_password_hash(kwargs['password']).decode('utf-8')
+        super(User, self).__init__(**kwargs)
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
 
     driver_profile = db.relationship(
         'Driver', back_populates='user', uselist=False,

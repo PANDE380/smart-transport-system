@@ -16,6 +16,9 @@ A web and mobile system that:
 - Detects taxi overloading
 - Helps traffic police monitor taxis using digital number plates
 
+## Project Documentation
+For professional software standards and functional details, see the [Software Requirements Specification (SRS)](SRS.md).
+
 ## System Architecture
 User → Web App → Backend Server → Database
 ↓

@@ -68,10 +68,18 @@
           </div>
           
             <div class="frow"><span>Route Distance</span><b id="frd">—</b></div>
-            <div class="frow"><span>Base Rate</span><b>150 UGX/km</b></div>
+            <div class="frow"><span>Pricing Engine</span><b style="color:var(--cyan); font-weight:800; font-size:.75rem;"><i class="fas fa-brain"></i> AI-OPTIMIZED</b></div>
             <div class="frow"><span>Transport Mode</span><b id="frm">—</b></div>
             <div class="frow"><span>Estimated Travel Time</span><b id="frtime">—</b></div>
-            <div class="frow"><span class="frow-t">Total Fare</span><b class="frow-t" id="frt">—</b></div>
+            <div class="frow">
+              <span class="frow-t">Total Fare</span>
+              <div style="text-align:right;">
+                <b class="frow-t" id="frt">—</b>
+                <div id="ai-label" style="display:none; font-size:.65rem; color:var(--teal); font-weight:700; text-transform:uppercase; margin-top:-2px;">
+                  <i class="fas fa-shield-halved"></i> AI Predicted
+                </div>
+              </div>
+            </div>
           </div>
           <div class="drv-box" id="drvbox">
             <div class="drv-av"><i class="fas fa-user-tie"></i></div>
@@ -87,10 +95,16 @@
             <button class="btn-full" style="background:#000; color:var(--yellow); border:1.5px solid var(--yellow);" onclick="registerBooking()">Confirm & Register Booking</button>
           </div>
 
+          <div class="fg" style="margin-top:2px;">
+            <label class="fl"><i class="fas fa-calendar-clock"></i> Schedule for Later (REQ-28 — Optional)</label>
+            <input class="fi" type="datetime-local" id="schedule-datetime" style="color:var(--text);background:var(--bg2);"/>
+            <div style="font-size:.72rem;color:var(--text3);margin-top:4px;"><i class="fas fa-info-circle"></i> Leave blank to book immediately. Future date schedules the ride.</div>
+          </div>
           <div class="safety-row">
             <button class="btn-sos" onclick="openM('sos-m')"><i class="fas fa-circle-exclamation"></i> SOS</button>
             <button class="btn-sh" onclick="shareTrip()"><i class="fas fa-share-nodes"></i> Share Trip</button>
             <button class="btn-sh" style="background:var(--navy-l); color:#fff;" onclick="openM('rating-m')"><i class="fas fa-star"></i> Rate</button>
+            <button class="btn-sh" style="background:rgba(255,194,0,0.15); color:var(--yellow);" onclick="openM('support-m')"><i class="fas fa-headset"></i> Support</button>
           </div>
         </div>
       </div>

@@ -1,17 +1,72 @@
-from flask import Blueprint, jsonify
+
+# --- Imports and Blueprint creation must come first ---
+from datetime import datetime
+from flask import Blueprint, jsonify, request, current_app
+import re
 
 try:
     from ..models.user_model import User
     from ..models.driver_model import Driver
     from ..models.trip_model import Trip
     from ..models.vehicle_model import Vehicle
+    from ..database import db
 except ImportError:
     from models.user_model import User
     from models.driver_model import Driver
     from models.trip_model import Trip
     from models.vehicle_model import Vehicle
+    from database import db
 
 admin_bp = Blueprint('admin_bp', __name__)
+
+# Password requirements (reuse from user_routes if needed)
+PASSWORD_SPECIAL_CHAR_RE = re.compile(r'[^A-Za-z0-9]')
+PASSWORD_REQUIREMENTS = (
+    "Password must be at least 8 characters, "
+    "contain a number, a lowercase, an uppercase letter, and a special character."
+)
+
+def evaluate_password_strength(password):
+    value = str(password or '')
+    return (
+        len(value) >= 8 and
+        any(c.islower() for c in value) and
+        any(c.isupper() for c in value) and
+        any(c.isdigit() for c in value) and
+        PASSWORD_SPECIAL_CHAR_RE.search(value)
+    )
+
+@admin_bp.route('/register', methods=['POST'])
+def admin_register():
+    data = request.get_json()
+    if not all(k in data for k in ('name', 'email', 'password')):
+        return jsonify({'error': 'Missing required fields'}), 400
+    if not evaluate_password_strength(data['password']):
+        return jsonify({'error': PASSWORD_REQUIREMENTS}), 400
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'error': 'Email already registered'}), 400
+    admin = User(
+        name=data['name'],
+        email=data['email'],
+        phone=data.get('phone', '0700000000'),
+        password=data['password'],
+        role='admin'
+    )
+    db.session.add(admin)
+    db.session.commit()
+    current_app.logger.info(f"New admin registered: {admin.email}")
+    return jsonify({'message': 'Admin registered successfully'}), 201
+
+@admin_bp.route('/login', methods=['POST'])
+def admin_login():
+    data = request.get_json()
+    if not all(k in data for k in ('email', 'password')):
+        return jsonify({'error': 'Missing email or password'}), 400
+    admin = User.query.filter_by(email=data['email'], role='admin').first()
+    if not admin or not admin.check_password(data['password']):
+        return jsonify({'error': 'Invalid credentials'}), 401
+    # In production, return a JWT or session token
+    return jsonify({'message': 'Login successful', 'admin': admin.to_dict()}), 200
 
 
 @admin_bp.route('/dashboard', methods=['GET'])
@@ -28,6 +83,10 @@ def admin_dashboard():
     total_revenue = sum(trip.fare for trip in Trip.query.filter_by(
         status='completed').all())
 
+    # Fetch 10 most recent trips (requests + active)
+    live_trips = Trip.query.order_by(Trip.created_at.desc()).limit(10).all()
+
+    current_app.logger.info("Admin dashboard stats retrieved")
     return jsonify({
         'stats': {
             'total_users': total_users,
@@ -41,10 +100,83 @@ def admin_dashboard():
         },
         'sos_alerts': [t.to_dict() for t in sos_alerts],
         'active_vehicles': [v.to_dict() for v in active_vehicles],
+        'live_trips': [t.to_dict() for t in live_trips],
         'pending_drivers': [{
             'id': driver.id,
             'name': driver.user.name if driver.user else 'Unknown Driver',
             'license_number': driver.license_number,
             'vehicles': [vehicle.to_dict() for vehicle in driver.vehicles]
         } for driver in pending_drivers]
+    }), 200
+
+
+@admin_bp.route('/reports', methods=['GET'])
+def generate_reports():
+    """Satisfies REQ-20: Generate financial and operational reports."""
+    all_trips = Trip.query.all()
+    completed = [t for t in all_trips if t.status == 'completed']
+
+    # Financial Summary
+    total_revenue = sum(t.fare for t in completed)
+    avg_fare = total_revenue / len(completed) if completed else 0
+
+    # Operational Metrics
+    by_vehicle_type = {}
+    for t in completed:
+        v_type = t.vehicle.vehicle_type if t.vehicle else 'Unknown'
+        by_vehicle_type[v_type] = by_vehicle_type.get(v_type, 0) + 1
+
+    return jsonify({
+        'report_type': 'Global Operational Summary',
+        'generated_at': datetime.now().isoformat(),
+        'financials': {
+            'total_revenue_ugx': total_revenue,
+            'average_trip_fare': round(avg_fare, 2),
+            'currency': 'UGX'
+        },
+        'operations': {
+            'total_trips_attempted': len(all_trips),
+            'total_trips_completed': len(completed),
+            'completion_rate': f"{len(completed)/len(all_trips)*100 if all_trips else 0:.1f}%",
+            'popular_vehicle_types': by_vehicle_type
+        }
+    }), 200
+
+
+@admin_bp.route('/drivers/<int:driver_id>/approve', methods=['POST'])
+def approve_driver(driver_id):
+    """REQ-26: Admin approves a driver after KYC verification."""
+    driver = db.session.get(Driver, driver_id)
+    if not driver:
+        return jsonify({'error': 'Driver not found'}), 404
+
+    driver.is_approved = True
+    db.session.commit()
+    current_app.logger.info(f"Driver approved: {driver.user.name if driver.user else driver_id} by admin")
+
+    return jsonify({
+        'message': f'Driver {driver.user.name if driver.user else driver_id} has been approved.',
+        'driver': driver.to_dict()
+    }), 200
+
+
+@admin_bp.route('/drivers/<int:driver_id>/reject', methods=['POST'])
+def reject_driver(driver_id):
+    """REQ-26: Admin rejects a driver application."""
+    driver = db.session.get(Driver, driver_id)
+    if not driver:
+        return jsonify({'error': 'Driver not found'}), 404
+
+    # Remove the driver, vehicle, and user records
+    for vehicle in driver.vehicles:
+        db.session.delete(vehicle)
+    user = driver.user
+    db.session.delete(driver)
+    if user:
+        db.session.delete(user)
+    db.session.commit()
+    current_app.logger.info(f"Driver application rejected and removed: {driver_id}")
+
+    return jsonify({
+        'message': 'Driver application has been rejected and removed.'
     }), 200

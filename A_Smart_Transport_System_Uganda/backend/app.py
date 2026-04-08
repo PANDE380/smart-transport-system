@@ -1,10 +1,13 @@
 import os
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, make_response, jsonify
 from flask_cors import CORS
-from werkzeug.exceptions import NotFound
+from flask_bcrypt import Bcrypt
+from werkzeug.exceptions import NotFound, HTTPException, InternalServerError
+from sqlalchemy import inspect, text
+from dotenv import load_dotenv
 
 try:
-    from .database import db
+    from .database import db, bcrypt
     from .routes.user_routes import user_bp
     from .routes.vehicle_routes import vehicle_bp
     from .routes.trip_routes import trip_bp
@@ -12,8 +15,9 @@ try:
     from .routes.admin_routes import admin_bp
     from .routes.ussd_routes import ussd_bp
     from .routes.chatbot_routes import chatbot_bp
+    from .routes.services_routes import services_bp
 except ImportError:
-    from database import db
+    from database import db, bcrypt
     from routes.user_routes import user_bp
     from routes.vehicle_routes import vehicle_bp
     from routes.trip_routes import trip_bp
@@ -21,6 +25,12 @@ except ImportError:
     from routes.admin_routes import admin_bp
     from routes.ussd_routes import ussd_bp
     from routes.chatbot_routes import chatbot_bp
+    from routes.services_routes import services_bp
+
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(os.path.join(os.path.dirname(BASE_DIR), '.env'))
 
 
 def create_app():
@@ -33,6 +43,13 @@ def create_app():
     app = Flask(__name__, static_folder=frontend_dir)
     CORS(app)
 
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        return response
+
     # Configuration
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///smart_taxi.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -42,6 +59,19 @@ def create_app():
     os.makedirs(profile_upload_dir, exist_ok=True)
 
     db.init_app(app)
+    bcrypt.init_app(app)
+
+    def run_startup_migrations():
+        inspector = inspect(db.engine)
+        if 'trips' not in inspector.get_table_names():
+            return
+
+        trip_columns = {column['name'] for column in inspector.get_columns('trips')}
+        if 'scheduled_at' not in trip_columns:
+            with db.engine.begin() as connection:
+                connection.execute(
+                    text('ALTER TABLE trips ADD COLUMN scheduled_at DATETIME')
+                )
 
     # Register Blueprints
     app.register_blueprint(user_bp, url_prefix='/api/users')
@@ -51,6 +81,7 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(ussd_bp, url_prefix='/api/ussd')
     app.register_blueprint(chatbot_bp, url_prefix='/api/chat')
+    app.register_blueprint(services_bp, url_prefix='/api/services')
 
     # Automatically import all models and seed database
     with app.app_context():
@@ -62,6 +93,7 @@ def create_app():
             from utils.seeder import seed_db
 
         db.create_all()
+        run_startup_migrations()
         seed_db()
         active_profile_paths = {
             profile_image.storage_path
@@ -83,6 +115,24 @@ def create_app():
     def health_check():
         return {'status': 'healthy', 'message': 'ASTS Uganda API is running'}
 
+    @app.errorhandler(Exception)
+    def handle_global_exception(e):
+        if isinstance(e, HTTPException):
+            return jsonify({
+                'status': 'error',
+                'error': e.name,
+                'message': e.description,
+                'code': e.code
+            }), e.code
+        
+        app.logger.error(f'Unhandled Exception: {str(e)}', exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'error': 'Internal Server Error',
+            'message': 'An unexpected error occurred on the server.',
+            'code': 500
+        }), 500
+
     @app.route('/', defaults={'path': 'views/index.html'})
     @app.route('/<path:path>')
     def serve_frontend(path):
@@ -96,4 +146,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(port=5001)
+    app.run(host='0.0.0.0', port=5001)
