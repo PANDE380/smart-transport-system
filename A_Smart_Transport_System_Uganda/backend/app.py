@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 from flask import Flask, send_from_directory, make_response, jsonify
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -34,12 +35,12 @@ load_dotenv(os.path.join(os.path.dirname(BASE_DIR), '.env'))
 
 
 def create_app():
-    # Serve frontend files from the sibling 'frontend' directory
     frontend_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..', 'frontend')
     )
     views_dir = os.path.join(frontend_dir, 'views')
     profile_upload_dir = os.path.join(frontend_dir, 'uploads', 'profile-photos')
+
     app = Flask(__name__, static_folder=frontend_dir)
     CORS(app)
 
@@ -50,8 +51,17 @@ def create_app():
         response.headers['X-XSS-Protection'] = '1; mode=block'
         return response
 
-    # Configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///smart_taxi.db'
+    # Database config
+    instance_dir = os.path.abspath(
+        os.path.join(os.path.dirname(BASE_DIR), 'instance')
+    )
+    os.makedirs(instance_dir, exist_ok=True)
+
+    default_db_path = os.path.join(instance_dir, 'smart_taxi.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+        'DATABASE_URL',
+        f'sqlite:///{default_db_path}'
+    )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
     app.config['PROFILE_PHOTO_UPLOAD_DIR'] = profile_upload_dir
@@ -61,16 +71,48 @@ def create_app():
     db.init_app(app)
     bcrypt.init_app(app)
 
+    #   MIGRATIONS FUNCTION
     def run_startup_migrations():
         inspector = inspect(db.engine)
+
         if 'trips' not in inspector.get_table_names():
             return
 
         trip_columns = {column['name'] for column in inspector.get_columns('trips')}
-        if 'scheduled_at' not in trip_columns:
-            with db.engine.begin() as connection:
+
+        with db.engine.begin() as connection:
+            if 'scheduled_at' not in trip_columns:
                 connection.execute(
                     text('ALTER TABLE trips ADD COLUMN scheduled_at DATETIME')
+                )
+
+            if 'sos_evidence_url' not in trip_columns:
+                connection.execute(
+                    text('ALTER TABLE trips ADD COLUMN sos_evidence_url TEXT')
+                )
+
+            if 'sos_description' not in trip_columns:
+                connection.execute(
+                    text('ALTER TABLE trips ADD COLUMN sos_description TEXT')
+                )
+
+        if 'users' in inspector.get_table_names():
+            user_columns = {column['name'] for column in inspector.get_columns('users')}
+            with db.engine.begin() as connection:
+                if 'preferred_language' not in user_columns:
+                    connection.execute(
+                        text("ALTER TABLE users ADD COLUMN preferred_language VARCHAR(10) DEFAULT 'en' NOT NULL")
+                    )
+
+                if 'created_at' not in user_columns:
+                    connection.execute(
+                        text("ALTER TABLE users ADD COLUMN created_at DATETIME")
+                    )
+
+                # Always attempt to backfill NULL created_at values to fix legacy data
+                now = datetime.now(timezone.utc).isoformat()
+                connection.execute(
+                    text(f"UPDATE users SET created_at = '{now}' WHERE created_at IS NULL")
                 )
 
     # Register Blueprints
@@ -83,7 +125,7 @@ def create_app():
     app.register_blueprint(chatbot_bp, url_prefix='/api/chat')
     app.register_blueprint(services_bp, url_prefix='/api/services')
 
-    # Automatically import all models and seed database
+    # Initialize DB
     with app.app_context():
         try:
             from . import models
@@ -95,15 +137,18 @@ def create_app():
         db.create_all()
         run_startup_migrations()
         seed_db()
+
         active_profile_paths = {
             profile_image.storage_path
             for profile_image in models.ProfileImage.query.all()
         }
+
         for entry in os.listdir(profile_upload_dir):
             storage_path = os.path.join(
                 'uploads', 'profile-photos', entry
             )
             file_path = os.path.join(profile_upload_dir, entry)
+
             if (os.path.isfile(file_path) and
                     storage_path not in active_profile_paths):
                 try:
@@ -113,7 +158,7 @@ def create_app():
 
     @app.route('/api/health')
     def health_check():
-        return {'status': 'healthy', 'message': 'ASTS Uganda API is running'}
+        return {'status': 'healthy', 'message': 'STS Uganda API is running'}
 
     @app.errorhandler(Exception)
     def handle_global_exception(e):
@@ -124,7 +169,7 @@ def create_app():
                 'message': e.description,
                 'code': e.code
             }), e.code
-        
+
         app.logger.error(f'Unhandled Exception: {str(e)}', exc_info=True)
         return jsonify({
             'status': 'error',
@@ -146,4 +191,12 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='0.0.0.0', port=5001)
+    host = os.getenv('HOST', '0.0.0.0')
+    port = int(os.getenv('PORT', 5001))
+    
+    print(f"\n STS Uganda Backend is starting...")
+    print(f" API Endpoint: http://{host}:{port}/api")
+    print(f" Health Check: http://{host}:{port}/api/health")
+    print(f" To connect from Android Emulator, use: http://10.0.2.2:{port}/api\n")
+    
+    app.run(host=host, port=port)

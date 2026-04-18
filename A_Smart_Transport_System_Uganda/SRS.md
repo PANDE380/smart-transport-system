@@ -87,8 +87,39 @@ New standalone system consisting of:
 - **REQ-29**: **Push Notifications**: System shall use Firebase Cloud Messaging (FCM) for real-time status updates.
 - **REQ-30**: **Data Privacy & Security (NITAU Compliance)**: System shall implement data encryption and retention policies as per the Uganda Data Protection and Privacy Act 2019.
 
-## 5. Other Requirements
-- **Performance**: Response time < 3 seconds.
-- **Safety**: Emergency/SOS feature, driver verification.
-- **Security**: Data encryption, secure login.
-- **Quality**: Scalability, Reliability (24/7), Maintainability.
+## 5. Software Quality Attributes (ISO/IEC 25010)
+
+### 5.1 Functionality
+The system fulfills all defined transport requirements, including booking, payment, and driver management.
+
+### 5.2 Reliability
+- **Error Handling**: Global exception handling with structured JSON responses.
+- **Logging**: Comprehensive server-side logging for auditing and debugging.
+- **Persistence**: ACID-compliant transactions using SQLAlchemy.
+
+### 5.3 Usability
+- **Intuitive UI**: Simple buttons, clear screens, and premium aesthetics.
+- **Feedback**: Loading states and toast notifications for all major actions.
+- **Accessibility**: Support for screen readers and high-contrast focus states.
+
+### 5.4 Efficiency
+- **Performance**: Database indexing on high-traffic columns (`trips.status`, `passenger_id`).
+- **AI Fare Prediction**: Module-level model loading for sub-second prediction times.
+
+### 5.5 Maintainability
+- **Clean Code**: Modular Blueprint-based architecture.
+- **Documentation**: Standardized code comments and updated SRS.
+
+### 5.6 Portability
+- **Responsive Design**: Mobile-first CSS with robust media queries.
+- **Standards**: Cross-browser compatibility via modern CSS/JS.
+
+### 5.7 Security
+- **Data Protection**: Bcrypt password hashing.
+- **Transport Security**: X-Content-Type-Options, X-Frame-Options, and XSS protection.
+- **Compliance**: Alignment with Uganda Data Protection Act 2019.
+
+## 6. Performance and Safety
+- **Performance**: Response time < 2 seconds for non-AI tasks.
+- **Safety**: Emergency SOS feature and verified driver profiles.
+- **Availability**: High availability targets (99.9% uptime).

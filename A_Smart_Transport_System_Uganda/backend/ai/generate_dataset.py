@@ -27,26 +27,23 @@ def generate_uganda_transport_dataset(num_records=5000):
         hour = random.randint(0, 23)
         day_of_week = random.randint(0, 6) # 0=Mon, 6=Sun
         
-        # Traffic levels: 1 (Low), 2 (Medium), 3 (High)
-        # Rush hours in Kampala: 7-9 AM, 5-8 PM
+        # Real-time fuel price simulated between 4000 and 6500 UGX
+        fuel_price = round(random.uniform(4000.0, 6500.0), 2)
+        
+        # Base rate per km adjusts actively with fuel price hikes
+        active_rate_per_km = rate_per_km + ((fuel_price - 4000) * 0.08)
+        
         if (7 <= hour <= 9) or (17 <= hour <= 20):
             traffic_level = random.choices([2, 3], weights=[30, 70])[0]
         else:
             traffic_level = random.choices([1, 2], weights=[80, 20])[0]
             
-        # Weather: 0 (Clear), 1 (Rainy)
         weather = random.choices([0, 1], weights=[85, 15])[0]
         
         v_type = random.choice(vehicle_types)
         multiplier = vehicle_multipliers[v_type]
         
-        # Calculate fare with AI factors
-        # Base + (Distance * Rate * Multiplier)
-        # + Traffic Surcharge (1.1x to 1.5x)
-        # + Weather Surcharge (1.2x if raining)
-        # + Night Surcharge (1.1x if 10 PM - 5 AM)
-        
-        fare = base_fare + (distance * rate_per_km * multiplier)
+        fare = base_fare + (distance * active_rate_per_km * multiplier)
         
         if traffic_level == 2: fare *= 1.2
         if traffic_level == 3: fare *= 1.5
@@ -55,14 +52,12 @@ def generate_uganda_transport_dataset(num_records=5000):
         
         if hour >= 22 or hour <= 5: fare *= 1.15
         
-        # Add some random noise (-3% to +3%)
         fare *= random.uniform(0.97, 1.03)
-        
-        # Round to nearest 500 UGX
         fare = round(fare / 500) * 500
         
         data.append({
             'distance_km': distance,
+            'fuel_price': fuel_price,
             'hour': hour,
             'day_of_week': day_of_week,
             'traffic_level': traffic_level,

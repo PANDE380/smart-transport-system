@@ -1,10 +1,13 @@
 from datetime import datetime
 import uuid
+import os
+from werkzeug.utils import secure_filename
 from flask import Blueprint, request, jsonify, current_app
 
 try:
     from ..models.payment_model import Payment
     from ..models.trip_model import Trip
+    from ..models.trip_log_model import TripLog
     from ..models.vehicle_model import Vehicle
     from ..models.wallet_model import Wallet
     from ..models.wallet_transaction_model import WalletTransaction
@@ -13,6 +16,7 @@ try:
 except ImportError:
     from models.payment_model import Payment
     from models.trip_model import Trip
+    from models.trip_log_model import TripLog
     from models.vehicle_model import Vehicle
     from models.wallet_model import Wallet
     from models.wallet_transaction_model import WalletTransaction
@@ -103,6 +107,12 @@ def book_trip():
     )
 
     db.session.add(new_trip)
+    db.session.flush() # Get ID for log
+
+    # PLATFORM REFLEX: Log booking interaction
+    log_msg = f"Passenger {new_trip.passenger.name} requested a {new_trip.vehicle.vehicle_type} ride to {new_trip.end_location}."
+    db.session.add(TripLog(trip_id=new_trip.id, event_type='REQUEST', message=log_msg))
+    
     db.session.commit()
     current_app.logger.info(f"New trip booked: ID {new_trip.id} by Passenger {new_trip.passenger_id}")
 
@@ -118,16 +128,43 @@ def book_trip():
 
 @trip_bp.route('/<int:trip_id>/approve', methods=['POST'])
 def approve_trip(trip_id):
+    data = request.get_json() or {}
+    driver_user_id = data.get('driver_user_id')
+    
     trip = db.get_or_404(Trip, trip_id)
-    if trip.status != 'pending':
-        return jsonify({'error': 'Trip is not pending approval'}), 400
+    if trip.status not in {'pending', 'scheduled'}:
+        return jsonify({'error': 'Trip is not awaiting approval'}), 400
 
-    vehicle = trip.vehicle
-    if vehicle.current_passengers >= vehicle.capacity:
+    # Claiming logic: If a different driver approves, reassign the vehicle
+    target_vehicle = trip.vehicle
+    if driver_user_id:
+        # We use the relationship to get the User model via Trip -> Passenger -> __class__ ? 
+        # Better: just import User at the top or locally.
+        try:
+            from ..models.user_model import User
+        except ImportError:
+            from models.user_model import User
+            
+        driver_user = db.session.get(User, driver_user_id)
+        if driver_user and driver_user.driver_profile:
+            # Match by vehicle type
+            desired_type = trip.vehicle.vehicle_type
+            new_vehicle = next((v for v in driver_user.driver_profile.vehicles 
+                              if v.vehicle_type == desired_type and v.is_active), None)
+            if new_vehicle:
+                target_vehicle = new_vehicle
+                trip.vehicle_id = new_vehicle.id
+
+    if target_vehicle.current_passengers >= target_vehicle.capacity:
         return jsonify({'error': 'Vehicle is full'}), 400
 
     trip.status = 'active'
-    vehicle.current_passengers += 1
+    target_vehicle.current_passengers += 1
+    
+    # PLATFORM REFLEX: Log approval interaction
+    log_msg = f"Driver {target_vehicle.driver.user.name} accepted the trip request to {trip.end_location} (Vehicle: {target_vehicle.number_plate})."
+    db.session.add(TripLog(trip_id=trip.id, event_type='APPROVAL', message=log_msg))
+
     db.session.commit()
     current_app.logger.info(f"Trip {trip.id} approved by Driver")
 
@@ -140,6 +177,8 @@ def approve_trip(trip_id):
 @trip_bp.route('/<int:trip_id>/complete', methods=['POST'])
 def complete_trip(trip_id):
     trip = db.get_or_404(Trip, trip_id)
+    passenger_name = trip.passenger.name if trip.passenger else "Passenger"
+    driver_name = trip.vehicle.driver.user.name if (trip.vehicle and trip.vehicle.driver and trip.vehicle.driver.user) else "Driver"
     if trip.status != 'active':
         return jsonify({'error': 'Trip is not currently active'}), 400
 
@@ -182,6 +221,10 @@ def complete_trip(trip_id):
 
     trip.status = 'completed'
 
+    # PLATFORM REFLEX: Log completion interaction
+    log_msg = f"Trip completed successfully. {driver_name} dropped off {passenger_name} at {trip.end_location}."
+    db.session.add(TripLog(trip_id=trip.id, event_type='COMPLETION', message=log_msg))
+
     db.session.commit()
     current_app.logger.info(f"Trip {trip.id} completed. Payment success.")
 
@@ -197,10 +240,16 @@ def complete_trip(trip_id):
 @trip_bp.route('/<int:trip_id>/reject', methods=['POST'])
 def reject_trip(trip_id):
     trip = db.get_or_404(Trip, trip_id)
-    if trip.status != 'pending':
+    if trip.status not in {'pending', 'scheduled'}:
         return jsonify({'error': 'Trip is not pending approval'}), 400
 
     trip.status = 'cancelled'
+    
+    # PLATFORM REFLEX: Log rejection interaction
+    actor = "Driver" # Usually driver rejects pending
+    log_msg = f"{actor} declined the trip request to {trip.end_location}."
+    db.session.add(TripLog(trip_id=trip.id, event_type='REJECTION', message=log_msg))
+
     db.session.commit()
 
     return jsonify({
@@ -213,11 +262,33 @@ def reject_trip(trip_id):
 def trigger_sos(trip_id):
     trip = db.get_or_404(Trip, trip_id)
     trip.is_sos = True
+    
+    # Process forensic evidence if provided
+    evidence_desc = request.form.get('description', '').strip()
+    if evidence_desc:
+        trip.sos_description = evidence_desc
+        
+    if 'evidence_photo' in request.files:
+        photo = request.files['evidence_photo']
+        if photo and photo.filename:
+            filename = secure_filename(f"sos_{trip_id}_{uuid.uuid4().hex[:8]}_{photo.filename}")
+            upload_folder = os.path.join(current_app.static_folder, 'evidence')
+            os.makedirs(upload_folder, exist_ok=True)
+            photo_path = os.path.join(upload_folder, filename)
+            photo.save(photo_path)
+            trip.sos_evidence_url = f"/static/evidence/{filename}"
+
+    # PLATFORM REFLEX: Log SOS interaction
+    log_msg = f"🚨 SOS ALERT triggered by Passenger {trip.passenger.name} for ride to {trip.end_location}!"
+    db.session.add(TripLog(trip_id=trip.id, event_type='SOS', message=log_msg))
+
     db.session.commit()
-    # In a real system, this would alert security/police
+    
+    current_app.logger.warning(f"SOS triggered for Trip #{trip_id}. Evidence Photo: {trip.sos_evidence_url}")
     return jsonify({
         'message': 'SOS Alert triggered! Authorities and Admin have been notified.',
-        'trip_id': trip_id
+        'trip_id': trip_id,
+        'evidence_logged': bool(trip.sos_evidence_url or trip.sos_description)
     }), 200
 
 
@@ -238,6 +309,11 @@ def rate_trip(trip_id):
 
     trip.rating = rating_val
     trip.feedback = str(data.get('feedback', '')).strip()
+    
+    # PLATFORM REFLEX: Log rating interaction
+    log_msg = f"Passenger {trip.passenger.name} rated the experience {rating_val} stars."
+    db.session.add(TripLog(trip_id=trip.id, event_type='RATE', message=log_msg))
+
     db.session.commit()
 
     return jsonify({

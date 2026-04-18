@@ -1,19 +1,23 @@
 
 # --- Imports and Blueprint creation must come first ---
-from datetime import datetime
-from flask import Blueprint, jsonify, request, current_app
+from datetime import datetime, timezone
 import re
+import json
+import time
+from flask import Blueprint, Response, jsonify, request, stream_with_context, current_app
 
 try:
     from ..models.user_model import User
     from ..models.driver_model import Driver
     from ..models.trip_model import Trip
+    from ..models.trip_log_model import TripLog
     from ..models.vehicle_model import Vehicle
     from ..database import db
 except ImportError:
     from models.user_model import User
     from models.driver_model import Driver
     from models.trip_model import Trip
+    from models.trip_log_model import TripLog
     from models.vehicle_model import Vehicle
     from database import db
 
@@ -69,8 +73,7 @@ def admin_login():
     return jsonify({'message': 'Login successful', 'admin': admin.to_dict()}), 200
 
 
-@admin_bp.route('/dashboard', methods=['GET'])
-def admin_dashboard():
+def _build_admin_dashboard_payload():
     total_users = User.query.count()
     total_passengers = User.query.filter_by(role='passenger').count()
     total_drivers = Driver.query.count()
@@ -83,11 +86,13 @@ def admin_dashboard():
     total_revenue = sum(trip.fare for trip in Trip.query.filter_by(
         status='completed').all())
 
+    # PLATFORM REFLEX: Fetch 20 most recent interaction logs
+    recent_logs = TripLog.query.order_by(TripLog.created_at.desc()).limit(20).all()
+
     # Fetch 10 most recent trips (requests + active)
     live_trips = Trip.query.order_by(Trip.created_at.desc()).limit(10).all()
 
-    current_app.logger.info("Admin dashboard stats retrieved")
-    return jsonify({
+    return {
         'stats': {
             'total_users': total_users,
             'total_passengers': total_passengers,
@@ -101,13 +106,49 @@ def admin_dashboard():
         'sos_alerts': [t.to_dict() for t in sos_alerts],
         'active_vehicles': [v.to_dict() for v in active_vehicles],
         'live_trips': [t.to_dict() for t in live_trips],
+        'recent_logs': [log.to_dict() for log in recent_logs],
         'pending_drivers': [{
             'id': driver.id,
             'name': driver.user.name if driver.user else 'Unknown Driver',
             'license_number': driver.license_number,
+            'applied_at': (driver.user.created_at.isoformat() if (driver.user and hasattr(driver.user, 'created_at') and driver.user.created_at) else datetime.now(timezone.utc).isoformat()),
             'vehicles': [vehicle.to_dict() for vehicle in driver.vehicles]
         } for driver in pending_drivers]
-    }), 200
+    }
+
+
+@admin_bp.route('/dashboard', methods=['GET'])
+def admin_dashboard():
+    payload = _build_admin_dashboard_payload()
+    current_app.logger.info("Admin dashboard stats retrieved")
+    return jsonify(payload), 200
+
+
+@admin_bp.route('/dashboard/stream', methods=['GET'])
+def admin_dashboard_stream():
+    """Server-Sent Events stream for high-fidelity admin surveillance."""
+    def event_stream():
+        last_payload = None
+        while True:
+            # Re-fetch data within the context
+            with current_app.app_context():
+                payload = _build_admin_dashboard_payload()
+                serialized = json.dumps(payload, sort_keys=True)
+                
+                if serialized != last_payload:
+                    last_payload = serialized
+                    yield f"data: {serialized}\n\n"
+                    
+            time.sleep(5)  # Professional interval for platform-level monitoring
+
+    return Response(
+        stream_with_context(event_stream()),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no'
+        }
+    )
 
 
 @admin_bp.route('/reports', methods=['GET'])

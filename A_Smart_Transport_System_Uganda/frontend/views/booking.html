@@ -1,137 +1,230 @@
-<div class="srv-hero">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="margin-bottom:14px; background: rgba(255,194,0,0.1); border-color: rgba(255,194,0,0.25); color: var(--yellow);"><span></span>LIVE · STS Booking</div>
-    <h1>Book Your Journey</h1>
-    <p>Secure, transparent, and AI-optimized ride booking across Uganda. Select your mode, enter your destination, and get matched with a verified driver in minutes.</p>
-  </div>
-</div>
-
-<div class="wrap">
-  <!-- BOOKING SECTION -->
-  <div id="book-sec">
-    <div class="sec-hdr" style="margin-top:0;"><span class="sec-title"><i class="fas fa-map-location-dot"></i> Secure Booking Portal</span></div>
-    
-    <div id="sc-wrap" style="display:none;">
-      <div class="sc-card">
-        <div>
-          <div class="sc-name"><i class="fas fa-credit-card"></i> STS SmartCard</div>
-          <div class="sc-lbl">Available Balance</div>
-          <div class="sc-bal" id="baldis">0 UGX</div>
-        </div>
-        <div class="sc-r">
-          <div class="sc-num" id="sc-num-display">—</div>
-          <button class="btn-tu" onclick="startTopupFlow()">Top Up</button>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a Ride | STS Uganda</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/professional-refresh.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+<section class="dashboard-shell booking-shell" aria-label="Booking dashboard">
+  <section class="booking-hero-panel">
+    <article class="booking-hero-copy">
+      <span id="booking-live-pill" class="booking-live-pill">
+        <span class="booking-live-dot"></span>
+        Connecting fleet map
+      </span>
+      <h1 id="booking-hero-title">Book a trip with live fleet visibility</h1>
+      <p id="booking-hero-summary">
+        Compare nearby vehicles, calculate a route, and confirm your ride from one clear dashboard.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-ghost" type="button" onclick="showPg('services')">Compare services</button>
+        <button class="btn-ghost" type="button" onclick="showPg('payment')">Open wallet</button>
       </div>
+    </article>
+
+    <article id="sc-wrap" class="booking-wallet-card" style="display:none;">
+      <div>
+        <span class="booking-eyebrow">STS SmartCard</span>
+        <strong id="baldis" style="display:block; font-family:'Sora',sans-serif; font-size:2rem; margin-bottom:8px;">UGX 0</strong>
+        <p style="margin:0;">Wallet balance updates here before you confirm a booking request.</p>
+      </div>
+      <div class="action-list">
+        <div class="service-stat-item"><strong id="sc-num-display">Not linked</strong><span>Card reference</span></div>
+        <button class="btn-full" type="button" onclick="startTopupFlow()">Top up wallet</button>
+      </div>
+    </article>
+  </section>
+
+  <section id="booking-ui" style="display:none;">
+    <div class="booking-live-metrics">
+      <article class="booking-metric-card">
+        <span class="booking-eyebrow">Live vehicles</span>
+        <strong id="booking-live-count">0</strong>
+        <p id="booking-live-count-detail">Waiting for active fleet data</p>
+      </article>
+      <article class="booking-metric-card">
+        <span class="booking-eyebrow">Nearest match</span>
+        <strong id="booking-nearest-driver">Searching</strong>
+        <p id="booking-nearest-driver-detail">Pick a service to filter the live map</p>
+      </article>
+      <article class="booking-metric-card">
+        <span class="booking-eyebrow">Route status</span>
+        <strong id="booking-route-state">Select route</strong>
+        <p id="booking-route-state-detail">Pickup and destination are needed for fare calculation</p>
+      </article>
+      <article class="booking-metric-card">
+        <span class="booking-eyebrow">Last sync</span>
+        <strong id="booking-latest-sync">Waiting</strong>
+        <p id="booking-latest-sync-detail">Fleet data refreshes automatically</p>
+      </article>
     </div>
 
-    <div id="booking-ui" style="display:none;">
-      <div class="booking-layout">
-        <div>
+    <div class="booking-layout-pro">
+      <article class="booking-map-panel">
+        <div class="booking-panel-head">
+          <div>
+            <span class="booking-eyebrow">Live fleet map</span>
+            <h2>Active vehicles on the road</h2>
+          </div>
+          <span id="booking-map-chip" class="booking-chip">0 visible vehicles</span>
+        </div>
+
+        <div class="booking-map-wrap">
           <div id="map"></div>
-          <div class="map-info-bar" id="map-info-bar">
-            <span>📍 <b id="mi-from">—</b></span>
-            <span>🎯 <b id="mi-to">—</b></span>
-            <span>📏 Distance: <b id="mi-dist">—</b></span>
-            <span>⏱️ ETA: <b id="mi-time">—</b></span>
+          <div id="booking-map-empty" class="booking-map-empty">Live vehicles will appear here when drivers are online.</div>
+        </div>
+
+        <div id="map-info-bar" class="map-info-bar">
+          <span>From <b id="mi-from">Not selected</b></span>
+          <span>To <b id="mi-to">Not selected</b></span>
+          <span>Distance <b id="mi-dist">--</b></span>
+          <span>ETA <b id="mi-time">--</b></span>
+        </div>
+
+        <div class="booking-panel-head" style="margin-top:18px;">
+          <div>
+            <span class="booking-eyebrow">Nearby options</span>
+            <h2 style="font-size:1.05rem;">Vehicles visible for the selected mode</h2>
           </div>
         </div>
-        <div class="bpanel">
-          <h3><i class="fas fa-taxi"></i> Trip Details</h3>
-          <div class="mode-grid">
-            <div class="mpill sel" onclick="selMode(this,'Standard Taxi',1.0)"><span class="mpill-ico"><i class="fas fa-taxi"></i></span><span class="mpill-nm">Standard Taxi</span></div>
-            <div class="mpill" onclick="selMode(this,'Boda Boda',0.7)"><span class="mpill-ico"><i class="fas fa-motorcycle"></i></span><span class="mpill-nm">Boda Boda</span></div>
-            <div class="mpill" onclick="selMode(this,'Special Hire',2.0)"><span class="mpill-ico"><i class="fas fa-car-side"></i></span><span class="mpill-nm">Special Hire</span></div>
-            <div class="mpill" onclick="selMode(this,'Mini Bus',0.5)"><span class="mpill-ico"><i class="fas fa-bus-simple"></i></span><span class="mpill-nm">Mini Bus</span></div>
-            <div class="mpill" onclick="selMode(this,'Marine Transport',3.0)"><span class="mpill-ico"><i class="fas fa-ship"></i></span><span class="mpill-nm">Marine</span></div>
-            <div class="mpill" onclick="selMode(this,'Smart Bus',0.3)"><span class="mpill-ico"><i class="fas fa-bus"></i></span><span class="mpill-nm">Bus</span></div>
-          </div>
-          <style>
-            .mpill.sel{background:var(--yellow); color:#000; border-color:var(--yellow);}
-            .mpill.sel .mpill-ico{background:#000; color:var(--yellow);}
-          </style>
-          <div class="fg">
-            <label class="fl">Pickup Location</label>
-            <div class="field-icon">
-              <span class="ico"><i class="fas fa-location-dot"></i></span>
-              <input class="fi" id="pickup" placeholder="e.g. Kampala City Center" oninput="geocodeLive('pickup')"/>
-            </div>
-            <div id="pickup-suggestions" style="position:relative;z-index:50;"></div>
-          </div>
-          <div class="fg">
-            <label class="fl">Drop-off Destination</label>
-            <div class="field-icon">
-              <span class="ico"><i class="fas fa-crosshairs"></i></span>
-              <input class="fi" id="dropoff" placeholder="e.g. Entebbe Airport" oninput="geocodeLive('dropoff')"/>
-            </div>
-            <div id="dropoff-suggestions" style="position:relative;z-index:50;"></div>
-          </div>
-          
-            <div class="frow"><span>Route Distance</span><b id="frd">—</b></div>
-            <div class="frow"><span>Pricing Engine</span><b style="color:var(--cyan); font-weight:800; font-size:.75rem;"><i class="fas fa-brain"></i> AI-OPTIMIZED</b></div>
-            <div class="frow"><span>Transport Mode</span><b id="frm">—</b></div>
-            <div class="frow"><span>Estimated Travel Time</span><b id="frtime">—</b></div>
-            <div class="frow">
-              <span class="frow-t">Total Fare</span>
-              <div style="text-align:right;">
-                <b class="frow-t" id="frt">—</b>
-                <div id="ai-label" style="display:none; font-size:.65rem; color:var(--teal); font-weight:700; text-transform:uppercase; margin-top:-2px;">
-                  <i class="fas fa-shield-halved"></i> AI Predicted
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="drv-box" id="drvbox">
-            <div class="drv-av"><i class="fas fa-user-tie"></i></div>
-            <div class="drv-info">
-              <div class="drv-n" id="drv-name">Finding driver...</div>
-              <div class="drv-m" id="drv-meta">Searching nearby...</div>
-            </div>
-            <div class="drv-eta" id="drv-eta">—</div>
-          </div>
-          <button class="btn-full btn-full-o" onclick="calcFare()" style="margin-bottom:9px; background:var(--yellow); color:#000;">Calculate Fare & Find Taxi</button>
-          
-          <div id="confirm-booking-box" style="display:none; margin-bottom:12px;">
-            <button class="btn-full" style="background:#000; color:var(--yellow); border:1.5px solid var(--yellow);" onclick="registerBooking()">Confirm & Register Booking</button>
-          </div>
+        <div id="booking-vehicle-list" class="booking-vehicle-list">
+          <div class="booking-empty-state">Select a service to see nearby active vehicles.</div>
+        </div>
+      </article>
 
-          <div class="fg" style="margin-top:2px;">
-            <label class="fl"><i class="fas fa-calendar-clock"></i> Schedule for Later (REQ-28 — Optional)</label>
-            <input class="fi" type="datetime-local" id="schedule-datetime" style="color:var(--text);background:var(--bg2);"/>
-            <div style="font-size:.72rem;color:var(--text3);margin-top:4px;"><i class="fas fa-info-circle"></i> Leave blank to book immediately. Future date schedules the ride.</div>
+      <aside class="booking-form-panel">
+        <div class="booking-panel-head">
+          <div>
+            <span class="booking-eyebrow">Trip details</span>
+            <h2>Set up your journey</h2>
           </div>
-          <div class="safety-row">
-            <button class="btn-sos" onclick="openM('sos-m')"><i class="fas fa-circle-exclamation"></i> SOS</button>
-            <button class="btn-sh" onclick="shareTrip()"><i class="fas fa-share-nodes"></i> Share Trip</button>
-            <button class="btn-sh" style="background:var(--navy-l); color:#fff;" onclick="openM('rating-m')"><i class="fas fa-star"></i> Rate</button>
-            <button class="btn-sh" style="background:rgba(255,194,0,0.15); color:var(--yellow);" onclick="openM('support-m')"><i class="fas fa-headset"></i> Support</button>
+          <span id="booking-selected-mode-chip" class="booking-chip">Standard Taxi</span>
+        </div>
+
+        <div class="booking-mode-grid">
+          <button class="mpill sel" type="button" onclick="selMode(this,'Standard Taxi',1.0)">
+            <span class="mpill-ico"><i class="fas fa-taxi"></i></span>
+            <span class="mpill-nm">Standard Taxi</span>
+          </button>
+          <button class="mpill" type="button" onclick="selMode(this,'Boda Boda',0.7)">
+            <span class="mpill-ico"><i class="fas fa-motorcycle"></i></span>
+            <span class="mpill-nm">Boda Boda</span>
+          </button>
+          <button class="mpill" type="button" onclick="selMode(this,'Special Hire',2.0)">
+            <span class="mpill-ico"><i class="fas fa-car-side"></i></span>
+            <span class="mpill-nm">Special Hire</span>
+          </button>
+          <button class="mpill" type="button" onclick="selMode(this,'Mini Bus',0.5)">
+            <span class="mpill-ico"><i class="fas fa-bus-simple"></i></span>
+            <span class="mpill-nm">Mini Bus</span>
+          </button>
+          <button class="mpill" type="button" onclick="selMode(this,'Marine Transport',3.0)">
+            <span class="mpill-ico"><i class="fas fa-ship"></i></span>
+            <span class="mpill-nm">Marine</span>
+          </button>
+          <button class="mpill" type="button" onclick="selMode(this,'Smart Bus',0.3)">
+            <span class="mpill-ico"><i class="fas fa-bus"></i></span>
+            <span class="mpill-nm">Smart Bus</span>
+          </button>
+        </div>
+
+        <div class="fg">
+          <label class="fl" for="pickup">Pickup location</label>
+          <div class="field-icon">
+            <span class="ico"><i class="fas fa-location-dot"></i></span>
+            <input class="fi" id="pickup" placeholder="Kampala City Center" oninput="geocodeLive('pickup')">
+          </div>
+          <div id="pickup-suggestions" style="position:relative; z-index:50;"></div>
+        </div>
+
+        <div class="fg">
+          <label class="fl" for="dropoff">Drop off destination</label>
+          <div class="field-icon">
+            <span class="ico"><i class="fas fa-crosshairs"></i></span>
+            <input class="fi" id="dropoff" placeholder="Entebbe Airport" oninput="geocodeLive('dropoff')">
+          </div>
+          <div id="dropoff-suggestions" style="position:relative; z-index:50;"></div>
+        </div>
+
+        <div id="farebox" class="booking-fare-box">
+          <div class="frow"><span>Route distance</span><b id="frd">--</b></div>
+          <div class="frow"><span>Transport mode</span><b id="frm">Standard Taxi</b></div>
+          <div class="frow"><span>Estimated travel time</span><b id="frtime">--</b></div>
+          <div class="frow"><span>Pricing engine</span><b>AI assisted</b></div>
+          <div class="frow">
+            <span class="frow-t">Total fare</span>
+            <div style="text-align:right;">
+              <b class="frow-t" id="frt">--</b>
+              <div id="ai-label" style="display:none; font-size:.72rem; color:var(--success); font-weight:800;">AI predicted</div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- MY REGISTERED BOOKINGS -->
-    <div id="booking-summary-sec" style="margin-top: 40px; display: none;">
-      <div class="sh"><h3 style="margin-bottom: 20px;"><i class="fas fa-list-check"></i> My Registered Bookings</h3></div>
-      <div id="booking-summary-list" class="srv-grid reveal reveal-stagger">
-        <!-- Will be populated by JS -->
-        <div class="srv-card" style="padding: 30px; text-align: center; grid-column: 1 / -1;">
-          <div style="font-size: 2rem; color: var(--text3); margin-bottom: 10px;"><i class="fas fa-clock-rotate-left"></i></div>
-          <p style="color: var(--text3); margin: 0;">No active bookings found. Your recent trips will appear here.</p>
+        <div id="drvbox" class="drv-box booking-driver-box">
+          <div class="drv-av" id="drv-av-wrap" style="background:#f3f4f6; border-radius:12px; overflow:hidden;">
+            <img id="matched-driver-img" src="/assets/images/taxi.png" style="width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 0.3s;">
+          </div>
+          <div class="drv-info">
+            <div class="drv-n" id="drv-name">No driver matched yet</div>
+            <div class="drv-m" id="drv-meta">We will suggest the nearest active vehicle after fare calculation.</div>
+          </div>
+          <div class="drv-eta" id="drv-eta">--</div>
         </div>
-      </div>
+
+        <div class="fg">
+          <label class="fl" for="schedule-datetime">Schedule for later</label>
+          <input class="fi" type="datetime-local" id="schedule-datetime">
+          <div style="font-size:.78rem; color:var(--muted); margin-top:6px;">Leave blank to request the ride immediately.</div>
+        </div>
+
+        <div id="passenger-live-status" class="passenger-live-box" style="display:none; margin-bottom:16px; border-radius:16px; padding:20px;"></div>
+
+        <div id="confirm-booking-box" style="display:none; margin-bottom:12px;">
+          <button class="btn-full" type="button" onclick="registerBooking()">Confirm booking request</button>
+        </div>
+
+        <button class="btn-full" type="button" onclick="calcFare()">Calculate fare and match vehicle</button>
+
+        <div class="safety-row">
+          <button class="btn-sos" type="button" onclick="openM('sos-m')"><i class="fas fa-circle-exclamation"></i>SOS</button>
+          <button class="btn-sh" type="button" onclick="shareTrip()"><i class="fas fa-share-nodes"></i>Share trip</button>
+          <button class="btn-sh" type="button" onclick="openM('rating-m')"><i class="fas fa-star"></i>Rate</button>
+          <button class="btn-sh" type="button" onclick="openM('support-m')"><i class="fas fa-headset"></i>Support</button>
+        </div>
+      </aside>
     </div>
 
-    <div id="guest-prompt" class="guest-prompt" style="padding: 40px 20px;">
-      <div style="font-size:3rem;margin-bottom:14px;"><i class="fas fa-lock" style="color:var(--navy)"></i></div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:8px;">Sign in to unlock booking</div>
-      <div style="font-size:.88rem;color:var(--text2);margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;">Join the ASTS network to enjoy AI-optimized fares, real-time GPS tracking and secure payments.</div>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn-o" style="padding: 12px 28px;" onclick="openM('auth-m')">Sign In or Register now</button>
+    <section id="booking-summary-sec" class="booking-history-panel" style="display:none;">
+      <div class="booking-panel-head">
+        <div>
+          <span class="booking-eyebrow">My bookings</span>
+          <h2>Recent ride requests</h2>
+        </div>
+        <span class="booking-chip">Latest activity</span>
       </div>
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-size:.82rem;color:var(--text3);">
-        No smartphone? <button onclick="showPg('ussd')" style="background:none;border:none;color:var(--cyan);font-weight:700;cursor:pointer;font-size:.82rem;font-family:'Inter',sans-serif;text-shadow:0 0 5px rgba(0,242,255,0.3);">Use USSD *123# instead →</button>
+      <div id="booking-summary-list" class="booking-summary-grid">
+        <div class="booking-empty-state">No active bookings found. Your recent ride requests will appear here.</div>
       </div>
+    </section>
+  </section>
+
+  <section id="guest-prompt" class="guest-prompt booking-guest-prompt" style="padding:40px 20px;">
+    <div style="font-size:2.8rem; margin-bottom:14px;"><i class="fas fa-lock" style="color:var(--brand)"></i></div>
+    <div style="font-family:'Sora',sans-serif; font-size:1.2rem; font-weight:800; margin-bottom:8px;">Sign in to unlock live booking</div>
+    <div style="font-size:.9rem; color:var(--muted); margin-bottom:24px; max-width:460px; margin-left:auto; margin-right:auto; line-height:1.7;">
+      Join STS to see live vehicles, calculate assisted fares, and send secure ride requests to verified drivers.
     </div>
-  </div>
-</div>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn-o" type="button" onclick="openM('auth-m')">Sign in or create an account</button>
+      <button class="btn-ghost" type="button" onclick="showPg('ussd')">Use USSD instead</button>
+    </div>
+  </section>
+</section>
+  </main>
+</body>
+</html>

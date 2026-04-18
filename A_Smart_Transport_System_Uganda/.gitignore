@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.sqlite
+*.db
+.env
+.venv/
+env/
+
+# Flask instance data & uploads
+instance/
+frontend/uploads/
+
+# Tooling caches
+.pytest_cache/
+.coverage
+.vscode/
+.idea/

@@ -1,17 +1,52 @@
-<div class="txw">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History | STS Uganda</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/professional-refresh.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+<section class="history-shell" aria-label="Wallet and ride history">
+  <div class="txw">
     <div class="txtop">
-      <h2>Transaction History</h2>
-      <div class="bbal"><span>SmartCard Balance</span><b id="balbadge">0 UGX</b></div>
+      <div>
+        <h2 id="wallet-history">Wallet and ride history</h2>
+        <p style="margin:8px 0 0; color:var(--muted);">Review spend, top ups, and completed trip activity in one place.</p>
+      </div>
+      <div class="bbal">
+        <span>SmartCard balance</span>
+        <b id="balbadge">UGX 0</b>
+      </div>
     </div>
+
     <div class="txsum">
-      <div class="txsc"><div class="txsv" id="tspent" style="color:var(--text3)">0 UGX</div><div class="txsl">Total Spent</div></div>
-      <div class="txsc"><div class="txsv" id="ttopup" style="color:var(--yellow)">0 UGX</div><div class="txsl">Total Topped Up</div></div>
-      <div class="txsc"><div class="txsv" id="trides">0</div><div class="txsl">Total Rides</div></div>
+      <div class="txsc">
+        <div class="txsv" id="tspent">UGX 0</div>
+        <div class="txsl">Total spent</div>
+      </div>
+      <div class="txsc">
+        <div class="txsv" id="ttopup">UGX 0</div>
+        <div class="txsl">Total topped up</div>
+      </div>
+      <div class="txsc">
+        <div class="txsv" id="trides">0</div>
+        <div class="txsl">Completed rides</div>
+      </div>
     </div>
+
     <div class="txfs">
-      <button class="fbtn active" onclick="filtTx('all',this)">All</button>
-      <button class="fbtn" onclick="filtTx('ride',this)">Rides</button>
-      <button class="fbtn" onclick="filtTx('topup',this)">Top-ups</button>
+      <button class="fbtn active" type="button" onclick="filtTx('all',this)">All</button>
+      <button class="fbtn" type="button" onclick="filtTx('ride',this)">Rides</button>
+      <button class="fbtn" type="button" onclick="filtTx('topup',this)">Top ups</button>
     </div>
+
     <div id="txlist"></div>
   </div>
+</section>
+  </main>
+</body>
+</html>

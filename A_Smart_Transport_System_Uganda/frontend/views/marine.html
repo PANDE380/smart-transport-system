@@ -1,57 +1,71 @@
-<div class="srv-hero" style="background-image: linear-gradient(rgba(11,13,23,0.3), rgba(11,13,23,0.85)), url('img/Boat.jfif'); background-size: cover; background-position: center;">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="margin-bottom:14px; background: rgba(0,242,255,0.1); border-color: rgba(0,242,255,0.25); color: var(--cyan);"><span></span>LIVE · ASTS Marine Dispatch</div>
-    <h1>Safe Lake Crossings</h1>
-    <p>Premium marine transport across the waters of Uganda. Our smart ferry network connects islands and coastal cities with unmatched safety and reliability.</p>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marine Transport | STS Uganda</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/professional-refresh.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+<section class="service-page" aria-label="Marine transport service">
+  <section class="page-hero page-hero-media" style="--hero-image:url('assets/images/marine.png');">
+    <div class="page-hero-content">
+      <span class="page-kicker">Marine transport</span>
+      <h1 class="page-title">Lake and shoreline travel managed with the same clarity as road transport.</h1>
+      <p class="page-summary">Marine Transport extends the STS experience to crossings, island routes, and water based movement where schedules and safety information need to stay visible.</p>
+      <div class="hero-actions">
+        <button class="btn-o" type="button" onclick="bookService('Marine Transport', 3.0)">Book marine transport</button>
+        <button class="btn-ghost" type="button" onclick="showPg('contact')">Ask about routes</button>
+      </div>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="booking-layout">
-    <div>
-      <div class="sh"><h3><i class="fas fa-ship"></i> Professional Marine Services</h3></div>
-      <div class="srv-grid reveal reveal-stagger" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
-        <div class="srv-card" style="padding: 20px; border-left: 4px solid var(--cyan);">
-          <div class="srv-icon-wrap" style="width:42px; height:42px; margin-bottom:12px; background:rgba(0,242,255,0.1); color:var(--cyan);"><i class="fas fa-anchor"></i></div>
-          <h4>Smart Ferry Network</h4>
-          <p>Real-time tracking for all vessels. Know exactly when your ferry will arrive and depart.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-n"><i class="fas fa-life-ring"></i></div>
-          <h4>Certified Safety</h4>
-          <p>All vessels are equipped with modern life-saving gear and AIS (Automatic Identification System).</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-t"><i class="fas fa-route"></i></div>
-          <h4>Island Connectivity</h4>
-          <p>Regular scheduled routes to Ssese Islands, Entebbe, and Jinja ports.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-r"><i class="fas fa-ticket"></i></div>
-          <h4>Digital Ticketing</h4>
-          <p>Pay with your ASTS SmartCard or Mobile Money. No more queues at the pier.</p>
-        </div>
-      </div>
-      
-      <div class="sh"><h3><i class="fas fa-map-marked-alt"></i> Popular Marine Routes</h3></div>
-      <div class="stat-strip" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 30px;">
-        <div class="ssc"><div class="ssc-val">Entebbe - Kalangala</div><div class="ssc-lbl">Daily at 08:00 AM</div></div>
-        <div class="ssc"><div class="ssc-val">Jinja - Masese</div><div class="ssc-lbl">Hourly Shuttle</div></div>
-        <div class="ssc"><div class="ssc-val">Kiyindi - Buvuma</div><div class="ssc-lbl">Scheduled Transport</div></div>
+  <section class="service-layout">
+    <div class="service-main">
+      <div class="service-highlight-grid" aria-label="Marine features">
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-anchor"></i></div>
+          <h3>Supports lake crossings</h3>
+          <p>Useful for routes where water transport is the practical or preferred option.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-life-ring"></i></div>
+          <h3>Safety visible in context</h3>
+          <p>The same STS support and alert tools remain available within the booking flow.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-ticket"></i></div>
+          <h3>Digital ticket style flow</h3>
+          <p>Users can keep route, fare, and support details in the same experience.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-clock"></i></div>
+          <h3>Schedule aware planning</h3>
+          <p>Water routes often depend on timing, so scheduled planning matters even more here.</p>
+        </article>
       </div>
     </div>
-    
-    <div class="bpanel">
-      <h3><i class="fas fa-ticket"></i> Book Your Crossing</h3>
-      <p style="font-size: 0.84rem; color: var(--text2); margin-bottom: 20px;">Secure your spot on the next ferry. AI-driven scheduling ensures you're never left behind.</p>
-      
-      <div class="ai-hint" style="margin-bottom: 24px;">
-        <i class="fas fa-robot"></i>
-        <span><b>AI Route Tip:</b> Marine routes are 3x faster than road travel for island crossings during peak hours.</span>
-      </div>
-      
-      <button class="btn-full btn-full-o" style="background:var(--cyan); box-shadow:0 4px 15px rgba(0,242,255,0.3);" onclick="bookService('Marine Transport', 3.0)">Book Safe Crossing Now</button>
-      <button class="btn-out" style="width: 100%; margin-top: 10px;" onclick="showPg('services')">View All Services</button>
-    </div>
-  </div>
-</div>
+
+    <aside class="service-sidebar">
+      <article class="service-action-card">
+        <h3>Service snapshot</h3>
+        <div class="service-stat-list">
+          <div class="service-stat-item"><strong>Best for</strong><span>Crossings and island routes</span></div>
+          <div class="service-stat-item"><strong>Typical capacity</strong><span>Varies by vessel type</span></div>
+          <div class="service-stat-item"><strong>Important factor</strong><span>Schedule and route timing</span></div>
+        </div>
+      </article>
+      <article class="service-action-card">
+        <h3>Planning a crossing?</h3>
+        <p>Use booking for route details or contact the team for service guidance.</p>
+        <button class="btn-full" type="button" onclick="bookService('Marine Transport', 3.0)">Book now</button>
+      </article>
+    </aside>
+  </section>
+</section>
+  </main>
+</body>
+</html>

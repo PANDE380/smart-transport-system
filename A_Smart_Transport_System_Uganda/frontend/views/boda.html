@@ -1,64 +1,82 @@
-<div class="srv-hero" style="background: linear-gradient(140deg, var(--navy-d), #1a1a1a);">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="margin-bottom:14px; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.25); color: var(--teal);"><span></span>LIVE · Boda Boda</div>
-    <h1>Boda Boda Services</h1>
-    <p>The fastest way to navigate Kampala's busy streets. Our Boda Boda riders are fully licensed, safety-trained, and equipped with helmets for every passenger.</p>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boda Boda | STS Uganda</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/professional-refresh.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+<section class="service-page" aria-label="Boda boda service">
+  <section class="page-hero page-hero-media" style="--hero-image:url('assets/images/boda.png');">
+    <div class="page-hero-content">
+      <span class="page-kicker">Boda boda</span>
+      <h1 class="page-title">Fast urban movement for short, time sensitive trips.</h1>
+      <p class="page-summary">STS Boda Boda focuses on quick movement through busy roads while keeping matching, route visibility, and safety support easy to reach.</p>
+      <div class="hero-actions">
+        <button class="btn-o" type="button" onclick="bookService('Boda Boda', 0.7)">Book boda boda</button>
+        <button class="btn-ghost" type="button" onclick="showPg('safety')">View safety guidance</button>
+      </div>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="booking-layout">
-    <div>
-      <div class="sh"><h3><i class="fas fa-bolt"></i> Why Choose Boda Boda?</h3></div>
-      <div class="srv-grid reveal reveal-stagger" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
-        <div class="srv-card" style="padding: 20px; border-left: 4px solid var(--yellow);">
-          <div class="srv-icon-wrap" style="width:42px; height:42px; margin-bottom:12px;"><i class="fas fa-motorcycle"></i></div>
-          <h4>Beat the Traffic</h4>
-          <p>Don't get stuck in jams. Boda Bodas are the most efficient way to reach your destination on time.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-n"><i class="fas fa-helmet-safety"></i></div>
-          <h4>Safety First</h4>
-          <p>Every rider provides a clean, sanitized helmet. Safety is our top priority for every trip.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-t"><i class="fas fa-receipt"></i></div>
-          <h4>Pocket Friendly</h4>
-          <p>The most affordable transport option in the city. Pay less and get there faster.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-r"><i class="fas fa-user-check"></i></div>
-          <h4>Licensed Riders</h4>
-          <p>All our Boda riders are registered with the city and have valid permits and insurance.</p>
-        </div>
+  <section class="service-layout">
+    <div class="service-main">
+      <div class="service-highlight-grid" aria-label="Boda features">
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-bolt"></i></div>
+          <h3>Faster through traffic</h3>
+          <p>Boda Boda is ideal when speed matters more than carrying capacity.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-helmet-safety"></i></div>
+          <h3>Safety aware workflow</h3>
+          <p>Support tools, driver visibility, and ride reporting remain available throughout the trip.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-location-crosshairs"></i></div>
+          <h3>Route clarity</h3>
+          <p>Pickup and destination entry help riders make quick decisions before sending a request.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-wallet"></i></div>
+          <h3>Wallet ready</h3>
+          <p>Use the shared STS wallet to keep small, frequent trips easy to manage.</p>
+        </article>
       </div>
-      
-      <div class="sh"><h3><i class="fas fa-tag"></i> Pricing Information</h3></div>
-      <div class="tech-card" style="margin-bottom: 24px; border-color: var(--yellow);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 1.2rem; font-weight: 800; color: var(--yellow);">400 UGX <small style="color: var(--text3); font-size: 0.8rem;">/ km</small></div>
-            <div style="font-size: 0.8rem; color: var(--text2);">Special discounted rate for this week</div>
-          </div>
-          <div style="text-align: right;">
-            <div style="font-size: 0.9rem; font-weight: 700; color: var(--yellow);">Low Demand</div>
-            <div style="font-size: 0.75rem; color: var(--text3);">Pricing is currently at its lowest</div>
-          </div>
+
+      <article class="info-card">
+        <div class="section-heading" style="margin-bottom:12px;">
+          <h2 id="good-fit" style="font-size:1.3rem;">Good fit for</h2>
         </div>
-      </div>
+        <ul class="check-list">
+          <li><i class="fas fa-check-circle"></i><span>Short city hops where road congestion is high</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Single passenger trips with light luggage</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Riders who want the fastest route to arrival</span></li>
+        </ul>
+      </article>
     </div>
-    
-    <div class="bpanel">
-      <h3><i class="fas fa-motorcycle"></i> Need a quick ride?</h3>
-      <p style="font-size: 0.84rem; color: var(--text2); margin-bottom: 20px;">Book a Boda Boda now and reach your destination in half the time of a car.</p>
-      
-      <div class="ai-hint" style="margin-bottom: 24px;">
-        <i class="fas fa-robot"></i>
-        <span><b>AI Route Tip:</b> Heavy traffic detected on Jinja Road. A Boda Boda will save you approximately 15 minutes today.</span>
-      </div>
-      
-      <button class="btn-full btn-full-o" style="background: var(--yellow); color:#000;" onclick="bookService('Boda Boda', 0.7)">Book Boda Boda Now</button>
-      <button class="btn-out" style="width: 100%; margin-top: 10px;" onclick="showPg('services')">View All Services</button>
-    </div>
-  </div>
-</div>
+
+    <aside class="service-sidebar">
+      <article class="service-action-card">
+        <h3>Service snapshot</h3>
+        <div class="service-stat-list">
+          <div class="service-stat-item"><strong>Best for</strong><span>Fast solo trips</span></div>
+          <div class="service-stat-item"><strong>Typical capacity</strong><span>1 passenger</span></div>
+          <div class="service-stat-item"><strong>Use case</strong><span>Quick movement across busy roads</span></div>
+        </div>
+      </article>
+      <article class="service-action-card">
+        <h3>Need the quickest option?</h3>
+        <p>Open the booking page to match with the nearest available rider.</p>
+        <button class="btn-full" type="button" onclick="bookService('Boda Boda', 0.7)">Book now</button>
+      </article>
+    </aside>
+  </section>
+</section>
+  </main>
+</body>
+</html>

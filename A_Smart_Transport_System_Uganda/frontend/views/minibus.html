@@ -1,57 +1,71 @@
-<div class="srv-hero" style="background-image: linear-gradient(rgba(11,13,23,0.3), rgba(11,13,23,0.85)), url('img/Mini bus.webp'); background-size: cover; background-position: center;">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="margin-bottom:14px; background: rgba(255,194,0,0.1); border-color: rgba(255,194,0,0.25); color: var(--yellow);"><span></span>LIVE · ASTS Mini Bus Dispatch</div>
-    <h1>Professional Mini Bus</h1>
-    <p>Premium 14-seater transport optimized for group logistics, team travel, and corporate events across Uganda.</p>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Bus | STS Uganda</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/professional-refresh.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+<section class="service-page" aria-label="Mini bus service">
+  <section class="page-hero page-hero-media" style="--hero-image:url('assets/images/minibus.png');">
+    <div class="page-hero-content">
+      <span class="page-kicker">Mini bus</span>
+      <h1 class="page-title">Group transport that is easier to organize and easier to monitor.</h1>
+      <p class="page-summary">Mini Bus works well for airport groups, events, staff movement, and any journey where people need to arrive together.</p>
+      <div class="hero-actions">
+        <button class="btn-o" type="button" onclick="bookService('Mini Bus', 0.5)" aria-label="Book mini bus">Book mini bus</button>
+        <button class="btn-ghost" type="button" onclick="showPg('services')" aria-label="See other transport options">See other transport options</button>
+      </div>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="booking-layout">
-    <div>
-      <div class="sh"><h3><i class="fas fa-bus-simple"></i> Group Travel Intelligence</h3></div>
-      <div class="srv-grid reveal reveal-stagger" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
-        <div class="srv-card" style="padding: 20px; border-left: 4px solid var(--yellow);">
-          <div class="srv-icon-wrap" style="width:42px; height:42px; margin-bottom:12px; background:rgba(255,194,0,0.1); color:var(--yellow);"><i class="fas fa-users-viewfinder"></i></div>
-          <h4>Large Capacity</h4>
-          <p>Comfortable 20-seat configuration. Ideal for large families, corporate teams, or social groups.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-n"><i class="fas fa-shield-halved"></i></div>
-          <h4>Group Safety</h4>
-          <p>Enhanced safety protocols. Real-time fleet monitoring and certified professional drivers.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-t"><i class="fas fa-clock"></i></div>
-          <h4>Scheduled Efficiency</h4>
-          <p>Precise timing and GPS-optimized routing to ensure your group arrives together and on time.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-r"><i class="fas fa-wallet"></i></div>
-          <h4>Cost Optimization</h4>
-          <p>Significant cost savings for group travel. Split fares via the STS SmartCard system.</p>
-        </div>
-      </div>
-      
-      <div class="sh"><h3><i class="fas fa-chart-line-up"></i> Usage Statistics</h3></div>
-      <div class="stat-strip" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 30px;">
-        <div class="ssc"><div class="ssc-val">500+</div><div class="ssc-lbl">Daily Group Bookings</div></div>
-        <div class="ssc"><div class="ssc-val">98.5%</div><div class="ssc-lbl">On-Time Arrival Rate</div></div>
-        <div class="ssc"><div class="ssc-val">14 Seats</div><div class="ssc-lbl">Standard Configuration</div></div>
+  <section class="service-layout">
+    <div class="service-main">
+      <div class="service-highlight-grid" aria-label="Mini bus features">
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-users"></i></div>
+          <h3>Built for groups</h3>
+          <p>Keep team, family, and event travel together instead of splitting across smaller vehicles.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
+          <h3>Better for planned trips</h3>
+          <p>Scheduled transport becomes easier when you can set one route for the full group.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-route"></i></div>
+          <h3>Shared route clarity</h3>
+          <p>Distance, timing, and pickup details stay in one place for the booking owner.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-wallet"></i></div>
+          <h3>Cost visibility</h3>
+          <p>The booking experience still keeps fares visible before the request is confirmed.</p>
+        </article>
       </div>
     </div>
-    
-    <div class="bpanel">
-      <h3><i class="fas fa-bus"></i> Book for Your Group</h3>
-      <p style="font-size: 0.84rem; color: var(--text2); margin-bottom: 20px;">Secure a professional mini bus for your next team event or airport transfer.</p>
-      
-      <div class="ai-hint" style="margin-bottom: 24px;">
-        <i class="fas fa-robot"></i>
-        <span><b>AI Route Tip:</b> Group travel currently has high demand. Booking now secures our nearest 14-seater vehicle.</span>
-      </div>
-      
-      <button class="btn-full btn-full-o" style="background: var(--yellow); color:#000;" onclick="bookService('Mini Bus', 0.5)">Book Mini Bus Now</button>
-      <button class="btn-out" style="width: 100%; margin-top: 10px;" onclick="showPg('services')">View All Services</button>
-    </div>
-  </div>
-</div>
+
+    <aside class="service-sidebar">
+      <article class="service-action-card">
+        <h3>Service snapshot</h3>
+        <div class="service-stat-list">
+          <div class="service-stat-item"><strong>Best for</strong><span>Group and event transport</span></div>
+          <div class="service-stat-item"><strong>Typical capacity</strong><span>About 14 passengers</span></div>
+          <div class="service-stat-item"><strong>Useful when</strong><span>People need to move together</span></div>
+        </div>
+      </article>
+      <article class="service-action-card">
+        <h3>Organizing a group trip?</h3>
+        <p>Open booking to set the route and request the nearest suitable vehicle.</p>
+        <button class="btn-full" type="button" onclick="bookService('Mini Bus', 0.5)" aria-label="Book mini bus now">Book now</button>
+      </article>
+    </aside>
+  </section>
+</section>
+  </main>
+</body>
+</html>

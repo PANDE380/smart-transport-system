@@ -12,8 +12,8 @@ class Vehicle(db.Model):
     number_plate = db.Column(db.String(20), unique=True, nullable=False)
     capacity = db.Column(db.Integer, nullable=False, default=14)
     current_passengers = db.Column(db.Integer, default=0)
-    current_lat = db.Column(db.Float, nullable=True)
-    current_lng = db.Column(db.Float, nullable=True)
+    current_lat = db.Column(db.Float, nullable=True, default=0.3476)
+    current_lng = db.Column(db.Float, nullable=True, default=32.5825)
     is_active = db.Column(db.Boolean, default=False)
 
     # New Multi-Modal Field (Taxi, Bus, Marine, Train)

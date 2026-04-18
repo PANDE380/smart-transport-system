@@ -1,80 +1,93 @@
-<div class="srv-hero">
-  <div class="srv-hero-inner">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:20px;">
-      <div>
-        <div class="hero-live" style="margin-bottom:14px; background:rgba(255,194,0,0.1); border-color:rgba(255,194,0,0.25); color:var(--yellow);"><span></span>LIVE · Driver Partner</div>
-        <h1 style="font-size: 2.2rem; margin-bottom: 4px;">Driver Command Center</h1>
-        <p id="driver-welcome" style="margin:0; opacity:0.8;">Welcome back. Your assigned vehicles and recent trips will sync here.</p>
-      </div>
-      <div style="display:flex; gap:12px; align-items:center;">
-        <div class="otog">
-          <div class="odot on" id="odot" style="background:var(--yellow);"></div>
-          <span class="olbl" id="olbl">Online</span>
-          <button class="togbtn" onclick="togOnline()" style="background:rgba(255,194,0,0.2); color:var(--yellow);">Toggle Status</button>
-        </div>
-        <button class="btn-o-sm" style="background:var(--yellow); color:#000; border:none; padding:10px 18px; font-weight:800;" onclick="showT('<i class=&quot;fas fa-wallet&quot;></i>','Withdrawal integration is the next backend step.','var(--yellow)')">
-          <i class="fas fa-hand-holding-dollar"></i> Withdraw Earnings
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driver Dashboard | STS Uganda</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/professional-refresh.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+<section class="dashboard-shell" aria-label="Driver dashboard">
+  <section class="driver-hero">
+    <article class="driver-hero-copy">
+      <span class="page-kicker">Driver workspace</span>
+      <h1 id="driver-hero-title">Driver command center</h1>
+      <p id="driver-welcome">Welcome back. Your assigned vehicles, requests, and recent trip activity will sync here.</p>
+    </article>
 
-<div class="wrap">
-  <div class="dstats reveal reveal-stagger" style="margin-top: -30px; position: relative; z-index: 10; margin-bottom: 30px;">
-    <div class="dsc">
+    <article class="driver-status-card">
+      <div class="otog">
+        <div class="odot" id="odot" style="background:var(--accent);"></div>
+        <span class="olbl" id="olbl">Online</span>
+        <button class="togbtn" type="button" onclick="togOnline()">Toggle status</button>
+      </div>
+      <button class="btn-o-sm" type="button" onclick="openDriverWithdrawModal()">
+        <i class="fas fa-hand-holding-dollar"></i>
+        Withdraw earnings
+      </button>
+      <div class="service-stat-list">
+        <div class="service-stat-item"><strong>Workspace focus</strong><span>Requests, coverage, and payout</span></div>
+        <div class="service-stat-item"><strong>Live sync</strong><span>Driver dashboard stream</span></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="dstats">
+    <article class="dsc">
       <div class="dsc-ico"><i class="fas fa-route"></i></div>
       <div class="dsc-v" id="driver-rides-today">0</div>
-      <div class="dsc-l">Rides Today</div>
-      <div class="dsc-ch">Live from completed trips</div>
-    </div>
-    <div class="dsc">
-      <div class="dsc-ico" style="background:var(--yellow-l); color:var(--yellow);"><i class="fas fa-money-bill-trend-up"></i></div>
-      <div class="dsc-v" id="driver-earnings">0</div>
-      <div class="dsc-l">Earnings (UGX)</div>
-      <div class="dsc-ch">Backend-calculated revenue</div>
-    </div>
-    <div class="dsc">
-      <div class="dsc-ico" style="background:rgba(0,0,0,0.05); color:var(--text);"><i class="fas fa-star"></i></div>
+      <div class="dsc-l">Rides today</div>
+      <div class="dsc-ch">Completed trips from the backend</div>
+    </article>
+    <article class="dsc">
+      <div class="dsc-ico"><i class="fas fa-money-bill-trend-up"></i></div>
+      <div class="dsc-v" id="driver-earnings">UGX 0</div>
+      <div class="dsc-l">Earnings</div>
+      <div class="dsc-ch">Current total across completed rides</div>
+    </article>
+    <article class="dsc">
+      <div class="dsc-ico"><i class="fas fa-star"></i></div>
       <div class="dsc-v" id="driver-rating">0.0</div>
-      <div class="dsc-l">Avg Rating</div>
-      <div class="dsc-ch">Based on submitted feedback</div>
-    </div>
-    <div class="dsc">
-      <div class="dsc-ico" style="background:var(--navy-l); color:#fff;"><i class="fas fa-car"></i></div>
+      <div class="dsc-l">Average rating</div>
+      <div class="dsc-ch">Based on submitted rider feedback</div>
+    </article>
+    <article class="dsc">
+      <div class="dsc-ico"><i class="fas fa-car"></i></div>
       <div class="dsc-v" id="driver-active-vehicles">0</div>
-      <div class="dsc-l">Active Vehicles</div>
-      <div class="dsc-ch">Current availability state</div>
-    </div>
-  </div>
+      <div class="dsc-l">Active vehicles</div>
+      <div class="dsc-ch">Vehicles currently available in the feed</div>
+    </article>
+  </section>
 
-  <div class="dgrid reveal">
-    <div>
+  <section class="dgrid">
+    <article class="dashboard-panel">
       <div class="sh" style="display:flex; justify-content:space-between; align-items:center;">
-        <h3><i class="fas fa-satellite-dish"></i> Fleet and Recent Trips</h3>
-        <span class="chip ct" id="driver-request-chip">Syncing backend data</span>
+        <h3><i class="fas fa-list-check"></i> Live work queue</h3>
+        <span class="chip" id="driver-request-chip">Syncing backend data</span>
       </div>
       <div id="rreqs">
-        <div class="rc" style="border: 1.5px solid var(--border); border-radius:12px; padding:16px; background:var(--white); box-shadow:var(--shadow-md); margin-bottom:12px;">
-          <div class="rr" style="font-weight:700; color:var(--navy); margin-bottom:4px;">Driver dashboard is loading...</div>
-          <div class="rm" style="display:flex; gap:12px; font-size:.74rem; color:var(--text3);">
-            <span><i class="fas fa-database"></i> Connecting to ASTS backend</span>
-          </div>
-        </div>
+        <div class="booking-empty-state">Driver dashboard is loading.</div>
       </div>
-    </div>
-    <div>
-      <div class="sh"><h3><i class="fas fa-map-marked-alt"></i> Area Coverage</h3></div>
+    </article>
+
+    <article class="dashboard-panel">
+      <div class="sh"><h3><i class="fas fa-map-marked-alt"></i> Area coverage</h3></div>
       <div class="map-surface">
         <div class="map-surface-head">
           <div>
-            <div class="map-surface-title">Live Coverage Map</div>
-            <div class="map-surface-note">A cleaner daylight map so routes, roads, and nearby service points stay easy to read.</div>
+            <div class="map-surface-title">Live coverage map</div>
+            <div class="map-surface-note">Vehicle and passenger movement appears here as the backend dashboard updates.</div>
           </div>
-          <span class="map-surface-chip"><i class="fas fa-sun"></i> Clear View</span>
+          <span class="map-surface-chip"><i class="fas fa-location-dot"></i>Live map</span>
         </div>
-        <div id="driver-map" style="height:350px;"></div>
+        <div id="driver-map"></div>
       </div>
-    </div>
-  </div>
-</div>
+    </article>
+  </section>
+</section>
+  </main>
+</body>
+</html>

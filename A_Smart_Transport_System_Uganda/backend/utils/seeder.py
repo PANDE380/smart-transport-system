@@ -1,8 +1,8 @@
 try:
-    from ..database import db
+    from ..database import db, bcrypt
     from ..models import User, Driver, Vehicle
 except ImportError:
-    from database import db
+    from database import db, bcrypt
     from models import User, Driver, Vehicle
 
 
@@ -11,7 +11,7 @@ def _upsert_user(name, email, phone, password, role):
     if user:
         user.name = name
         user.phone = phone
-        user.password = password
+        user.password = bcrypt.generate_password_hash(password).decode('utf-8')
         user.role = role
         return user
 
