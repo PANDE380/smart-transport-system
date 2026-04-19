@@ -21,6 +21,8 @@ class Trip(db.Model):
     rating = db.Column(db.Integer, nullable=True)
     feedback = db.Column(db.Text, nullable=True)
     is_sos = db.Column(db.Boolean, default=False)
+    sos_evidence_url = db.Column(db.String(500), nullable=True)
+    sos_description = db.Column(db.Text, nullable=True)
     scheduled_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -40,9 +42,11 @@ class Trip(db.Model):
             'rating': self.rating,
             'feedback': self.feedback,
             'is_sos': self.is_sos,
+            'sos_evidence_url': self.sos_evidence_url,
+            'sos_description': self.sos_description,
             'scheduled_at': self.scheduled_at.isoformat() if self.scheduled_at else None,
-            'created_at': self.created_at.isoformat(),
-            'timestamp': self.created_at.strftime('%d %b %Y, %I:%M %p'),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'timestamp': self.created_at.strftime('%d %b %Y, %I:%M %p') if self.created_at else None,
             'passenger_name': self.passenger.name if self.passenger else None,
             'passenger_phone': self.passenger.phone if self.passenger else None,
             'vehicle_type': self.vehicle.vehicle_type if self.vehicle else None,

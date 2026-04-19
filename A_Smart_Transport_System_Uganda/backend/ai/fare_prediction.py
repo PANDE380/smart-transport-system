@@ -20,6 +20,14 @@ if AI_DEPS_AVAILABLE:
     except Exception as e:
         print(f"Error loading AI model: {e}")
 
+def get_live_fuel_price() -> float:
+    """
+    Simulates fetching the real-time market price for fuel in Uganda per litre.
+    In a true production environment, this would hit an external commodity API.
+    Prices generally fluctuate between 5000 and 6000 UGX.
+    """
+    return round(random.uniform(5300.0, 5600.0), 2)
+
 def predict_fare(
     distance_km: float,
     vehicle_type: str = 'Taxi',
@@ -32,28 +40,26 @@ def predict_fare(
     Predicts transport fare using the trained Embedded AI model.
     Falls back to a robust calculation if the model is not found.
     """
-    # 1. Prepare inputs
     now = datetime.now()
     if hour is None: hour = now.hour
     if day_of_week is None: day_of_week = now.weekday()
     
-    # Simulate traffic based on typical Kampala rush hours if not provided
     if traffic_level is None:
         if (7 <= hour <= 9) or (17 <= hour <= 20):
-            traffic_level = 3 # High
+            traffic_level = 3
         else:
-            traffic_level = 1 # Low
+            traffic_level = 1
             
-    # Simulate weather if not provided
     if weather is None:
-        weather = 0 # Clear
+        weather = 0
         
-    # 2. Use AI Model if available
+    fuel_price = get_live_fuel_price()
+        
     if model:
         try:
-            # Prepare a DataFrame matching the training data format
             input_data = pd.DataFrame([{
                 'distance_km': distance_km,
+                'fuel_price': fuel_price,
                 'hour': hour,
                 'day_of_week': day_of_week,
                 'traffic_level': traffic_level,
@@ -62,15 +68,13 @@ def predict_fare(
             }])
             
             prediction = model.predict(input_data)[0]
-            
-            # Ensure we return a float and round to nearest 500
             return float(round(prediction / 500) * 500)
         except Exception as e:
             print(f"AI prediction error: {e}")
             
-    # 3. Fallback logic (Mathematical approximation of the model)
+    # Fallback logic mirroring the new fuel correlation math
     base_fare = 1000.0
-    rate_per_km = 500.0
+    active_rate_per_km = 500.0 + ((fuel_price - 4000) * 0.08)
     
     multipliers = {
         'Taxi': 1.0,
@@ -82,9 +86,8 @@ def predict_fare(
     }
     
     mult = multipliers.get(vehicle_type, 1.0)
-    fare = base_fare + (distance_km * rate_per_km * mult)
+    fare = base_fare + (distance_km * active_rate_per_km * mult)
     
-    # Add modifiers
     if traffic_level == 3: fare *= 1.5
     elif traffic_level == 2: fare *= 1.2
     

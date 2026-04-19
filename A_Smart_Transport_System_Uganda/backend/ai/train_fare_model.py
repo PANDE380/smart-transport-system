@@ -32,7 +32,7 @@ def train_model():
     # OneHotEncode the categorical 'vehicle_type'
     
     categorical_features = ['vehicle_type']
-    numeric_features = ['distance_km', 'hour', 'day_of_week', 'traffic_level', 'weather']
+    numeric_features = ['distance_km', 'fuel_price', 'hour', 'day_of_week', 'traffic_level', 'weather']
     
     preprocessor = ColumnTransformer(
         transformers=[

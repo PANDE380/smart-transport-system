@@ -15,6 +15,7 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     # passenger, driver, admin, traffic_officer
     role = db.Column(db.String(20), nullable=False, default='passenger')
+    preferred_language = db.Column(db.String(10), nullable=False, default='en')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __init__(self, **kwargs):
@@ -23,7 +24,11 @@ class User(db.Model):
         super(User, self).__init__(**kwargs)
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password, password)
+        try:
+            return bcrypt.check_password_hash(self.password, password)
+        except ValueError:
+            # Handle 'Invalid salt' errors gracefully (e.g. if hash is malformed)
+            return False
 
     driver_profile = db.relationship(
         'Driver', back_populates='user', uselist=False,
@@ -41,6 +46,7 @@ class User(db.Model):
             'email': self.email,
             'phone': self.phone,
             'role': self.role,
+            'preferred_language': self.preferred_language,
             'profile_image_url': (
                 profile_image.public_url() if profile_image else None
             ),

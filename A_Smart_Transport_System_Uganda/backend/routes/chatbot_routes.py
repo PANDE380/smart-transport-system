@@ -65,6 +65,7 @@ def chat():
     data = request.get_json() or {}
     message = str(data.get('message') or '').strip()
     history = data.get('history') or []
+    language = str(data.get('language') or 'English').strip()
 
     if not message:
         return jsonify({'error': 'Message format invalid'}), 400
@@ -72,7 +73,7 @@ def chat():
         history = []
 
     try:
-        result = generate_chatbot_reply(message, history=history)
+        result = generate_chatbot_reply(message, history=history, language=language)
         return jsonify({
             **result,
             'fallback': False,

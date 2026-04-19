@@ -19,15 +19,25 @@ _last_error_at = None
 
 
 SYSTEM_PROMPT = """
-You are the OpenAI-powered assistant for A Smart Transport System Uganda (ASTS).
+You are the advanced OpenAI-powered assistant for A Smart Transport System Uganda (ASTS).
 
-Your job:
-- Help users with ASTS transport, booking, driver, wallet, payment, safety, tracking, and support questions.
-- You may also answer general knowledge questions clearly and helpfully.
-- When a user asks for account-specific data that you cannot directly inspect, say that clearly and guide them to the right ASTS page or support path.
-- Keep answers practical, warm, and easy to understand.
-- Do not invent internal policies, balances, bookings, or live account data.
-- If web search is enabled and you rely on it, keep the answer concise and grounded in the cited sources.
+Your Identity & Mission:
+- You are a professional, helpful, and culturally aware assistant specialized in the Ugandan transport ecosystem.
+- Your primary goal is to assist users with ASTS services: city taxis (matatus), Boda Bodas, Smart Buses, Special Hires, and Marine Transport on Lake Victoria/Lake Kyoga.
+
+Core ASTS Knowledge:
+1. Booking: Users can book via the web dashboard or USSD (*250#).
+2. Payments: ASTS uses a SmartCard and Wallet system. Top-ups happen via MTN Mobile Money, Airtel Money, or STS Agents.
+3. Safety: There is a dedicated 'SOS' button in the app and USSD that coordinates with Uganda Police and emergency services.
+4. Support: Users can report Lost & Found items or lodging complaints via the 'STS Connect' hub.
+5. Rewards: Users earn 'STS Points' for frequent travel.
+
+Guidelines for Interaction:
+- Maintain a warm, helpful, and professional tone. Use regional terms appropriately (e.g., 'Matatu' or 'Taxi' for 14-seater vans, 'Captain' for drivers).
+- If a user asks for live data (like their balance or trip status) that you cannot access, politely explain that you don't have direct access to their private account data and guide them to the 'Wallet' or 'History' page.
+- Do not invent internal policies, specific fares for unknown routes, or fake driver names.
+- Always prioritize safety advice if a user reports an emergency, and remind them to use the physical SOS button for immediate police dispatch.
+- Keep responses concise but comprehensive.
 """.strip()
 
 
@@ -99,24 +109,26 @@ def _describe_openai_error(error):
     if isinstance(error, ChatbotUnavailableError):
         return str(error)
     if isinstance(error, AuthenticationError):
-        return 'The OpenAI API key was rejected. Check the configured key and try again.'
+        return 'OpenAI authentication failed. Please verify the API key configuration.'
     if isinstance(error, RateLimitError):
         return (
-            'OpenAI is unavailable because the current API quota or rate limit was reached. '
-            'Check billing and usage, then try again.'
+            'The AI assistant is currently at its processing limit. '
+            'Service will automatically resume shortly. Please try again in 1 minute.'
         )
     if isinstance(error, APIConnectionError):
-        return 'The OpenAI service could not be reached. Check internet access and try again.'
+        return 'Could not connect to the AI gateway. Please check your network and try again.'
     if isinstance(error, OpenAIError):
-        return f'OpenAI returned an API error: {error}'
-    return f'OpenAI is temporarily unavailable: {error}'
+        return f'AI Service Error: {error}'
+    return f'The assistant is temporarily unavailable: {error}'
 
 
-def _build_input_items(message, history):
+def _build_input_items(message, history, language=None):
+    language_directive = f"\n- VERY IMPORTANT: The user has explicitly selected {language} as their preferred application interface language. You MUST process their message and return your ENTIRE reply exclusively in {language}, using correct regional vernacular and spelling." if language and str(language).lower() not in ('', 'en', 'english') else ""
+    
     input_items = [
         {
             'role': 'system',
-            'content': [{'type': 'input_text', 'text': SYSTEM_PROMPT}]
+            'content': [{'type': 'input_text', 'text': SYSTEM_PROMPT + language_directive}]
         }
     ]
 
@@ -212,7 +224,7 @@ def get_chatbot_runtime_status():
     }
 
 
-def generate_chatbot_reply(message, history=None):
+def generate_chatbot_reply(message, history=None, language=None):
     message = str(message or '').strip()
     if not message:
         raise ChatbotUnavailableError('Please enter a message for the assistant.')
@@ -225,7 +237,7 @@ def generate_chatbot_reply(message, history=None):
 
     request_kwargs = {
         'model': get_chatbot_model(),
-        'input': _build_input_items(message, history or []),
+        'input': _build_input_items(message, history or [], language),
         'max_output_tokens': 500
     }
 

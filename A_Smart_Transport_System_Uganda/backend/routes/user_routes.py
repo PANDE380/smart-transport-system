@@ -427,6 +427,24 @@ def get_user_profile(user_id):
     }), 200
 
 
+@user_bp.route('/<int:user_id>', methods=['PUT', 'POST'])
+def update_user_profile(user_id):
+    user = db.get_or_404(User, user_id)
+    data = request.get_json() or {}
+    
+    if 'preferred_language' in data:
+        user.preferred_language = data['preferred_language']
+    
+    if 'name' in data:
+        user.name = data['name']
+        
+    db.session.commit()
+    return jsonify({
+        'message': 'Profile updated successfully',
+        'user': user.to_dict()
+    }), 200
+
+
 @user_bp.route('/<int:user_id>/profile-photo', methods=['POST'])
 def upload_profile_photo(user_id):
     user = db.get_or_404(User, user_id)
@@ -497,15 +515,29 @@ def _get_driver_dashboard_payload(user_id):
 
     vehicles = list(driver_profile.vehicles)
     vehicle_ids = [vehicle.id for vehicle in vehicles]
+    vehicle_types = {v.vehicle_type for v in vehicles}
 
     trips = []
     if vehicle_ids:
-        trips = (
+        # Get trips explicitly assigned to this driver's vehicles
+        assigned_trips = (
             Trip.query
             .filter(Trip.vehicle_id.in_(vehicle_ids))
-            .order_by(Trip.created_at.desc())
             .all()
         )
+
+        # Get global pending trips matching this driver's vehicle types (that aren't already assigned to them)
+        claimable_trips = (
+            Trip.query
+            .join(Vehicle, Trip.vehicle_id == Vehicle.id)
+            .filter(Vehicle.vehicle_type.in_(list(vehicle_types)))
+            .filter(Trip.status == 'pending')
+            .filter(~Trip.vehicle_id.in_(vehicle_ids))
+            .all()
+        )
+
+        trips = assigned_trips + claimable_trips
+        trips.sort(key=lambda x: x.created_at, reverse=True)
 
     today = datetime.now(timezone.utc).date()
     paid_completed_trips = [
@@ -513,7 +545,10 @@ def _get_driver_dashboard_payload(user_id):
         if trip.status == 'completed' and trip.payment and
         trip.payment.status == 'success'
     ]
-    pending_trips = [trip for trip in trips if trip.status == 'pending']
+    pending_trips = [
+        trip for trip in trips
+        if trip.status in {'pending', 'scheduled'}
+    ]
     active_trips = [trip for trip in trips if trip.status == 'active']
     rated_trips = [trip.rating for trip in paid_completed_trips if trip.rating]
     withdrawal_transactions = (
@@ -593,6 +628,8 @@ def driver_dashboard_stream(user_id):
     if user.role != 'driver' or not driver_profile:
         return jsonify({'error': 'Driver profile not found'}), 404
 
+    current_app.logger.info(f"Driver {user_id} requested live dashboard stream sync.")
+
     def event_stream():
         last_payload = None
         last_heartbeat_at = time.monotonic()
@@ -636,10 +673,15 @@ def update_driver_status(user_id):
         return jsonify({'error': 'Driver profile not found'}), 404
 
     data = request.get_json() or {}
-    if 'active' not in data:
-        return jsonify({'error': 'Missing active status'}), 400
+    # Make robust: accept both 'active' and 'is_online' (common field names in our frontend)
+    active_val = data.get('active') if 'active' in data else data.get('is_online')
+    
+    if active_val is None:
+        return jsonify({'error': 'Missing status field (active or is_online)'}), 400
 
-    active = bool(data['active'])
+    active = bool(active_val)
+    current_app.logger.info(f"Updating Driver {user_id} availability to: {active}")
+    
     for vehicle in driver_profile.vehicles:
         vehicle.is_active = active
 

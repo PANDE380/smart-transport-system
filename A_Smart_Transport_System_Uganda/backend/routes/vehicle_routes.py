@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
-from flask import Blueprint, request, jsonify
+import json
+import time
+from flask import Blueprint, request, jsonify, Response, stream_with_context
 
 try:
     from ..models.vehicle_model import Vehicle
@@ -27,6 +29,76 @@ def get_live_locations():
         'vehicles': [v.to_dict() for v in vehicles],
         'trips': [t.to_dict() for t in active_trips]
     }), 200
+
+
+@vehicle_bp.route('/live-locations/stream', methods=['GET'])
+def get_live_locations_stream():
+    """
+    SSE endpoint for real-time live map tracking.
+    """
+    def event_stream():
+        last_payload = None
+        last_heartbeat_at = time.monotonic()
+
+        import random
+        try:
+            while True:
+                # Use a separate session context if needed, or query safely
+                vehicles = Vehicle.query.filter_by(is_active=True).all()
+                active_trips = Trip.query.filter(Trip.status.in_(['active', 'pending'])).all()
+                
+                vehicle_data_list = []
+                for v in vehicles:
+                    try:
+                        # Safe float cast for all numeric fields
+                        lat = float(v.current_lat) if v.current_lat is not None else 0.3476
+                        lng = float(v.current_lng) if v.current_lng is not None else 32.5825
+                        
+                        simulated_lat = lat + (random.random() - 0.5) * 0.0005
+                        simulated_lng = lng + (random.random() - 0.5) * 0.0005
+                        
+                        v_dict = v.to_dict()
+                        v_dict['current_lat'] = simulated_lat
+                        v_dict['current_lng'] = simulated_lng
+                        vehicle_data_list.append(v_dict)
+                    except (ValueError, TypeError):
+                        continue # Skip corrupted record
+                
+                # Robust serialization using default=str to catch decimals/datetimes
+                data_payload = {
+                    'vehicles': vehicle_data_list,
+                    'active_trips': [t.to_dict() for t in active_trips],
+                    'timestamp': datetime.now(timezone.utc).isoformat()
+                }
+                
+                payload = json.dumps(data_payload, default=str)
+                
+                if payload != last_payload:
+                    yield f"data: {payload}\n\n"
+                    last_payload = payload
+                
+                if time.monotonic() - last_heartbeat_at > 30:
+                    yield ": heartbeat\n\n"
+                    last_heartbeat_at = time.monotonic()
+
+                time.sleep(1)
+        except Exception as e:
+            # Fatal error in stream, log for debugging
+            with open('stream_debug.log', 'a') as f:
+                f.write(f"[{datetime.now()}] CRITICAL: {str(e)}\n")
+            return
+        except GeneratorExit:
+            return
+
+
+    return Response(
+        stream_with_context(event_stream()),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no'
+        }
+    )
 
 
 @vehicle_bp.route('/active', methods=['GET'])

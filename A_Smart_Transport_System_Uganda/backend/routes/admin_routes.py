@@ -3,19 +3,21 @@
 from datetime import datetime, timezone
 import time
 import json
-from flask import Blueprint, jsonify, request, current_app, Response, stream_with_context
+from flask import Blueprint, Response, jsonify, request, stream_with_context, current_app
 import re
 
 try:
     from ..models.user_model import User
     from ..models.driver_model import Driver
     from ..models.trip_model import Trip
+    from ..models.trip_log_model import TripLog
     from ..models.vehicle_model import Vehicle
     from ..database import db
 except ImportError:
     from models.user_model import User
     from models.driver_model import Driver
     from models.trip_model import Trip
+    from models.trip_log_model import TripLog
     from models.vehicle_model import Vehicle
     from database import db
 
@@ -84,6 +86,9 @@ def _get_admin_dashboard_payload():
     total_revenue = sum(trip.fare for trip in Trip.query.filter_by(
         status='completed').all())
 
+    # PLATFORM REFLEX: Fetch 20 most recent interaction logs
+    recent_logs = TripLog.query.order_by(TripLog.created_at.desc()).limit(20).all()
+
     # Fetch 10 most recent trips (requests + active)
     live_trips = Trip.query.order_by(Trip.created_at.desc()).limit(10).all()
 
@@ -102,12 +107,13 @@ def _get_admin_dashboard_payload():
         'sos_alerts': [t.to_dict() for t in sos_alerts],
         'active_vehicles': [v.to_dict() for v in active_vehicles],
         'live_trips': [t.to_dict() for t in live_trips],
+        'recent_logs': [log.to_dict() for log in recent_logs],
         'pending_drivers': [{
             'id': driver.id,
             'name': driver.user.name if driver.user else 'Unknown Driver',
             'license_number': driver.license_number,
             'vehicles': [vehicle.to_dict() for vehicle in driver.vehicles],
-            'created_at': driver.user.created_at.isoformat() if hasattr(driver, 'user') and driver.user and hasattr(driver.user, 'created_at') else datetime.now(timezone.utc).isoformat()
+            'created_at': (driver.user.created_at.isoformat() if (driver.user and hasattr(driver.user, 'created_at') and driver.user.created_at) else datetime.now(timezone.utc).isoformat())
         } for driver in pending_drivers]
     }
 
