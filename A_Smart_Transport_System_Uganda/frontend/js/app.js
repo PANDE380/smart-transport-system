@@ -29,6 +29,8 @@ let ussdSessionStarted = false;
 let driverMarkers = [];
 let adminMarkers = [];
 let liveTrackingInterval = null;
+let adminDashboardStream = null;
+let adminDashboardStreamConnected = false;
 let driverDashboardLoading = false;
 let driverDashboardStream = null;
 let driverDashboardStreamConnected = false;
@@ -48,11 +50,13 @@ let paymentDashboardPollingTimer = null;
 let passengerMarkers = [];
 let homeMarkers = [];
 let homeMarkersLookup = {}; // Added for smooth interpolation lookup
+let adminVehMarkers = {}; // Added for admin map smooth marker tracking
 let pendingProfilePhotoFile = null;
 let pendingProfilePhotoPreviewUrl = null;
 let chatbotConversation = [];
 let chatbotStatusSnapshot = null;
 let chatbotStatusLoading = false;
+let adminUserChartInstance = null; // Graph instance for admin dashboard
 const MODE_TO_VEHICLE_TYPE = {
     'Standard Taxi': 'Taxi',
     'Boda Boda': 'Boda Boda',
@@ -1005,7 +1009,15 @@ function selRegRole(el, role) {
 
 function markVehicleCapacityManual() {
     const capacity = document.getElementById('r-vehicle-capacity');
-    if (capacity) capacity.dataset.manual = 'true';
+    if (capacity) {
+        capacity.dataset.manual = 'true';
+        if (capacity.max && Number(capacity.value) > Number(capacity.max)) {
+            capacity.value = capacity.max;
+            showRegErr(`Maximum allowed capacity is ${capacity.max}.`);
+        } else {
+            showRegErr('');
+        }
+    }
 }
 
 function clearDriverExtraFields() {
@@ -1033,9 +1045,12 @@ function updateDriverVehicleFields() {
 
     const config = getDriverVehicleConfig(vehicleType.value);
     if (numberPlate) numberPlate.placeholder = config.platePlaceholder;
-    if (capacity && !capacity.dataset.manual) capacity.value = config.capacity;
+    if (capacity) {
+        if (!capacity.dataset.manual) capacity.value = config.capacity;
+        capacity.max = config.capacity;
+    }
     if (hint) {
-        hint.textContent = `Driver profile for ${config.label}. Default capacity is ${config.capacity}.`;
+        hint.textContent = `Driver profile for ${config.label}. Maximum allowed capacity is ${config.capacity}.`;
     }
 }
 
@@ -1321,6 +1336,12 @@ async function doRegister() {
             return;
         }
 
+        const config = getDriverVehicleConfig(vehicleType);
+        if (vehicleCapacity > config.capacity) {
+            showRegErr(`Maximum allowed passenger capacity for ${config.label} is ${config.capacity}.`);
+            return;
+        }
+
         Object.assign(payload, {
             license_number: licenseNumber,
             vehicle_type: vehicleType,
@@ -1580,10 +1601,41 @@ async function removeProfilePhoto() {
 // ══════════════════════════════════════════
 // UI BUILDERS
 // ══════════════════════════════════════════
-const PASS_NAV = [{key:'nav_home',p:'home'},{key:'nav_booking',p:'booking'},{key:'nav_services',p:'services'},{key:'nav_about',p:'about'},{key:'nav_support',p:'contact'},{key:'nav_ussd',p:'ussd'},{key:'nav_history',p:'history'},{key:'nav_admin',p:'admin'},{key:'nav_driver',p:'driver'}];
-const DRV_NAV = [{key:'nav_home',p:'home'},{key:'nav_driver',p:'driver'},{key:'nav_services',p:'services'},{key:'nav_about',p:'about'},{key:'nav_support',p:'contact'},{key:'nav_history',p:'history'},{key:'nav_admin',p:'admin'}];
-const ADM_NAV = [{key:'nav_home',p:'home'},{key:'nav_admin',p:'admin'},{key:'nav_services',p:'services'},{key:'nav_about',p:'about'},{key:'nav_support',p:'contact'},{key:'nav_history',p:'history'},{key:'nav_driver',p:'driver'}];
-const GUEST_NAV = [{key:'nav_home',p:'home'},{key:'nav_booking',p:'booking'},{key:'nav_services',p:'services'},{key:'nav_about',p:'about'},{key:'nav_support',p:'contact'},{key:'nav_admin',p:'admin'},{key:'nav_driver',p:'driver'}];
+// ══════════════════════════════════════════════════════════════════
+// ROLE-BASED ACCESS CONTROL — nav configs
+// Pages shown in the top nav per role (no cross-role dashboard links)
+// ══════════════════════════════════════════════════════════════════
+const PASS_NAV = [
+    {key:'nav_home',     p:'home'},
+    {key:'nav_booking',  p:'booking'},
+    {key:'nav_services', p:'services'},
+    {key:'nav_about',    p:'about'},
+    {key:'nav_support',  p:'contact'},
+    {key:'nav_ussd',     p:'ussd'},
+    {key:'nav_history',  p:'history'},
+];
+const DRV_NAV = [
+    {key:'nav_home',     p:'home'},
+    {key:'nav_driver',   p:'driver'},
+    {key:'nav_services', p:'services'},
+    {key:'nav_about',    p:'about'},
+    {key:'nav_support',  p:'contact'},
+    {key:'nav_history',  p:'history'},
+];
+const ADM_NAV = [
+    {key:'nav_home',     p:'home'},
+    {key:'nav_admin',    p:'admin'},
+    {key:'nav_services', p:'services'},
+    {key:'nav_about',    p:'about'},
+    {key:'nav_support',  p:'contact'},
+    {key:'nav_history',  p:'history'},
+];
+const GUEST_NAV = [
+    {key:'nav_home',     p:'home'},
+    {key:'nav_services', p:'services'},
+    {key:'nav_about',    p:'about'},
+    {key:'nav_support',  p:'contact'},
+];
 
 function setGuestUI() {
     document.getElementById('nav-right').innerHTML = `
@@ -1605,16 +1657,14 @@ function setGuestUI() {
     }
 
     buildNav(GUEST_NAV);
-    const admLink = document.getElementById('nav-admin-link');
-    if (admLink) admLink.style.display = 'inline-block';
+    syncMobileNav(null);
+
     const bui = document.getElementById('booking-ui');
-    const gp = document.getElementById('guest-prompt');
-    const sw = document.getElementById('sc-wrap');
-    
-    // Unblock for guests too: allow them to see the maps and calculate fares
+    const gp  = document.getElementById('guest-prompt');
+    const sw  = document.getElementById('sc-wrap');
     if (bui) bui.style.display = 'block';
-    if (gp) gp.style.display = 'none';
-    if (sw) sw.style.display = 'block';
+    if (gp)  gp.style.display  = 'none';
+    if (sw)  sw.style.display  = 'block';
 }
 
 function setLoggedInUI(user) {
@@ -1651,45 +1701,46 @@ function setLoggedInUI(user) {
             </div>`;
     }
 
-    const nav = user.role === 'driver'
-        ? DRV_NAV
-        : (user.role === 'admin' ? ADM_NAV : PASS_NAV);
+    const nav = user.role === 'driver' ? DRV_NAV
+              : user.role === 'admin'  ? ADM_NAV
+              : PASS_NAV;
     buildNav(nav);
-    const admLink = document.getElementById('nav-admin-link');
-    if (admLink) admLink.style.display = 'inline-block';
-    const bui = document.getElementById('booking-ui');
-    const gp = document.getElementById('guest-prompt');
-    const sw = document.getElementById('sc-wrap');
+    syncMobileNav(user.role);
 
-    // Restore role-based primary dashboard focus
-    if (user.role === 'passenger') {
-        if (bui) bui.style.display = 'block';
-        if (gp) gp.style.display = 'none';
-        if (sw) sw.style.display = 'block';
-        loadBookingSummary();
-    } else {
-        // Drivers/Admins: show the booking engine if they navigate to it, 
-        // but hide the default passenger prompt/summary by default
-        if (bui) bui.style.display = 'block';
-        if (gp) gp.style.display = 'none';
-        if (sw) sw.style.display = 'block';
-    }
+    const bui = document.getElementById('booking-ui');
+    const gp  = document.getElementById('guest-prompt');
+    const sw  = document.getElementById('sc-wrap');
+    if (bui) bui.style.display = 'block';
+    if (gp)  gp.style.display  = 'none';
+    if (sw)  sw.style.display  = 'block';
+    if (user.role === 'passenger') loadBookingSummary();
+
+    // Re-initialize Live Streams on successful login/identification
+    if (user.role === 'admin') initAdminStream();
+    if (user.role === 'driver') initDriverStream();
 }
 
 function syncActiveNav() {
-    const role = currentUser?.role || 'passenger';
+    const role = currentUser?.role; // undefined if guest
+
     document.querySelectorAll('.nl').forEach(link => {
         const page = link.dataset.page;
         link.classList.toggle('active', page === currentPage);
         
-        // Role-based visibility logic
-        if (PAGE_RESTRICTIONS[page]) {
-            if (PAGE_RESTRICTIONS[page].includes(role)) {
-                link.style.display = 'inline-flex';
-            } else {
-                link.style.display = 'none';
+        // Default assuming it's visible
+        let isVisible = true;
+
+        if (!role && AUTH_REQUIRED.has(page)) {
+            // Guest cannot see protected pages
+            isVisible = false;
+        } else if (role && PAGE_RESTRICTIONS[page]) {
+            // Logged in user must have the correct role for restricted pages
+            if (!PAGE_RESTRICTIONS[page].includes(role)) {
+                isVisible = false;
             }
         }
+
+        link.style.display = isVisible ? 'inline-flex' : 'none';
     });
 }
 
@@ -1720,19 +1771,60 @@ function buildNav(cfg) {
     syncActiveNav();
 }
 
-const PAGE_RESTRICTIONS = {};
+// ══════════════════════════════════════════════════════════════════
+// ROLE-BASED PAGE RESTRICTIONS
+// Keys = page name.  Values = array of roles allowed.
+// null means any authenticated user; omitting a page = public.
+// ══════════════════════════════════════════════════════════════════
+const PAGE_RESTRICTIONS = {
+    // Dashboards — strictly one role each
+    admin:   ['admin'],
+    driver:  ['driver'],
+    // Passenger-only features
+    booking: ['passenger'],
+    // Authenticated users only (all roles)
+    history: ['passenger', 'driver', 'admin'],
+    payment: ['passenger', 'driver', 'admin'],
+};
+
+// Pages that require at minimum a signed-in account (guests get redirected to sign-in)
+const AUTH_REQUIRED = new Set(['booking', 'history', 'payment', 'admin', 'driver']);
+
+// Helper: show/hide hamburger nav links based on role
+function syncMobileNav(role) {
+    // Admin link — admin only
+    const mobAdmin = document.getElementById('mob-nav-admin-link');
+    if (mobAdmin) mobAdmin.style.display = role === 'admin' ? 'flex' : 'none';
+
+    // Driver link — driver only
+    const mobDriver = document.getElementById('mob-nav-driver-link');
+    if (mobDriver) mobDriver.style.display = role === 'driver' ? 'flex' : 'none';
+}
+
 
 function showPg(name, btn) {
-    const role = currentUser?.role || 'passenger';
-    
-    // Auth Guard (Lifting restrictions for unblocked platform view)
-    if (PAGE_RESTRICTIONS[name] && !PAGE_RESTRICTIONS[name].includes(role)) {
-        showT('🔒', 'Access Restricted: Your account type is not authorized for this area.', 'var(--red)');
-        
-        if (!PAGE_RESTRICTIONS[currentPage] || PAGE_RESTRICTIONS[currentPage].includes(role)) {
-            return;
+    const role = currentUser?.role; // undefined if guest
+
+    // Guard: Require login for protected dashboards
+    if (AUTH_REQUIRED.has(name) && !currentUser) {
+        showT('🔒', 'Please sign in to access this page.', 'var(--yellow)');
+        openM('auth-m');
+        if (AUTH_REQUIRED.has(currentPage)) {
+            name = 'home'; // fallback if current page is also protected
+        } else {
+            return; // stay on current allowed page
         }
-        name = 'home';
+    }
+    
+    // Guard: Role-based restrictions (Admins can't see driver view, etc.)
+    if (currentUser && PAGE_RESTRICTIONS[name]) {
+        if (!PAGE_RESTRICTIONS[name].includes(role)) {
+            showT('🚫', 'Access Restricted: Your account type is not authorized for this area.', 'var(--red)');
+            if (!PAGE_RESTRICTIONS[currentPage] || PAGE_RESTRICTIONS[currentPage].includes(role)) {
+                return; // stay on current allowed page
+            }
+            name = 'home'; // fallback
+        }
     }
 
     currentPage = name;
@@ -2173,9 +2265,11 @@ function renderPassengerMarkersOnMap(trips, targetMap = drvMap, markerArray = pa
 }
 
 function renderDriverVehiclesOnMap(vehicles) {
-    if (!drvMap) return;
+    if (!drvMap || !vehicles || vehicles.length === 0) return;
     
     vehicles.forEach((v) => {
+        if (v.latitude == null || v.longitude == null) return;
+        
         const key = `d-veh-${v.id}`;
         if (adminVehMarkers[key]) {
             moveMarkerSmoothly(adminVehMarkers[key], [v.latitude, v.longitude]);
@@ -2188,8 +2282,14 @@ function renderDriverVehiclesOnMap(vehicles) {
 }
 
 function renderAdminVehiclesOnMap(vehicles) {
-    if (!admMap) return;
+    if (!admMap || !vehicles || vehicles.length === 0) return;
+    
+    let validVehicleFound = false;
+
     vehicles.forEach((v) => {
+        if (v.latitude == null || v.longitude == null) return;
+        validVehicleFound = true;
+        
         const key = `a-veh-${v.id}`;
         if (adminVehMarkers[key]) {
             moveMarkerSmoothly(adminVehMarkers[key], [v.latitude, v.longitude]);
@@ -2203,14 +2303,16 @@ function renderAdminVehiclesOnMap(vehicles) {
     Object.keys(adminVehMarkers).forEach(key => {
         if (key.startsWith('a-veh-')) {
             const id = parseInt(key.split('-')[2]);
-            if (!vehicles.find(v => v.id === id)) {
+            if (!vehicles.find(v => v.id === id && v.latitude != null && v.longitude != null)) {
                 admMap.removeLayer(adminVehMarkers[key]);
                 delete adminVehMarkers[key];
             }
         }
     });
 
-    admMap.setView(getMarkerPoint(vehicles[0], 0), 11);
+    if (validVehicleFound && vehicles[0] && vehicles[0].latitude != null) {
+        admMap.setView([vehicles[0].latitude, vehicles[0].longitude], 11);
+    }
 }
 
 function servicesPageIsActive() {
@@ -3592,19 +3694,69 @@ async function loadAdminReports() {
         const breakdown = document.getElementById('rpt-vehicle-breakdown');
         if (breakdown && data.operations?.popular_vehicle_types) {
             const types = data.operations.popular_vehicle_types;
-            breakdown.innerHTML = '<b>Trips by Vehicle Type:</b><br>' +
-                Object.entries(types).map(([type, count]) =>
-                    `<i class="fas fa-car" style="color:var(--yellow);margin-right:6px;"></i> ${escapeHtml(type)}: <b>${count}</b> trips`
-                ).join('<br>');
+            breakdown.innerHTML = Object.entries(types).map(([type, count]) => {
+                const icon = type.toLowerCase().includes('boda') ? 'motorcycle' : 'car';
+                return `
+                    <div style="display:flex; align-items:center; background:#f1f5f9; padding:12px; border-radius:8px; flex: 0 0 calc(50% - 8px); min-width: 200px; box-sizing: border-box;">
+                        <div style="background:#123a5a; color:#fff; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px; margin-right:12px; flex-shrink: 0;">
+                            <i class="fas fa-${icon}" style="font-size:0.9rem;"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:0.85rem; color:#475569; font-weight:600;">${escapeHtml(type)}</div>
+                            <div style="font-size:0.75rem; color:#64748b;">${count} successful trips</div>
+                        </div>
+                    </div>`;
+            }).join('');
         }
 
         const ts = document.getElementById('rpt-generated-at');
-        if (ts) ts.textContent = `Report generated at: ${data.generated_at || new Date().toISOString()}`;
+        if (ts) ts.innerHTML = `Date: <b>${new Date().toLocaleDateString('en-GB')}</b><br>Time: <b>${new Date().toLocaleTimeString('en-GB')}</b>`;
 
         showT('📊', 'Operational report generated successfully.', 'var(--yellow)');
     } catch (e) {
         showT('❌', e.message || 'Unable to generate report.', 'var(--red)');
     }
+}
+
+function downloadReportPDF() {
+    const element = document.getElementById('report-print-container');
+    if (!element) return;
+    
+    // Force a temporary view reset to top to prevent html2canvas blank page issues
+    const originalScrollPos = window.scrollY;
+    window.scrollTo(0, 0);
+
+    // Configure html2pdf options
+    const opt = {
+        margin: [0.3, 0.3],
+        filename: `STS_Operational_Report_${new Date().toISOString().split('T')[0]}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            logging: false,
+            letterRendering: true,
+            scrollY: 0,
+            scrollX: 0
+        },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    // Use html2pdf library to generate and download
+    if (typeof html2pdf === 'undefined') {
+        window.scrollTo(0, originalScrollPos);
+        showT('❌', 'PDF library not loaded. Please refresh the page.', 'var(--red)');
+        return;
+    }
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        window.scrollTo(0, originalScrollPos);
+        showT('✅', 'Report downloaded successfully!', 'var(--success)');
+    }).catch(err => {
+        window.scrollTo(0, originalScrollPos);
+        console.error('PDF Export Error:', err);
+        showT('❌', 'Failed to generate PDF. Check console for details.', 'var(--red)');
+    });
 }
 
 // REQ-27: In-App Support
@@ -4096,7 +4248,7 @@ function renderPendingDrivers(drivers = []) {
     if (!drivers.length) {
         body.innerHTML = `
             <tr style="border-bottom:1px solid var(--border);">
-                <td colspan="6" style="padding:18px; text-align:center; color:var(--text3);">No pending driver approvals are waiting in the backend queue.</td>
+                <td colspan="7" style="padding:18px; text-align:center; color:var(--text3);">No pending driver approvals are waiting in the backend queue.</td>
             </tr>`;
         return;
     }
@@ -4110,7 +4262,11 @@ function renderPendingDrivers(drivers = []) {
                 <td style="padding:14px;">${escapeHtml(vehicle?.number_plate || 'No vehicle yet')}</td>
                 <td style="padding:14px;">${escapeHtml(vehicle?.vehicle_type || 'Pending assignment')}</td>
                 <td style="padding:14px;"><span class="chip cm" style="background:#e5e7eb; color:#4b5563;">Pending</span></td>
-                <td style="padding:14px; text-align:center;"><span style="color:var(--text3); font-size:.8rem;">Review workflow is ready</span></td>
+                <td style="padding:14px;">${driver.created_at ? formatDateTime(driver.created_at) : 'N/A'}</td>
+                <td style="padding:14px; text-align:center;">
+                    <button onclick="appDrv(${driver.id})" style="background:#10b981; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; margin-right:4px;"><i class="fas fa-check"></i> Approve</button>
+                    <button onclick="rejDrv(${driver.id})" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px;"><i class="fas fa-times"></i> Reject</button>
+                </td>
             </tr>`;
     }).join('');
 }
@@ -4248,6 +4404,8 @@ async function loadAdminDashboard() {
             document.getElementById('admin-revenue-note').textContent = `${formatUGX(stats.total_revenue ?? 0)} has been collected from completed rides.`;
         }
 
+        updateAdminChart(stats.total_passengers ?? 0, stats.total_drivers ?? 0);
+
         initAdmMap();
         renderAdminVehiclesOnMap(vehicles);
         renderAdminAlerts(data.sos_alerts || []);
@@ -4255,6 +4413,60 @@ async function loadAdminDashboard() {
         renderAdminLiveActivity(data.live_trips || []);
     } catch (e) {
         showT('❌', e.message || 'Unable to load admin dashboard.', 'var(--red)');
+    }
+}
+
+function updateAdminChart(passengers, drivers) {
+    const ctx = document.getElementById('admin-user-chart');
+    const statusChip = document.getElementById('admin-chart-status');
+    if (!ctx) return;
+    
+    if (statusChip) {
+        statusChip.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success);"></i> Live Sync';
+    }
+
+    const chartData = {
+        labels: ['Passengers Accounts', 'Driver Partners'],
+        datasets: [{
+            data: [passengers, drivers],
+            backgroundColor: ['#10b981', '#34d399'], // Professional Emerald and Green
+            hoverBackgroundColor: ['#059669', '#10b981'],
+            borderWidth: 0,
+            hoverOffset: 4
+        }]
+    };
+
+    if (adminUserChartInstance) {
+        adminUserChartInstance.data = chartData;
+        adminUserChartInstance.update();
+    } else {
+        if (typeof Chart === 'undefined') return;
+        adminUserChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#4b5563',
+                            font: { family: "'Inter', sans-serif", size: 13, weight: 'bold' },
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#111827',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 14, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 13, family: "'Inter', sans-serif", weight: 'bold' }
+                    }
+                }
+            }
+        });
     }
 }
 
@@ -4268,12 +4480,43 @@ function legacyCloseM(id) {
     if (modal) modal.classList.remove('show');
 }
 
-function appDrv() {
-    showT('ℹ️', 'Pending-driver review is now fed from the backend queue.', 'var(--yellow)');
+function appDrv(driverId) {
+    if (!confirm('Are you sure you want to approve this driver? They will gain full access to the STS Driver app.')) return;
+    showT('⏳', 'Approving driver...', 'var(--brand)');
+    apiRequest(`/admin/drivers/${driverId}/approve`, { method: 'POST' })
+        .then(result => {
+            showT('✅', result.message || 'Driver approved successfully.', 'var(--success)');
+            loadAdminDashboard();
+        })
+        .catch(e => showT('❌', e.message || 'Failed to approve driver.', 'var(--red)'));
 }
 
-function rejDrv() {
-    showT('ℹ️', 'Pending-driver review is now fed from the backend queue.', 'var(--yellow)');
+function rejDrv(driver_id) {
+    if (!confirm('Are you sure you want to completely reject and remove this driver application?')) return;
+    showT('⏳', 'Removing application...', 'var(--gray)');
+    apiRequest(`/admin/drivers/${driver_id}/reject`, { method: 'POST' })
+        .then(result => {
+            showT('⚠️', result.message || 'Driver application rejected.', 'var(--orange)');
+            loadAdminDashboard();
+        })
+        .catch(e => showT('❌', e.message || 'Failed to reject driver.', 'var(--red)'));
+}
+
+async function resetSystemActivity() {
+    if (!confirm('CRITICAL ACTION: This will permanently delete ALL trip and payment history from the database. This is intended for clearing test data only. Proceed?')) return;
+    
+    showT('⚠️', 'Purging system activity logs...', 'var(--red)');
+    try {
+        const result = await apiRequest('/admin/system/reset-activity', { method: 'POST' });
+        showT('✅', result.message || 'Activity logs cleared.', 'var(--success)');
+        
+        // Refresh dashboard immediately to show empty state
+        if (typeof loadAdminDashboard === 'function') {
+            await loadAdminDashboard();
+        }
+    } catch (e) {
+        showT('❌', e.message || 'Failed to reset activity.', 'var(--red)');
+    }
 }
 
 // ══════════════════════════════════════════
@@ -4360,6 +4603,26 @@ async function initLiveTracking() {
     
     const poll = async () => {
         try {
+            // Update Sync Indicator Based on Connectivity
+            const indicator = document.getElementById('live-sync-indicator');
+            if (indicator) {
+                indicator.style.display = 'flex';
+                const pulse = indicator.querySelector('.sync-pulse');
+                const label = indicator.querySelector('span:last-child');
+                
+                // If any stream is active, show Green/Live
+                if (adminDashboardStreamConnected || driverDashboardStreamConnected) {
+                    pulse.style.background = '#10b981';
+                    label.style.color = '#10b981';
+                    label.textContent = 'Live';
+                } else {
+                    // Falling back to polling - show Yellow/Sync
+                    pulse.style.background = '#f59e0b';
+                    label.style.color = '#f59e0b';
+                    label.textContent = 'Sync';
+                }
+            }
+
             const data = await apiRequest('/vehicles/live-locations');
             liveFleetSnapshot = {
                 vehicles: data.vehicles || [],
@@ -4374,17 +4637,17 @@ async function initLiveTracking() {
             
             // 2. Fall back to polling if the live driver stream is unavailable.
             if (
-                drvMap &&
                 document.getElementById('driver-page')?.classList.contains('active') &&
-                currentUser &&
-                currentUser.role === 'driver' &&
+                currentUser?.role === 'driver' &&
                 !driverDashboardStreamConnected
             ) {
                 await loadDriverDashboard();
             }
             
-            // 3. Update admin dashboard (stat counts and live activity list)
-            if (document.getElementById('admin-page')?.classList.contains('active') && currentUser?.role === 'admin') {
+            // 3. Update admin dashboard if stream is unavailable
+            if (document.getElementById('admin-page')?.classList.contains('active') && 
+                currentUser?.role === 'admin' && 
+                !adminDashboardStreamConnected) {
                 await loadAdminDashboard();
             }
 
@@ -4394,11 +4657,122 @@ async function initLiveTracking() {
             }
         } catch (e) {
             console.warn('Live tracking poll skipped', e);
+            const indicator = document.getElementById('live-sync-indicator');
+            if (indicator) {
+                indicator.querySelector('.sync-pulse').style.background = '#ef4444';
+                indicator.querySelector('span:last-child').style.color = '#ef4444';
+                indicator.querySelector('span:last-child').textContent = 'Offline';
+            }
         }
     };
     
     poll();
-    liveTrackingInterval = setInterval(poll, 4000); // reduced from 8s to 4s for high responsiveness
+    liveTrackingInterval = setInterval(poll, 4000); 
+}
+
+/**
+ * Establishment of Server-Sent Events (SSE) for Admin
+ */
+function initAdminStream() {
+    if (adminDashboardStream) adminDashboardStream.close();
+    
+    console.log('Establishing Real-time Admin Bridge...');
+    adminDashboardStream = new EventSource(`${API_BASE_URL}/admin/dashboard/stream`);
+    
+    adminDashboardStream.onopen = () => {
+        adminDashboardStreamConnected = true;
+        console.log('✅ Admin Live Bridge Connected');
+        showT('🟢', 'Live Fleet Connection Established', 'var(--success)');
+    };
+
+    adminDashboardStream.addEventListener('connected', () => {
+        adminDashboardStreamConnected = true;
+        console.log('⚡ Admin Data Bridge Handshake Complete');
+    });
+
+    adminDashboardStream.addEventListener('dashboard', (e) => {
+        const data = JSON.parse(e.data);
+        adminDashboardStreamConnected = true;
+        
+        // Populate dashboard silently with live data
+        if (data.stats) {
+            if (document.getElementById('admin-total-users')) document.getElementById('admin-total-users').textContent = data.stats.total_users;
+            if (document.getElementById('admin-passengers')) document.getElementById('admin-passengers').textContent = data.stats.total_passengers;
+            if (document.getElementById('admin-drivers')) document.getElementById('admin-drivers').textContent = data.stats.total_drivers;
+            if (document.getElementById('admin-revenue')) document.getElementById('admin-revenue').textContent = formatUGX(data.stats.total_revenue);
+            
+            updateAdminChart(data.stats.total_passengers ?? 0, data.stats.total_drivers ?? 0);
+        }
+        
+        if (data.live_trips) renderAdminLiveActivity(data.live_trips);
+        if (data.sos_alerts) renderAdminAlerts(data.sos_alerts);
+        if (data.pending_drivers) renderPendingDrivers(data.pending_drivers);
+        
+        console.log('Admin Dashboard Synced via Live Stream');
+    });
+
+    adminDashboardStream.onerror = (err) => {
+        adminDashboardStreamConnected = false;
+        console.warn('Admin Live Stream encountered an error. Falling back to polling.', err);
+        // If the server is offline or the stream is blocked by a proxy
+        if (adminDashboardStream.readyState === EventSource.CLOSED) {
+            console.error('SSE Connection was closed by the server.');
+        }
+    };
+}
+
+/**
+ * Establishment of Server-Sent Events (SSE) for Driver
+ */
+function initDriverStream() {
+    if (driverDashboardStream) driverDashboardStream.close();
+    if (!currentUser || currentUser.role !== 'driver') return;
+
+    console.log('Establishing Real-time Driver Bridge...');
+    driverDashboardStream = new EventSource(`${API_BASE_URL}/users/${currentUser.id}/driver-dashboard/stream`);
+
+    driverDashboardStream.addEventListener('dashboard', (e) => {
+        const data = JSON.parse(e.data);
+        driverDashboardStreamConnected = true;
+        
+        // Pass data directly to renderer
+        renderDriverDashboardData(data);
+    });
+
+    driverDashboardStream.onerror = () => {
+        driverDashboardStreamConnected = false;
+        console.warn('Driver Live Stream encountered an error. Falling back to polling.');
+    };
+}
+
+function renderDriverDashboardData(data) {
+    if (!data) return;
+    
+    if (document.getElementById('drv-rides-today')) document.getElementById('drv-rides-today').textContent = data.stats?.rides_today ?? 0;
+    if (document.getElementById('drv-earnings')) document.getElementById('drv-earnings').textContent = formatUGX(data.stats?.earnings_total ?? 0);
+    if (document.getElementById('drv-rating')) document.getElementById('drv-rating').textContent = (data.stats?.avg_rating || '5.0') + '/5';
+    
+    if (data.active_trips) {
+        const container = document.getElementById('drv-active-trips');
+        if (container) {
+            if (data.active_trips.length > 0) {
+                container.innerHTML = data.active_trips.map(trip => `
+                    <div class="trip-card active">
+                        <div class="trip-header">
+                            <span class="trip-id">TRIP #${trip.id}</span>
+                            <span class="trip-status active">LIVE</span>
+                        </div>
+                        <div class="trip-body">
+                            <p><i class="fas fa-map-marker-alt"></i> ${escapeHtml(trip.start_location)}</p>
+                            <p><i class="fas fa-flag-checkered"></i> ${escapeHtml(trip.end_location)}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="empty-state">No live trips. Go online to receive requests.</div>';
+            }
+        }
+    }
 }
 
 

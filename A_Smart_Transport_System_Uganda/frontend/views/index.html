@@ -89,6 +89,10 @@
     </div>
 
     <div class="nav-actions" style="display:flex; align-items:center; gap:18px;">
+      <div id="live-sync-indicator" style="display:none; align-items:center; gap:8px; padding: 4px 10px; background: rgba(16, 185, 129, 0.1); border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2);">
+        <span class="sync-pulse" style="width:8px; height:8px; background:#10b981; border-radius:50%; display:inline-block;"></span>
+        <span style="font-size:0.7rem; font-weight:700; color:#10b981; text-transform:uppercase; letter-spacing:0.05em;">Live</span>
+      </div>
       <a href="#" class="nl desktop-book-btn" data-page="booking" onclick="showPg('booking'); return false;" style="font-weight:700;" data-i18n="nav_book">BOOK A RIDE</a>
       <div id="nav-right" class="nav-right" style="display:flex; align-items:center; gap:10px;">
         <!-- Auth buttons or User Profile will be injected here by app.js -->
@@ -704,7 +708,9 @@
 
 <div class="toast" id="toast"><span id="ticon"></span><span id="tmsg"></span></div>
 
-<script src="js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="js/app.js?v=2026.04.19.1"></script>
 <script src="js/i18n.js"></script>
 </body>
 </html>

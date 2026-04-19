@@ -1,7 +1,9 @@
 
 # --- Imports and Blueprint creation must come first ---
-from datetime import datetime
-from flask import Blueprint, jsonify, request, current_app
+from datetime import datetime, timezone
+import time
+import json
+from flask import Blueprint, jsonify, request, current_app, Response, stream_with_context
 import re
 
 try:
@@ -69,8 +71,7 @@ def admin_login():
     return jsonify({'message': 'Login successful', 'admin': admin.to_dict()}), 200
 
 
-@admin_bp.route('/dashboard', methods=['GET'])
-def admin_dashboard():
+def _get_admin_dashboard_payload():
     total_users = User.query.count()
     total_passengers = User.query.filter_by(role='passenger').count()
     total_drivers = Driver.query.count()
@@ -86,8 +87,7 @@ def admin_dashboard():
     # Fetch 10 most recent trips (requests + active)
     live_trips = Trip.query.order_by(Trip.created_at.desc()).limit(10).all()
 
-    current_app.logger.info("Admin dashboard stats retrieved")
-    return jsonify({
+    return {
         'stats': {
             'total_users': total_users,
             'total_passengers': total_passengers,
@@ -96,7 +96,8 @@ def admin_dashboard():
             'completed_trips': completed_trips,
             'sos_alerts_count': len(sos_alerts),
             'pending_drivers_count': len(pending_drivers),
-            'total_revenue': total_revenue
+            'total_revenue': total_revenue,
+            'streamed_at': datetime.now(timezone.utc).isoformat()
         },
         'sos_alerts': [t.to_dict() for t in sos_alerts],
         'active_vehicles': [v.to_dict() for v in active_vehicles],
@@ -105,9 +106,70 @@ def admin_dashboard():
             'id': driver.id,
             'name': driver.user.name if driver.user else 'Unknown Driver',
             'license_number': driver.license_number,
-            'vehicles': [vehicle.to_dict() for vehicle in driver.vehicles]
+            'vehicles': [vehicle.to_dict() for vehicle in driver.vehicles],
+            'created_at': driver.user.created_at.isoformat() if hasattr(driver, 'user') and driver.user and hasattr(driver.user, 'created_at') else datetime.now(timezone.utc).isoformat()
         } for driver in pending_drivers]
-    }), 200
+    }
+
+
+@admin_bp.route('/dashboard', methods=['GET'])
+def admin_dashboard():
+    """REQ-19: Real-time dashboard with platform metrics."""
+    payload = _get_admin_dashboard_payload()
+    current_app.logger.info("Admin dashboard stats retrieved")
+    return jsonify(payload), 200
+
+
+@admin_bp.route('/dashboard/stream', methods=['GET'])
+def admin_dashboard_stream():
+    """Real-time SSE stream for Admin Dashboard."""
+    def event_stream():
+        # Send an immediate connection confirmation to trigger the 'Green' state
+        yield f'event: connected\ndata: {json.dumps({"status": "ready", "at": datetime.now(timezone.utc).isoformat()})}\n\n'
+        
+        last_payload = None
+        last_heartbeat_at = time.monotonic()
+
+        try:
+            while True:
+                # Get current state
+                payload = _get_admin_dashboard_payload()
+                # Create a version without the changing timestamp for comparison
+                comparable_payload = payload.copy()
+                if 'stats' in comparable_payload:
+                    stats_copy = comparable_payload['stats'].copy()
+                    stats_copy.pop('streamed_at', None)
+                    comparable_payload['stats'] = stats_copy
+                
+                serialized = json.dumps(comparable_payload, sort_keys=True)
+
+                # Only push if data has actually changed or 15s have passed (heartbeat)
+                if serialized != last_payload:
+                    last_payload = serialized
+                    yield f'event: dashboard\ndata: {json.dumps(payload)}\n\n'
+                    last_heartbeat_at = time.monotonic()
+                elif time.monotonic() - last_heartbeat_at >= 15:
+                    heartbeat = json.dumps({
+                        'streamed_at': datetime.now(timezone.utc).isoformat(),
+                        'type': 'heartbeat'
+                    })
+                    yield f'event: heartbeat\ndata: {heartbeat}\n\n'
+                    last_heartbeat_at = time.monotonic()
+
+                time.sleep(3) # check every 3 seconds
+        except GeneratorExit:
+            return
+
+    return Response(
+        stream_with_context(event_stream()),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+            'Connection': 'keep-alive',
+            'Transfer-Encoding': 'chunked'
+        }
+    )
 
 
 @admin_bp.route('/reports', methods=['GET'])
@@ -180,3 +242,18 @@ def reject_driver(driver_id):
     return jsonify({
         'message': 'Driver application has been rejected and removed.'
     }), 200
+
+@admin_bp.route('/system/reset-activity', methods=['POST'])
+def reset_system_activity():
+    """Clean all trip and payment logs for a fresh platform start."""
+    try:
+        from ..models.payment_model import Payment
+    except ImportError:
+        from models.payment_model import Payment
+        
+    Trip.query.delete()
+    Payment.query.delete()
+    db.session.commit()
+    
+    current_app.logger.warning("System activity logs purged by admin.")
+    return jsonify({'message': 'System activity logs have been cleared successfully.'}), 200

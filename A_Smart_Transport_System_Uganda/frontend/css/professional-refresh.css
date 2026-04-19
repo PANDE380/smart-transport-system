@@ -2745,3 +2745,7 @@ textarea {
     height: 320px;
   }
 }
+
+ . s y n c - p u l s e   {   a n i m a t i o n :   s y n c - p u l s e - g l o w   2 s   i n f i n i t e ;   } 
+ @ k e y f r a m e s   s y n c - p u l s e - g l o w   {   0 %   {   o p a c i t y :   1 ;   t r a n s f o r m :   s c a l e ( 1 ) ;   }   5 0 %   {   o p a c i t y :   0 . 4 ;   t r a n s f o r m :   s c a l e ( 1 . 2 ) ;   }   1 0 0 %   {   o p a c i t y :   1 ;   t r a n s f o r m :   s c a l e ( 1 ) ;   }   }  
+ 
