@@ -4,6 +4,7 @@ try:
     from ..database import db, bcrypt
 except ImportError:
     from database import db, bcrypt
+from sqlalchemy.orm import validates
 
 
 class User(db.Model):
@@ -18,10 +19,14 @@ class User(db.Model):
     preferred_language = db.Column(db.String(10), nullable=False, default='en')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    def __init__(self, **kwargs):
-        if 'password' in kwargs:
-            kwargs['password'] = bcrypt.generate_password_hash(kwargs['password']).decode('utf-8')
-        super(User, self).__init__(**kwargs)
+    @validates('password')
+    def _hash_password(self, key, password):
+        if not password:
+            return password
+        # Check if it looks like a bcrypt hash already
+        if password.startswith('$2b$') or password.startswith('$2a$'):
+            return password
+        return bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
         try:
