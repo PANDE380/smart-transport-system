@@ -50,8 +50,18 @@
     </article>
   </section>
 
-  <section class="dgrid">
-    <article class="dashboard-panel">
+  <!-- Mobile View Toggle -->
+  <div class="mobile-view-toggle" style="margin: 0 20px 20px;">
+    <button onclick="toggleDriverMobView('list')" id="drv-toggle-list" class="btn-full">
+      <i class="fas fa-list"></i> View Queue
+    </button>
+    <button onclick="toggleDriverMobView('map')" id="drv-toggle-map" class="btn-out">
+      <i class="fas fa-map"></i> View Map
+    </button>
+  </div>
+
+  <section class="dgrid" id="driver-dashboard-grid">
+    <article class="dashboard-panel" id="driver-panel-list">
       <div class="sh" style="display:flex; justify-content:space-between; align-items:center;">
         <h3><i class="fas fa-list-check"></i> Live work queue</h3>
         <span class="chip" id="driver-request-chip">Syncing backend data</span>
@@ -61,7 +71,7 @@
       </div>
     </article>
 
-    <article class="dashboard-panel">
+    <article class="dashboard-panel" id="driver-panel-map">
       <div class="sh"><h3><i class="fas fa-map-marked-alt"></i> Area coverage</h3></div>
       <div class="map-surface">
         <div class="map-surface-head">

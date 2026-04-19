@@ -843,6 +843,31 @@ function closeMobileMenu() {
     document.body.style.overflow = '';
 }
 
+function toggleDriverMobView(view) {
+    const listPanel = document.getElementById('driver-panel-list');
+    const mapPanel  = document.getElementById('driver-panel-map');
+    const listBtn   = document.getElementById('drv-toggle-list');
+    const mapBtn    = document.getElementById('drv-toggle-map');
+
+    if (!listPanel || !mapPanel) return;
+
+    if (view === 'map') {
+        listPanel.style.display = 'none';
+        mapPanel.style.display = 'block';
+        listBtn.className = 'btn-out';
+        mapBtn.className = 'btn-full';
+        // Invalidate map size to ensure it renders correctly after being hidden
+        if (typeof drvMap !== 'undefined' && drvMap) {
+            setTimeout(() => drvMap.invalidateSize(), 50);
+        }
+    } else {
+        listPanel.style.display = 'block';
+        mapPanel.style.display = 'none';
+        listBtn.className = 'btn-full';
+        mapBtn.className = 'btn-out';
+    }
+}
+
 function toggleMobAccordion(triggerBtn) {
     const body     = triggerBtn.nextElementSibling;
     const isOpen   = body.classList.contains('is-open');
@@ -5038,4 +5063,46 @@ function sendUSSD() {
             scr.innerHTML = scr.innerHTML.split('<br>0. Back')[0] + "<br>(Invalid) 0. Back";
         }
     }
+}
+
+function updateSyncUI(isConnected) {
+    const indicators = [
+        document.getElementById('live-sync-indicator'),
+        document.getElementById('mobile-sync-slot')
+    ];
+    
+    indicators.forEach(indicator => {
+        if (!indicator) return;
+        
+        if (indicator.id === 'mobile-sync-slot') {
+            indicator.innerHTML = `
+                <div id="live-sync-indicator-mob" class="live-indicator-mob" style="display:flex; align-items:center; gap:8px; padding: 4px 10px; background: rgba(16, 185, 129, 0.1); border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <span class="sync-pulse" style="width:8px; height:8px; background:${isConnected ? '#10b981' : '#f97316'}; border-radius:50%; display:inline-block;"></span>
+                    <span style="font-size:0.7rem; font-weight:700; color:${isConnected ? '#10b981' : '#f97316'}; text-transform:uppercase; letter-spacing:0.05em;">${isConnected ? 'Live' : 'Offline'}</span>
+                </div>
+            `;
+        } else {
+            indicator.style.display = 'flex';
+            const dot = indicator.querySelector('.sync-pulse');
+            const lbl = indicator.querySelector('span:last-child');
+            if (dot) dot.style.background = isConnected ? '#10b981' : '#f97316';
+            if (lbl) {
+                lbl.textContent = isConnected ? 'Live' : 'Offline';
+                lbl.style.color = isConnected ? '#10b981' : '#f97316';
+            }
+        }
+    });
+}
+
+function initSyncMonitoring() {
+    const poll = async () => {
+        try {
+            const resp = await fetch(`${API_BASE_URL}/admin/dashboard/stream`, { method: 'HEAD' });
+            updateSyncUI(resp.ok);
+        } catch (e) {
+            updateSyncUI(false);
+        }
+    };
+    poll();
+    setInterval(poll, 15000); 
 }
