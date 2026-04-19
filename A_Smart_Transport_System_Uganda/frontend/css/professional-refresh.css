@@ -91,17 +91,38 @@
 /* PROFESSIONAL RESPONSIVE SYSTEM */
 /* -------------------------------------------------------------------------- */
 
-/* Standard Breakpoints */
 :root {
     --mobile-width: 768px;
     --tablet-width: 1024px;
 }
 
-/* Fluid Layout Helpers */
+/* Universal Fluid Grid Utility */
 .auto-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 100%, 350px), 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
+    width: 100%;
+}
+
+/* Responsive Stack */
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .stack {
+        gap: 16px;
+    }
 }
 
 .scroll-table-container {
@@ -410,7 +431,6 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-=======
   margin-left: auto;
   flex-shrink: 0;
 }
@@ -506,7 +526,6 @@ textarea {
   .tb-res-content .top-pref-item:hover {
     background: rgba(255, 255, 255, 0.1);
   }
->>>>>>> 0aa3d441efc565e99187ed2951ea3b9ced01464f
 }
 
 .top-bar-note {
@@ -635,7 +654,6 @@ textarea {
   border-radius: 999px;
   color: var(--muted-strong);
   cursor: pointer;
-<<<<<<< HEAD
   font-size: 0.88rem;
   font-weight: 700;
   padding: 10px 16px;
@@ -2754,7 +2772,7 @@ textarea {
 .service-highlight-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .service-action-card,
@@ -2831,15 +2849,12 @@ textarea {
   gap: 8px;
 }
 
-=======
 
->>>>>>> 0aa3d441efc565e99187ed2951ea3b9ced01464f
 .chatbot-toggle-btn {
   background: linear-gradient(135deg, #123a5a, #0a2740);
   box-shadow: var(--shadow-strong);
 }
 
-<<<<<<< HEAD
 @media (max-width: 1180px) {
   .home-quick-grid,
   .dashboard-hero,
@@ -2856,11 +2871,11 @@ textarea {
   .contact-layout,
   .ussd-layout,
   .split-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .footer-inner {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
