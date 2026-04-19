@@ -71,6 +71,16 @@ def create_app():
     db.init_app(app)
     bcrypt.init_app(app)
 
+    # Enable WAL mode for SQLite to support multi-threading/concurrency
+    with app.app_context():
+        @db.event.listens_for(db.engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            if "sqlite" in app.config['SQLALCHEMY_DATABASE_URI']:
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA journal_mode=WAL")
+                cursor.execute("PRAGMA synchronous=NORMAL")
+                cursor.close()
+
     #   MIGRATIONS FUNCTION
     def run_startup_migrations():
         inspector = inspect(db.engine)

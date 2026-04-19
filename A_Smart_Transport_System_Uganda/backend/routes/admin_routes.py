@@ -113,7 +113,7 @@ def _get_admin_dashboard_payload():
             'name': driver.user.name if driver.user else 'Unknown Driver',
             'license_number': driver.license_number,
             'vehicles': [vehicle.to_dict() for vehicle in driver.vehicles],
-            'created_at': (driver.user.created_at.isoformat() if (driver.user and hasattr(driver.user, 'created_at') and driver.user.created_at) else datetime.now(timezone.utc).isoformat())
+            'created_at': (driver.user.created_at.isoformat() if (driver.user and getattr(driver.user, 'created_at', None)) else datetime.now(timezone.utc).isoformat())
         } for driver in pending_drivers]
     }
 

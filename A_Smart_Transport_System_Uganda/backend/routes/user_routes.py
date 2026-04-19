@@ -601,7 +601,7 @@ def _get_driver_dashboard_payload(user_id):
                 'amount': txn.amount,
                 'payment_method': txn.payment_method,
                 'reference': txn.reference,
-                'created_at': txn.created_at.isoformat()
+                'created_at': (txn.created_at.isoformat() if getattr(txn, 'created_at', None) else datetime.now(timezone.utc).isoformat())
             }
             for txn in withdrawal_transactions[:5]
         ]
