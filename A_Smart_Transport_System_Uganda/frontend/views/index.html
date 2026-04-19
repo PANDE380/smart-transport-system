@@ -22,29 +22,46 @@
 <!-- TOP BAR -->
 <div class="top-bar">
   <div class="top-bar-inner container">
-    <div class="social-links-ref">
-      <span class="top-bar-note" data-i18n="connect_support">Connect &amp; Support</span>
-      <a id="top-whatsapp-link" href="#" target="_blank" rel="noopener noreferrer" title="Share STS on WhatsApp" aria-label="Share STS on WhatsApp"><i class="fab fa-whatsapp"></i></a>
-      <a id="top-x-link" href="#" target="_blank" rel="noopener noreferrer" title="Share STS on X" aria-label="Share STS on X"><i class="fab fa-x-twitter"></i></a>
-      <a href="mailto:support@sts.ug?subject=STS%20Support%20Request" title="Email STS support" aria-label="Email STS support"><i class="fas fa-envelope"></i></a>
-      <a href="tel:+256800123456" title="Call STS helpline" aria-label="Call STS helpline"><i class="fas fa-phone"></i></a>
-    </div>
-    <div class="lang-cur-ref">
-      <div class="top-pref">
-        <button class="top-pref-btn" type="button" aria-expanded="false" aria-controls="currency-menu" title="Select currency" onclick="toggleTopPrefMenu('currency')">
-          <span class="top-pref-label" data-i18n="currency_label">Currency</span>
-          <span id="currency-current">UGX</span>
-          <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
-        </button>
-        <div class="top-pref-menu" id="currency-menu"></div>
+    <!-- Left: Connect & Support Dropdown for Mobile -->
+    <div class="tb-res-wrap">
+      <button class="tb-res-btn" type="button" aria-label="Toggle support menu">
+        <i class="fas fa-comments"></i> <span data-i18n="nav_support">Support</span> <i class="fas fa-chevron-down" style="font-size:.6rem; opacity:.7;"></i>
+      </button>
+      <div class="tb-res-content">
+        <div class="social-links-ref">
+          <span class="top-bar-note" data-i18n="connect_support">Connect &amp; Support</span>
+          <a id="top-whatsapp-link" href="#" target="_blank" rel="noopener noreferrer" title="Share STS on WhatsApp" aria-label="Share STS on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a id="top-x-link" href="#" target="_blank" rel="noopener noreferrer" title="Share STS on X" aria-label="Share STS on X"><i class="fab fa-x-twitter"></i></a>
+          <a href="mailto:support@sts.ug?subject=STS%20Support%20Request" title="Email STS support" aria-label="Email STS support"><i class="fas fa-envelope"></i></a>
+          <a href="tel:+256800123456" title="Call STS helpline" aria-label="Call STS helpline"><i class="fas fa-phone"></i></a>
+        </div>
       </div>
-      <div class="top-pref">
-        <button class="top-pref-btn" type="button" aria-expanded="false" aria-controls="language-menu" title="Select language" onclick="toggleTopPrefMenu('language')">
-          <span class="top-pref-label" data-i18n="lang_label">Language</span>
-          <span id="language-current">ENG</span>
-          <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
-        </button>
-        <div class="top-pref-menu" id="language-menu"></div>
+    </div>
+
+    <!-- Right: Language & Currency Dropdown for Mobile -->
+    <div class="tb-res-wrap tb-res-right">
+      <button class="tb-res-btn" type="button" aria-label="Toggle settings menu">
+        <i class="fas fa-globe"></i> <span data-i18n="lang_label">Language</span> <i class="fas fa-chevron-down" style="font-size:.6rem; opacity:.7;"></i>
+      </button>
+      <div class="tb-res-content">
+        <div class="lang-cur-ref">
+          <div class="top-pref">
+            <button class="top-pref-btn" type="button" aria-expanded="false" aria-controls="currency-menu" title="Select currency" onclick="toggleTopPrefMenu('currency')">
+              <span class="top-pref-label" data-i18n="currency_label">Currency</span>
+              <span id="currency-current">UGX</span>
+              <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
+            </button>
+            <div class="top-pref-menu" id="currency-menu"></div>
+          </div>
+          <div class="top-pref">
+            <button class="top-pref-btn" type="button" aria-expanded="false" aria-controls="language-menu" title="Select language" onclick="toggleTopPrefMenu('language')">
+              <span class="top-pref-label" data-i18n="lang_label">Language</span>
+              <span id="language-current">ENG</span>
+              <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
+            </button>
+            <div class="top-pref-menu" id="language-menu"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
