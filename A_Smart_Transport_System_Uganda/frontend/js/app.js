@@ -5097,7 +5097,7 @@ function updateSyncUI(isConnected) {
 function initSyncMonitoring() {
     const poll = async () => {
         try {
-            const resp = await fetch(`${API_BASE_URL}/admin/dashboard/stream`, { method: 'HEAD' });
+            const resp = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
             updateSyncUI(resp.ok);
         } catch (e) {
             updateSyncUI(false);
@@ -5106,3 +5106,24 @@ function initSyncMonitoring() {
     poll();
     setInterval(poll, 15000); 
 }
+
+// DROPDOWN CLICK HANDLER
+document.addEventListener('click', function(e) {
+    const dropbtn = e.target.closest('.dropbtn');
+    const dropdowns = document.querySelectorAll('.dropdown');
+    
+    if (dropbtn) {
+        const parent = dropbtn.closest('.dropdown');
+        e.preventDefault();
+        
+        // Close all others
+        dropdowns.forEach(d => {
+            if (d !== parent) d.classList.remove('open');
+        });
+        // Toggle the clicked one
+        parent.classList.toggle('open');
+    } else {
+        // Clicked outside, close all
+        dropdowns.forEach(d => d.classList.remove('open'));
+    }
+});

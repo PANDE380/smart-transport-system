@@ -186,8 +186,8 @@ nav{background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:b
 .dropdown-content { display: none; position: absolute; top: 100%; left: 0; background-color: var(--white); min-width: 180px; box-shadow: var(--shadow-md); border-radius: 10px; padding: 10px 0; z-index: 500; border: 1px solid var(--border); margin-top: 10px; animation: pgIn .2s ease; }
 .dropdown-content button { color: var(--text); padding: 10px 18px; text-decoration: none; display: block; width: 100%; text-align: left; border: none; background: none; font-size: .8rem; font-weight: 600; cursor: pointer; transition: var(--tr); }
 .dropdown-content button:hover { background-color: var(--off); color: var(--yellow); padding-left: 22px; }
-.dropdown:hover .dropdown-content { display: block; }
-.dropdown:hover .dropbtn { color: var(--yellow); }
+.dropdown.open .dropdown-content { display: block; }
+.dropdown.open .dropbtn { color: var(--yellow); }
 
 .u-role{font-size:.64rem;color:var(--text3);text-transform: capitalize;}
 

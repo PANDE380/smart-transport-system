@@ -318,7 +318,10 @@
         display: flex;
         align-items: center;
     }
-}  .main-footer .footer-inner {
+}
+
+@media (max-width: 767px) {
+  .main-footer .footer-inner {
     flex-direction: column;
     gap: 18px;
     padding: 0 4vw;
@@ -3018,7 +3021,46 @@ textarea {
   }
 }
 
- . s y n c - p u l s e   {   a n i m a t i o n :   s y n c - p u l s e - g l o w   2 s   i n f i n i t e ;   } 
- @ k e y f r a m e s   s y n c - p u l s e - g l o w   {   0 %   {   o p a c i t y :   1 ;   t r a n s f o r m :   s c a l e ( 1 ) ;   }   5 0 %   {   o p a c i t y :   0 . 4 ;   t r a n s f o r m :   s c a l e ( 1 . 2 ) ;   }   1 0 0 %   {   o p a c i t y :   1 ;   t r a n s f o r m :   s c a l e ( 1 ) ;   }   } 
- 
- 
+.sync-pulse { animation: sync-pulse-glow 2s infinite; }
+@keyframes sync-pulse-glow { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+/* -------------------------------------------------------------------------- */
+/* HERO SLIDER ENGINE - Professional */
+/* -------------------------------------------------------------------------- */
+.landing-slider {
+  background: #0a2740;
+  height: clamp(600px, 85vh, 900px);
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.slide {
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: opacity 0.8s ease;
+  visibility: hidden;
+  width: 100%;
+  z-index: 1;
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 10;
+}
+
+.sync-pulse {
+  animation: sync-pulse-glow 2s infinite;
+}
+
+@keyframes sync-pulse-glow {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.4; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
