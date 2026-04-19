@@ -1,45 +1,65 @@
-<div class="srv-hero">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="margin-bottom:14px; background: rgba(255,194,0,0.1); border-color: rgba(255,194,0,0.25); color: var(--yellow);"><span></span>24/7 SUPPORT AVAILABLE</div>
-    <h1>Contact STS Team</h1>
-    <p>Have questions or need assistance? Our dedicated support team is here to help you navigate your journey.</p>
-  </div>
-</div>
+<section class="page-shell" aria-label="Contact STS">
+  <section class="page-hero page-hero-color">
+    <div class="page-hero-content">
+      <span class="page-kicker">Contact STS</span>
+      <h1 class="page-title">Support that stays close to the journey.</h1>
+      <p class="page-summary">
+        Whether you need booking help, payment support, or service information, the STS team is available through phone, email, and in app channels.
+      </p>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="booking-layout reveal">
-    <div>
-      <div class="sh"><h3><i class="fas fa-headset"></i> Get in Touch</h3></div>
-      <div class="srv-grid" style="grid-template-columns: 1fr; gap:20px; margin-bottom:30px;">
-        <div class="srv-card" style="padding:20px; display:flex; gap:20px; align-items:center;">
-          <div class="srv-icon-wrap" style="width:50px; height:50px; flex-shrink:0;"><i class="fas fa-phone"></i></div>
-          <div>
-            <h4 style="margin-bottom:4px;">Helpline</h4>
-            <div style="font-weight:700; color:var(--yellow); font-size:1.1rem;">+256 800 123 456</div>
-          </div>
+  <section class="page-section contact-layout">
+    <div class="stack">
+      <article class="info-card contact-card">
+        <div class="card-icon"><i class="fas fa-phone"></i></div>
+        <div>
+          <h3>Helpline</h3>
+          <p>Call our support desk for urgent rider or driver issues.</p>
+          <strong>+256 800 123 456</strong>
         </div>
-        <div class="srv-card" style="padding:20px; display:flex; gap:20px; align-items:center;">
-          <div class="srv-icon-wrap" style="width:50px; height:50px; flex-shrink:0;"><i class="fas fa-envelope"></i></div>
-          <div>
-            <h4 style="margin-bottom:4px;">Email Support</h4>
-            <div style="font-weight:700; color:var(--yellow); font-size:1.1rem;">support@sts.ug</div>
-          </div>
+      </article>
+      <article class="info-card contact-card">
+        <div class="card-icon"><i class="fas fa-envelope"></i></div>
+        <div>
+          <h3>Email support</h3>
+          <p>Send detailed questions, screenshots, or documents to the support team.</p>
+          <strong>support@sts.ug</strong>
         </div>
-        <div class="srv-card" style="padding:20px; display:flex; gap:20px; align-items:center;">
-          <div class="srv-icon-wrap" style="width:50px; height:50px; flex-shrink:0;"><i class="fas fa-location-dot"></i></div>
-          <div>
-            <h4 style="margin-bottom:4px;">Headquarters</h4>
-            <div style="font-weight:700; color:var(--yellow); font-size:1.1rem;">Plot 12, Kampala Road, Kampala, Uganda</div>
-          </div>
+      </article>
+      <article class="info-card contact-card">
+        <div class="card-icon"><i class="fas fa-location-dot"></i></div>
+        <div>
+          <h3>Operations office</h3>
+          <p>Visit the coordination office for onboarding and platform support.</p>
+          <strong>Plot 12, Kampala Road, Kampala, Uganda</strong>
+        </div>
+      </article>
+    </div>
+
+    <form class="contact-form" onsubmit="event.preventDefault(); this.reset(); showT('<i class=&quot;fas fa-paper-plane&quot;></i>', 'Message sent. The STS team will get back to you soon.', 'var(--success)');">
+      <div class="section-heading" style="margin-bottom:12px;">
+        <h2 id="send-message" style="font-size:1.3rem;">Send a message</h2>
+      </div>
+      <div class="frow2">
+        <div class="fg">
+          <label class="fl" for="contact-name">Full name</label>
+          <input class="fi" id="contact-name" type="text" placeholder="Your name" required>
+        </div>
+        <div class="fg">
+          <label class="fl" for="contact-phone">Phone number</label>
+          <input class="fi" id="contact-phone" type="tel" placeholder="0772 000000" required>
         </div>
       </div>
-    </div>
-
-    <div class="bpanel" style="padding:30px; border-color:var(--yellow); background:rgba(255,194,0,0.02);">
-      <h3><i class="fas fa-paper-plane"></i> Send a Message</h3>
-      <div class="fg"><label class="fl">Subject</label><input class="fi" placeholder="Feedback / Inquiry"/></div>
-      <div class="fg"><label class="fl">Message</label><textarea class="fi" style="height:120px; resize:none;" placeholder="How can we help?"></textarea></div>
-      <button class="btn-full" style="background:var(--yellow); color:#000; font-weight:800;" onclick="showT('✅','Message sent! We will contact you soon.','var(--yellow)')">Send Message</button>
-    </div>
-  </div>
-</div>
+      <div class="fg">
+        <label class="fl" for="contact-subject">Subject</label>
+        <input class="fi" id="contact-subject" type="text" placeholder="How can we help?" required>
+      </div>
+      <div class="fg">
+        <label class="fl" for="contact-message">Message</label>
+        <textarea class="fi" id="contact-message" rows="6" style="resize:none;" placeholder="Share the details so we can help quickly." required></textarea>
+      </div>
+      <button class="btn-full" type="submit">Send message</button>
+    </form>
+  </section>
+</section>

@@ -1,43 +1,59 @@
-<div class="ussd-hero-bg">
-  <div class="ussd-wrap-main">
-    
-    <!-- Phone Simulator -->
-    <div class="ussd-phone-mockup">
+<section class="ussd-shell" aria-label="USSD booking">
+  <section class="page-hero page-hero-color">
+    <div class="page-hero-content">
+      <span class="page-kicker">USSD access</span>
+      <h1 class="page-title">A simpler booking path for users without a smartphone.</h1>
+      <p class="page-summary">STS keeps a lightweight USSD flow available so basic booking and service information remain reachable from any compatible phone.</p>
+    </div>
+  </section>
+
+  <section class="page-section ussd-layout">
+    <article class="ussd-phone-mockup">
       <div class="ussd-status-bar">
-        <span class="status-left"><i class="fas fa-signal" style="color:#4a90e2;"></i> ASTS Uganda</span>
-        <span class="status-right"><i class="fas fa-battery-full" style="color:#4cd964;"></i> 100%</span>
+        <span class="status-left"><i class="fas fa-signal"></i> STS Uganda</span>
+        <span class="status-right"><i class="fas fa-battery-full"></i> Ready</span>
       </div>
-      
+
       <div class="ussd-screen-container">
-        <div class="ussd-screen-text" id="uscr">A Smart Transport System Uganda<br>Dial *123# to begin</div>
+        <div class="ussd-screen-text" id="uscr">A Smart Transport System Uganda&#10;Dial *123# to begin</div>
       </div>
-      
+
       <div class="ussd-input-group">
-        <input class="ussd-mock-input" id="uinp" placeholder="Type option..." onkeydown="if(event.key==='Enter')sendUSSD()"/>
-        <button class="ussd-send-btn" onclick="sendUSSD()">Send <i class="fas fa-caret-right"></i></button>
+        <input class="ussd-mock-input" id="uinp" placeholder="Enter choice or code" onkeydown="if(event.key==='Enter')sendUSSD()">
+        <button class="ussd-send-btn" type="button" onclick="sendUSSD()">Send</button>
       </div>
-      
+
       <div class="ussd-numpad">
-        <button class="ukey-btn" onclick="appendUSSD('1')">1</button>
-        <button class="ukey-btn" onclick="appendUSSD('2')">2</button>
-        <button class="ukey-btn" onclick="appendUSSD('3')">3</button>
-        <button class="ukey-btn" onclick="appendUSSD('4')">4</button>
-        <button class="ukey-btn" onclick="appendUSSD('5')">5</button>
-        <button class="ukey-btn" onclick="appendUSSD('6')">6</button>
-        <button class="ukey-btn" onclick="appendUSSD('7')">7</button>
-        <button class="ukey-btn" onclick="appendUSSD('8')">8</button>
-        <button class="ukey-btn" onclick="appendUSSD('9')">9</button>
-        <button class="ukey-btn" onclick="appendUSSD('*')">*</button>
-        <button class="ukey-btn" onclick="appendUSSD('0')">0</button>
-        <button class="ukey-btn" onclick="appendUSSD('#')">#</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('1')">1</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('2')">2</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('3')">3</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('4')">4</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('5')">5</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('6')">6</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('7')">7</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('8')">8</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('9')">9</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('*')">*</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('0')">0</button>
+        <button class="ukey-btn" type="button" onclick="appendUSSD('#')">#</button>
       </div>
 
       <div class="ussd-action-row">
-        <button class="ukey-action back" onclick="clearUSSD()"><i class="fas fa-delete-left"></i></button>
+        <button class="ukey-action back" type="button" onclick="clearUSSD()"><i class="fas fa-delete-left"></i></button>
         <div class="ukey-spacer"></div>
-        <button class="ukey-action ok" onclick="sendUSSD()">OK <i class="fas fa-caret-right"></i></button>
+        <button class="ukey-action ok" type="button" onclick="sendUSSD()">OK</button>
       </div>
-    </div>
-    
-  </div>
-</div>
+    </article>
+
+    <article class="ussd-panel">
+      <div class="section-heading" style="margin-bottom:12px;">
+        <h2 id="why-ussd" style="font-size:1.3rem;">Why USSD matters</h2>
+      </div>
+      <ul class="check-list">
+        <li><i class="fas fa-check-circle"></i><span>Supports users who do not have a smartphone or reliable data connection.</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Keeps booking and service information reachable during low bandwidth conditions.</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Extends the platform to more passengers without changing the core service logic.</span></li>
+      </ul>
+    </article>
+  </section>
+</section>

@@ -1,46 +1,64 @@
-<div class="srv-hero" style="background: linear-gradient(rgba(11,13,23,0.8), rgba(11,13,23,0.9)), url('https://images.unsplash.com/photo-1557597774-9d2739f85a94?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center;">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="background: rgba(0,230,118,0.1); border-color: rgba(0,230,118,0.25); color: var(--teal);"><span></span>STS · SAFETY FIRST</div>
-    <h1 style="color: #fff;">ASTS Safety Ecosystem</h1>
-    <p style="color: rgba(255,255,255,0.8);">Your security is our highest priority. We leverage cutting-edge AI and rigorous verification to ensure every journey is safe.</p>
-  </div>
-</div>
+<section class="page-shell" aria-label="Safety and trust">
+  <section class="page-hero page-hero-color">
+    <div class="page-hero-content">
+      <span class="page-kicker">Safety and trust</span>
+      <h1 class="page-title">Safety is built into the booking flow, not added at the end.</h1>
+      <p class="page-summary">
+        STS keeps driver verification, trip tracking, SOS access, and support close to every ride so passengers and drivers can act quickly when something feels wrong.
+      </p>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="sec-hdr reveal"><span class="sec-title"><i class="fas fa-shield-halved"></i> Our Safety Pillars</span></div>
-  
-  <div class="srv-grid reveal reveal-stagger" style="margin-bottom: 40px;">
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--teal-l); color: var(--teal);"><i class="fas fa-user-check"></i></div>
-      <h3>Verified Driver Network</h3>
-      <p>Every STS driver undergoes a rigorous 5-step background check, including National ID verification, license validation, and vehicle inspection.</p>
+  <section class="page-section">
+    <div class="section-heading">
+      <h2 id="safety-controls">Safety controls across the platform</h2>
+      <p>These controls are visible in booking, trip management, and support workflows so users do not need to search for them.</p>
     </div>
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--navy-l); color: #fff;"><i class="fas fa-eye"></i></div>
-      <h3>AI-Driven Surveillance</h3>
-      <p>Our Intelligent Security Center monitors every active trip in real-time, detecting unusual stops or route deviations using predictive data.</p>
+    <div class="card-grid">
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-id-card"></i></div>
+        <h3>Driver and vehicle checks</h3>
+        <p>Accounts, license details, and vehicle information are collected before driver approval and service activation.</p>
+      </article>
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-location-crosshairs"></i></div>
+        <h3>Trip visibility</h3>
+        <p>Pickup points, routes, and vehicle movement stay visible to help riders and operators understand what is happening in real time.</p>
+      </article>
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-triangle-exclamation"></i></div>
+        <h3>SOS actions</h3>
+        <p>Emergency alerts can be triggered quickly from the main experience and tied back to current trip activity.</p>
+      </article>
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-headset"></i></div>
+        <h3>Post trip support</h3>
+        <p>Ratings, support tickets, and lost item reporting help keep accountability in place after the ride ends.</p>
+      </article>
     </div>
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--red-l); color: var(--red);"><i class="fas fa-truck-medical"></i></div>
-      <h3>Integrated SOS Network</h3>
-      <p>Instant access to a 24/7 emergency response team. One tap on the SOS button alerts local authorities and our security dispatch.</p>
-    </div>
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--yellow-l); color: var(--yellow);"><i class="fas fa-lock"></i></div>
-      <h3>Safe Payments</h3>
-      <p>100% cashless options via SmartCard and Mobile Money eliminate the risks associated with carrying physical currency.</p>
-    </div>
-  </div>
+  </section>
 
-  <div class="ai-tip reveal" style="border-left: 4px solid var(--teal);">
-    <i class="fas fa-circle-info" style="color: var(--teal);"></i>
-    <div>
-      <b style="color: var(--teal);">Safety Fact:</b> 
-      Over 99.9% of STS trips are completed without incident. Our AI models analyze over 1 million data points monthly to keep it that way.
-    </div>
-  </div>
+  <section class="page-section split-grid">
+    <article class="info-card">
+      <div class="section-heading" style="margin-bottom:12px;">
+        <h2 id="passenger-checklist" style="font-size:1.3rem;">Passenger checklist</h2>
+      </div>
+      <ul class="check-list">
+        <li><i class="fas fa-check-circle"></i><span>Confirm the driver and vehicle details before the trip begins.</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Review the route and fare estimate before sending a booking request.</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Use the in app support and rating tools if the experience needs review.</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Use SOS immediately if you believe you are in danger.</span></li>
+      </ul>
+    </article>
 
-  <div style="text-align: center; margin-top: 40px; margin-bottom: 60px;">
-    <button class="btn-o" style="padding: 16px 40px;" onclick="showPg('booking')">Book a Safe Ride Now</button>
-  </div>
-</div>
+    <aside class="cta-panel">
+      <h3>Need help right now?</h3>
+      <p>The safety tools are available directly from the main ride flow and support screens.</p>
+      <div class="action-list">
+        <button class="btn-ghost" type="button" onclick="openM('sos-m')">Open SOS</button>
+        <button class="btn-ghost" type="button" onclick="showPg('booking')">Return to booking</button>
+        <button class="btn-ghost" type="button" onclick="showPg('contact')">Contact support</button>
+      </div>
+    </aside>
+  </section>
+</section>

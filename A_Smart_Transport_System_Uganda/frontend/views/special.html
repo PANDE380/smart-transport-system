@@ -1,57 +1,67 @@
-<div class="srv-hero" style="background-image: linear-gradient(rgba(11,13,23,0.3), rgba(11,13,23,0.85)), url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center;">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="margin-bottom:14px; background: rgba(255,194,0,0.1); border-color: rgba(255,194,0,0.25); color: var(--yellow);"><span></span>LIVE · ASTS Executive Fleet</div>
-    <h1>Premium Special Hire</h1>
-    <p>Luxury travel tailored for executive meetings, special events, and high-end airport transfers. Experience the pinnacle of Ugandan mobility.</p>
-  </div>
-</div>
+<section class="service-page" aria-label="Special hire service">
+  <section class="page-hero page-hero-media" style="--hero-image:url('img/Special Hire1.jpg');">
+    <div class="page-hero-content">
+      <span class="page-kicker">Special hire</span>
+      <h1 class="page-title">A cleaner premium option for executive and scheduled travel.</h1>
+      <p class="page-summary">Special Hire is suited for airport pickups, formal events, client movement, and any trip where comfort and timing matter more than speed alone.</p>
+      <div class="hero-actions">
+        <button class="btn-o" type="button" onclick="bookService('Special Hire', 2.0)" aria-label="Book special hire">Book special hire</button>
+        <button class="btn-ghost" type="button" onclick="showPg('contact')" aria-label="Talk to support">Talk to support</button>
+      </div>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="booking-layout">
-    <div>
-      <div class="sh"><h3><i class="fas fa-crown"></i> The Elite Standard</h3></div>
-      <div class="srv-grid reveal reveal-stagger" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
-        <div class="srv-card" style="padding: 20px; border-left: 4px solid var(--yellow);">
-          <div class="srv-icon-wrap" style="width:42px; height:42px; margin-bottom:12px; background:rgba(255,194,0,0.1); color:var(--yellow);"><i class="fas fa-gem"></i></div>
-          <h4>Executive Fleet</h4>
-          <p>Travel in pristine, high-end sedans and SUVs. Every vehicle is vetted for maximum comfort and style.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-n"><i class="fas fa-user-tie"></i></div>
-          <h4>Professional Chauffeurs</h4>
-          <p>Elite drivers with advanced training and meticulous grooming. Dedicated to your comfort and privacy.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-t"><i class="fas fa-snowflake"></i></div>
-          <h4>Full Amenities</h4>
-          <p>Enjoy dual-zone climate control, premium refreshments, and on-board high-speed WiFi connectivity.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-r"><i class="fas fa-briefcase"></i></div>
-          <h4>Corporate Precision</h4>
-          <p>Punctuality is our priority. Specialized logistics support for corporate itineraries and diplomatic missions.</p>
-        </div>
+  <section class="service-layout">
+    <div class="service-main">
+      <div class="service-highlight-grid">
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-user-tie"></i></div>
+          <h3>Professional presentation</h3>
+          <p>A better fit for formal appointments, visitors, and scheduled business travel.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-clock"></i></div>
+          <h3>Planning friendly</h3>
+          <p>Use scheduled booking where timing needs to be arranged in advance.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+          <h3>Managed experience</h3>
+          <p>The same STS safety and support tools remain available throughout premium travel.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-suitcase"></i></div>
+          <h3>Airport and event ready</h3>
+          <p>A good option for trips with luggage, guests, or higher presentation standards.</p>
+        </article>
       </div>
-      
-      <div class="sh"><h3><i class="fas fa-stars"></i> Elite Performance</h3></div>
-      <div class="stat-strip" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 30px;">
-        <div class="ssc"><div class="ssc-val">0 Delay</div><div class="ssc-lbl">Policy for Scheduled Trips</div></div>
-        <div class="ssc"><div class="ssc-val">VIP</div><div class="ssc-lbl">Wait & Return Coverage</div></div>
-        <div class="ssc"><div class="ssc-val">5.0 ⭐</div><div class="ssc-lbl">Average Driver Rating</div></div>
-      </div>
+
+      <article class="info-card">
+        <div class="section-heading" style="margin-bottom:12px;">
+          <h2 id="best-use-cases" style="font-size:1.3rem;">Best use cases</h2>
+        </div>
+        <ul class="check-list">
+          <li><i class="fas fa-check-circle"></i><span>Airport transfers and guest pickup</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Business meetings and event transport</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Trips that benefit from planned arrival times</span></li>
+        </ul>
+      </article>
     </div>
-    
-    <div class="bpanel">
-      <h3><i class="fas fa-award"></i> Chauffeur Booking</h3>
-      <p style="font-size: 0.84rem; color: var(--text2); margin-bottom: 20px;">Book an executive vehicle and experience world-class chauffeur service in Uganda.</p>
-      
-      <div class="ai-hint" style="margin-bottom: 24px;">
-        <i class="fas fa-robot"></i>
-        <span><b>AI Concierge:</b> You have an upcoming business meeting. Our AI can automatically schedule your Special Hire to arrive 10 minutes prior.</span>
-      </div>
-      
-      <button class="btn-full btn-full-o" style="background: var(--yellow); color:#000; box-shadow: 0 4px 15px rgba(255, 194, 0, 0.3);" onclick="bookService('Special Hire', 2.0)">Book Special Hire Now</button>
-      <button class="btn-out" style="width: 100%; margin-top: 10px;" onclick="showPg('services')">View All Services</button>
-    </div>
-  </div>
-</div>
+
+    <aside class="service-sidebar">
+      <article class="service-action-card">
+        <h3>Service snapshot</h3>
+        <div class="service-stat-list">
+          <div class="service-stat-item"><strong>Best for</strong><span>Executive and formal travel</span></div>
+          <div class="service-stat-item"><strong>Typical capacity</strong><span>Up to 4 passengers</span></div>
+          <div class="service-stat-item"><strong>Extra option</strong><span>Scheduled booking support</span></div>
+        </div>
+      </article>
+      <article class="service-action-card">
+        <h3>Planning a premium trip?</h3>
+        <p>Head to the booking page to set pickup details and schedule when needed.</p>
+        <button class="btn-full" type="button" onclick="bookService('Special Hire', 2.0)" aria-label="Book special hire now">Book now</button>
+      </article>
+    </aside>
+  </section>
+</section>

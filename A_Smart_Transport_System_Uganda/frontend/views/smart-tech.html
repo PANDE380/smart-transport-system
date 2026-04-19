@@ -1,48 +1,63 @@
-<div class="srv-hero" style="background: linear-gradient(rgba(11,13,23,0.85), rgba(11,13,23,0.95)), url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center;">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="background: rgba(0,242,255,0.1); border-color: rgba(0,242,255,0.25); color: var(--cyan);"><span></span>ASTS · INNOVATION HUB</div>
-    <h1 style="color: #fff;">Smart Technology</h1>
-    <p style="color: rgba(255,255,255,0.8);">Powering the future of mobility in Uganda through advanced AI, big data, and seamless digital infrastructure.</p>
-  </div>
-</div>
+<section class="page-shell" aria-label="Smart technology">
+  <section class="page-hero page-hero-color">
+    <div class="page-hero-content">
+      <span class="page-kicker">Smart technology</span>
+      <h1 class="page-title">Practical digital tools that make transport easier to run.</h1>
+      <p class="page-summary">
+        STS uses live maps, route support, wallet tracking, and chatbot assistance to make the platform easier to use without overwhelming the user experience.
+      </p>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="sec-hdr reveal"><span class="sec-title"><i class="fas fa-microchip"></i> Future-Proof Infrastructure</span></div>
-  
-  <div class="srv-grid reveal reveal-stagger" style="margin-bottom: 40px;">
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--cyan-l); color: var(--cyan);"><i class="fas fa-brain"></i></div>
-      <h3>Predictive AI Routing</h3>
-      <p>Our algorithms analyze millions of traffic patterns to predict congestion and suggest the fastest routes dynamically.</p>
+  <section class="page-section">
+      <div class="section-heading">
+        <h2 id="tech-in-product">Technology in the product</h2>
+        <p>Each tool supports a real part of the transport workflow, from booking to support and reporting.</p>
+      </div>
+    <div class="card-grid">
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-route"></i></div>
+        <h3>Route support</h3>
+        <p>Pickup and destination selection connect directly to map routing so the fare and travel estimate feel grounded and clear.</p>
+      </article>
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-map-location-dot"></i></div>
+        <h3>Live service visibility</h3>
+        <p>Operations pages surface active vehicles, coverage points, and feed activity without forcing the user to refresh constantly.</p>
+      </article>
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-wallet"></i></div>
+        <h3>Shared wallet system</h3>
+        <p>Passengers can track top ups, spending, and expected balance changes from a single wallet view.</p>
+      </article>
+      <article class="info-card">
+        <div class="card-icon"><i class="fas fa-robot"></i></div>
+        <h3>Assistant support</h3>
+        <p>The STS assistant helps answer user questions about booking, pricing, support, and onboarding.</p>
+      </article>
     </div>
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--yellow-l); color: var(--yellow);"><i class="fas fa-id-card-clip"></i></div>
-      <h3>Unified SmartCard</h3>
-      <p>A single tap-and-go system for Taxis, Bodas, Buses, and Marine transport. Integrated with top mobile networks.</p>
-    </div>
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--teal-l); color: var(--teal);"><i class="fas fa-leaf"></i></div>
-      <h3>Eco-Fleet Intelligence</h3>
-      <p>Optimizing vehicle load and reducing empty-car miles to lower the carbon footprint of urban mobility in Uganda.</p>
-    </div>
-    <div class="srv-card">
-      <div class="srv-icon-wrap" style="background: var(--navy-l); color: #fff;"><i class="fas fa-cloud-bolt"></i></div>
-      <h3>Cloud-Native Ops</h3>
-      <p>99.99% uptime guaranteed by our distributed cloud architecture, ensuring your ride is always just a tap away.</p>
-    </div>
-  </div>
+  </section>
 
-  <div class="stat-strip reveal">
-    <div class="ssc"><div class="ssc-val">5ms</div><div class="ssc-lbl">Matching Latency</div></div>
-    <div class="ssc"><div class="ssc-val">10TB+</div><div class="ssc-lbl">Weekly Data Processed</div></div>
-    <div class="ssc"><div class="ssc-val">AI v2.4</div><div class="ssc-lbl">Core Engine Version</div></div>
-  </div>
+  <section class="page-section split-grid">
+    <article class="info-card">
+      <div class="section-heading" style="margin-bottom:12px;">
+        <h2 id="design-approach" style="font-size:1.3rem;">Design approach</h2>
+      </div>
+      <ul class="check-list">
+        <li><i class="fas fa-check-circle"></i><span>Keep the interface readable for passengers and staff.</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Use live data only where it helps the decision in front of the user.</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Make safety, support, and payments easy to find.</span></li>
+      </ul>
+    </article>
 
-  <div style="text-align: center; margin-top: 40px; margin-bottom: 60px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-    <h2 style="font-size: 1.8rem;">Experience the power of ASTS Tech</h2>
-    <div style="display: flex; gap: 16px;">
-      <button class="btn-o" style="padding: 16px 40px;" onclick="showPg('ussd')">Try USSD *123#</button>
-      <button class="btn-ghost" style="padding: 16px 40px; background: #fff;" onclick="showPg('booking')">Book Online</button>
-    </div>
-  </div>
-</div>
+    <aside class="cta-panel">
+      <h3>Explore the live tools</h3>
+      <p>Move from the technology overview into the working dashboards and booking flow.</p>
+      <div class="action-list">
+        <button class="btn-ghost" type="button" onclick="showPg('services')" aria-label="Open services dashboard">Open services dashboard</button>
+        <button class="btn-ghost" type="button" onclick="showPg('payment')" aria-label="View payments">View payments</button>
+        <button class="btn-ghost" type="button" onclick="showPg('ussd')" aria-label="Try USSD access">Try USSD access</button>
+      </div>
+    </aside>
+  </section>
+</section>

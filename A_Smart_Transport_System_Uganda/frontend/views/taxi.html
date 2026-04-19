@@ -1,60 +1,67 @@
-<div class="srv-hero">
-  <div class="srv-hero-inner">
-    <div class="hero-live" style="margin-bottom:14px;"><span></span>LIVE · Standard Taxi</div>
-    <h1>Standard Taxi Services</h1>
-    <p>Reliable, comfortable, and safe transport across Uganda. Our standard taxis are driven by verified professionals and equipped with real-time GPS tracking.</p>
-  </div>
-</div>
+<section class="service-page" aria-label="Standard taxi service">
+  <section class="page-hero page-hero-media" style="--hero-image:url('img/taxi.jpg');">
+    <div class="page-hero-content">
+      <span class="page-kicker">Standard taxi</span>
+      <h1 class="page-title">Comfortable city trips with clear pricing and verified drivers.</h1>
+      <p class="page-summary">STS Standard Taxi is designed for everyday travel around the city with route visibility, transparent fares, and a professional booking flow.</p>
+      <div class="hero-actions">
+        <button class="btn-o" type="button" onclick="bookService('Standard Taxi', 1.0)">Book standard taxi</button>
+        <button class="btn-ghost" type="button" onclick="showPg('services')">Compare all services</button>
+      </div>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div class="booking-layout">
-    <div>
-      <div class="sh"><h3><i class="fas fa-star-of-life"></i> Why Choose Standard Taxi?</h3></div>
-      <div class="srv-grid reveal reveal-stagger" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
-        <div class="srv-card" style="padding: 20px; border-left: 4px solid var(--yellow);">
-          <div class="srv-icon-wrap" style="width:42px; height:42px; margin-bottom:12px;"><i class="fas fa-shield-check"></i></div>
-          <h4>Verified Drivers</h4>
-          <p>Every driver undergoes a strict background check and National ID verification for your safety.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-n"><i class="fas fa-temperature-arrow-down"></i></div>
-          <h4>Climate Controlled</h4>
-          <p>Enjoy a comfortable ride with fully functional air conditioning in all our standard vehicles.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-t"><i class="fas fa-map-location-dot"></i></div>
-          <h4>Real-time Tracking</h4>
-          <p>Share your live trip status with loved ones so they know exactly where you are at all times.</p>
-        </div>
-        <div class="srv-card" style="padding: 20px;">
-          <div class="srv-icon-wrap ico-r"><i class="fas fa-card-heart"></i></div>
-          <h4>Transparent Pricing</h4>
-          <p>No hidden fees. The price you see on the app is the price you pay, calculated by GPS distance.</p>
-        </div>
+  <section class="service-layout">
+    <div class="service-main">
+      <div class="service-highlight-grid">
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+          <h3>Verified drivers</h3>
+          <p>Ride requests are matched against approved driver and vehicle records.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-map-location-dot"></i></div>
+          <h3>Live route support</h3>
+          <p>Pickup, destination, route distance, and travel time stay visible while you book.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-credit-card"></i></div>
+          <h3>Flexible payment</h3>
+          <p>Use wallet top ups and recent transaction history to keep spending easy to follow.</p>
+        </article>
+        <article class="info-card">
+          <div class="card-icon"><i class="fas fa-headset"></i></div>
+          <h3>Support after the trip</h3>
+          <p>Ratings, support tickets, and trip history stay connected after the ride ends.</p>
+        </article>
       </div>
-      
-      <div class="sh"><h3><i class="fas fa-money-bill-wave"></i> Pricing Information</h3></div>
-      <div class="tech-card" style="margin-bottom: 24px; border-left: 4px solid var(--yellow);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 1.2rem; font-weight: 800; color: var(--yellow);">200 UGX <small style="color: var(--text3); font-size: 0.8rem;">/ km</small></div>
-            <div style="font-size: 0.8rem; color: var(--text2);">Base rate for standard urban trips</div>
-          </div>
-          <div style="text-align: right;">
-            <div style="font-size: 0.9rem; font-weight: 700;">No Base Fare</div>
-            <div style="font-size: 0.75rem; color: var(--text3);">Pay only for the distance you travel</div>
-          </div>
+
+      <article class="info-card">
+        <div class="section-heading" style="margin-bottom:12px;">
+          <h2 id="rider-expect" style="font-size:1.3rem;">What riders can expect</h2>
         </div>
-      </div>
+        <ul class="check-list">
+          <li><i class="fas fa-check-circle"></i><span>Reliable city transport for daily commuting and errands</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Clear fare estimate before the booking request is confirmed</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Safety tools and support options close to the ride flow</span></li>
+        </ul>
+      </article>
     </div>
-    
-    <div class="bpanel">
-      <h3><i class="fas fa-taxi"></i> Ready to go?</h3>
-      <p style="font-size: 0.84rem; color: var(--text2); margin-bottom: 20px;">Book a standard taxi now and get matched with a driver in under 4 minutes.</p>
-      
-      
-      <button class="btn-full btn-full-o" onclick="bookService('Standard Taxi', 1.0)">Book Standard Taxi Now</button>
-      <button class="btn-out" style="width: 100%; margin-top: 10px;" onclick="showPg('services')">View All Services</button>
-    </div>
-  </div>
-</div>
+
+    <aside class="service-sidebar">
+      <article class="service-action-card">
+        <h3>Service snapshot</h3>
+        <div class="service-stat-list">
+          <div class="service-stat-item"><strong>Best for</strong><span>Daily city travel</span></div>
+          <div class="service-stat-item"><strong>Typical capacity</strong><span>Up to 4 passengers</span></div>
+          <div class="service-stat-item"><strong>Booking flow</strong><span>Live match with nearest vehicle</span></div>
+        </div>
+      </article>
+      <article class="service-action-card">
+        <h3>Ready to ride?</h3>
+        <p>Move into the booking page to enter your route and compare nearby vehicles.</p>
+        <button class="btn-full" type="button" onclick="bookService('Standard Taxi', 1.0)">Book now</button>
+      </article>
+    </aside>
+  </section>
+</section>
