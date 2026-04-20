@@ -775,7 +775,24 @@ function evaluatePasswordStrength(password = '') {
 
 async function apiRequest(path, options = {}) {
     try {
-        const response = await fetch(`${API_BASE_URL}${path}`, options);
+        const method = (options.method || 'GET').toUpperCase();
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+        };
+
+        const finalOptions = {
+            ...options,
+            method,
+            headers
+        };
+
+        // If it's a GET request, we usually don't want a Content-Type or body
+        if (method === 'GET') {
+            delete finalOptions.headers['Content-Type'];
+        }
+
+        const response = await fetch(`${API_BASE_URL}${path}`, finalOptions);
         let payload = {};
         try {
             payload = await response.json();

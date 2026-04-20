@@ -128,7 +128,7 @@ def book_trip():
 
 @trip_bp.route('/<int:trip_id>/approve', methods=['POST'])
 def approve_trip(trip_id):
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
     driver_user_id = data.get('driver_user_id')
     
     trip = db.get_or_404(Trip, trip_id)
