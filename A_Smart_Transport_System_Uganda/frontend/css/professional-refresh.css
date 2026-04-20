@@ -1743,18 +1743,23 @@ textarea {
 
 .booking-live-metrics,
 .services-metrics-grid,
-.dstats,
-.payment-mini-grid {
+.dstats {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   margin-top: 20px;
 }
 
+.payment-mini-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  margin-top: 20px;
+}
+
 .booking-metric-card,
 .services-metric-card,
-.dsc,
-.payment-mini-card {
+.dsc {
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: 22px;
@@ -1762,10 +1767,21 @@ textarea {
   padding: 22px;
 }
 
+.payment-mini-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
 .booking-metric-card strong,
 .services-metric-card strong,
-.dsc-v,
-.payment-mini-card strong {
+.dsc-v {
   color: var(--ink);
   display: block;
   font-family: "Sora", sans-serif;
@@ -1776,6 +1792,20 @@ textarea {
   word-break: break-word;
   overflow-wrap: break-word;
   min-width: 0;
+}
+
+.payment-mini-card strong {
+  color: var(--ink);
+  display: block;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(0.88rem, 1.65vw, 1.28rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
 .booking-metric-card p,
