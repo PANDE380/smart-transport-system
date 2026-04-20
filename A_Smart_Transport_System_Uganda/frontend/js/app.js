@@ -124,6 +124,18 @@ const PAYMENT_METHOD_META = {
         accountLabel: 'Airtel number',
         placeholder: '0701123456',
         helper: 'Use the Airtel number that will approve the wallet credit.'
+    },
+    FLEXIPAY: {
+        label: 'Stanbic FlexiPay',
+        accountLabel: 'FlexiPay number',
+        placeholder: '0700123456',
+        helper: 'Use your registered FlexiPay mobile number.'
+    },
+    CHIPPER: {
+        label: 'Chipper Cash',
+        accountLabel: 'Chipper username',
+        placeholder: '@username',
+        helper: 'Enter your Chipper Cash username to approve the transfer.'
     }
 };
 const SERVICES_DASHBOARD_CARDS = [

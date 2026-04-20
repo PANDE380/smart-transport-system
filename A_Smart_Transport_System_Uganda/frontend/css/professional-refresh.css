@@ -2372,6 +2372,13 @@ textarea {
   justify-content: space-between;
   padding: 14px;
   text-align: left;
+  transition: all 0.2s ease;
+}
+
+.pm-opt:hover {
+  background: var(--surface-soft);
+  border-color: rgba(18, 58, 90, 0.12);
+  transform: translateY(-2px);
 }
 
 .pm-opt.active {
