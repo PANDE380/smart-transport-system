@@ -100,14 +100,14 @@
 .auto-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 100%, 350px), 1fr));
-    gap: 24px;
+    gap: 16px;
     width: 100%;
 }
 
 .metric-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
+    gap: 16px;
     width: 100%;
 }
 
@@ -115,7 +115,7 @@
 .stack {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
     width: 100%;
 }
 
@@ -787,15 +787,15 @@ textarea {
 .ussd-shell {
   margin: 0 auto;
   max-width: 1280px;
-  padding: 38px 28px 0;
+  padding: 24px 20px 0;
 }
 
 .page-hero {
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-strong);
-  min-height: 360px;
+  min-height: 240px;
   overflow: hidden;
-  padding: clamp(34px, 5vw, 68px);
+  padding: clamp(24px, 4vw, 48px);
   position: relative;
 }
 
@@ -922,7 +922,7 @@ textarea {
 
 .card-grid {
   display: grid;
-  gap: 28px 32px;
+  gap: 20px 24px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   align-items: stretch;
   padding: 16px 0;
@@ -936,13 +936,28 @@ textarea {
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-xl);
   box-shadow: 0 4px 24px rgba(18,58,90,0.08);
-  padding: 32px 24px 28px 24px;
-  min-height: 370px;
+  padding: 24px 20px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 16px;
   transition: box-shadow 0.18s, border-color 0.18s;
   overflow: hidden;
+}
+
+.info-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.info-card-header .card-icon {
+  margin-bottom: 0;
+}
+
+.info-card-header h3 {
+  margin: 0;
 }
 
 .info-card.has-img {
@@ -1045,6 +1060,12 @@ textarea {
   display: grid;
   gap: 20px;
   grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.85fr);
+}
+
+.contact-card.info-card {
+  min-height: auto;
+  justify-content: flex-start;
+  padding: 32px 24px;
 }
 
 .stack {

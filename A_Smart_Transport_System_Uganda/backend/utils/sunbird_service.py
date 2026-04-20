@@ -1,6 +1,12 @@
 import os
-import requests
 import logging
+
+try:
+    import requests
+    REQUESTS_IMPORT_ERROR = None
+except ImportError as import_error:
+    requests = None
+    REQUESTS_IMPORT_ERROR = import_error
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +46,12 @@ def translate_text(text, source_lang='en', target_lang='lg'):
         logger.warning("SUNBIRD_API_KEY not configured. Returning original text.")
         return text
 
+    if REQUESTS_IMPORT_ERROR is not None or requests is None:
+        logger.warning(
+            "The requests package is not installed. Returning original text."
+        )
+        return text
+
     # Map ASTS codes to Sunbird codes
     s_lang = LANGUAGE_MAP.get(source_lang, source_lang)
     t_lang = LANGUAGE_MAP.get(target_lang, target_lang)
@@ -73,9 +85,21 @@ def translate_text(text, source_lang='en', target_lang='lg'):
 def get_sunbird_status():
     """Checks if Sunbird API is configured."""
     api_key = os.getenv('SUNBIRD_API_KEY', '').strip()
+    if not api_key:
+        status = "Not Configured"
+        detail = "Add SUNBIRD_API_KEY to enable language translation."
+    elif REQUESTS_IMPORT_ERROR is not None:
+        status = "Dependency Missing"
+        detail = "Install the requests package to enable Sunbird translation."
+    else:
+        status = "Ready"
+        detail = "Sunbird translation is ready."
+
     return {
         "provider": "Sunbird AI",
         "configured": bool(api_key),
-        "status": "Ready" if api_key else "Not Configured",
+        "status": status,
+        "detail": detail,
+        "requests_available": REQUESTS_IMPORT_ERROR is None,
         "supported_languages": list(LANGUAGE_MAP.keys())
     }
