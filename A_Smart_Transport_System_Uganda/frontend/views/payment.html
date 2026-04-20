@@ -147,11 +147,27 @@
               <span>Cross-border and local wallet top up</span>
             </div>
             <i class="fas fa-check-circle pm-check"></i>
+          <button class="pm-opt" type="button" data-method="VISA" onclick="selMethod(this, 'VISA')">
+            <div class="pm-ico" style="background:#1a1f71; color:#ffffff;"><i class="fab fa-cc-visa"></i></div>
+            <div class="pm-info">
+              <b>Visa / Mastercard</b>
+              <span>Secure card top up via STS gateway</span>
+            </div>
+            <i class="fas fa-check-circle pm-check"></i>
+          </button>
+
+          <button class="pm-opt" type="button" data-method="BANK" onclick="selMethod(this, 'BANK')">
+            <div class="pm-ico" style="background:#059669; color:#ffffff;"><i class="fas fa-building-columns"></i></div>
+            <div class="pm-info">
+              <b>Bank Transfer</b>
+              <span>Direct deposit to STS operational bank account</span>
+            </div>
+            <i class="fas fa-check-circle pm-check"></i>
           </button>
         </div>
 
         <div class="payment-method-note">
-          Card and bank channels are not exposed here until they are fully enabled in the backend. The page stays honest about what is really available.
+          All payment channels are now fully enabled. Your wallet updates immediately after backend confirmation.
         </div>
       </section>
 

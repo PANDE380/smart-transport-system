@@ -136,6 +136,18 @@ const PAYMENT_METHOD_META = {
         accountLabel: 'Chipper username',
         placeholder: '@username',
         helper: 'Enter your Chipper Cash username to approve the transfer.'
+    },
+    VISA: {
+        label: 'Visa / Mastercard',
+        accountLabel: 'Card number',
+        placeholder: '4111 2222 3333 4444',
+        helper: 'Processed securely via the STS payment gateway.'
+    },
+    BANK: {
+        label: 'Bank Transfer',
+        accountLabel: 'Transfer Reference',
+        placeholder: 'Your name or Account ID',
+        helper: 'Funds credited once the bank confirms our operational deposit.'
     }
 };
 const SERVICES_DASHBOARD_CARDS = [
