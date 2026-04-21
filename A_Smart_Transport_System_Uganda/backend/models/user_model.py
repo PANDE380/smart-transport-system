@@ -45,12 +45,21 @@ class User(db.Model):
     def to_dict(self):
         two_factor_setting = getattr(self, 'two_factor_setting', None)
         profile_image = getattr(self, 'profile_image', None)
+        
+        vehicle_type = None
+        if self.role == 'driver' and self.driver_profile:
+            # Get the vehicle type from the first vehicle associated with the driver
+            vehicle = self.driver_profile.vehicles[0] if self.driver_profile.vehicles else None
+            if vehicle:
+                vehicle_type = vehicle.vehicle_type
+
         return {
             'id': self.id,
             'name': self.name,
             'email': self.email,
             'phone': self.phone,
             'role': self.role,
+            'vehicle_type': vehicle_type,
             'preferred_language': self.preferred_language,
             'profile_image_url': (
                 profile_image.public_url() if profile_image else None

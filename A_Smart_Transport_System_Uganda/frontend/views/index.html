@@ -253,7 +253,7 @@
           <small data-i18n="ft_tagline">Connected travel across road and water</small>
         </div>
       </a>
-      <p style="margin-bottom:20px; max-width:320px;">A Smart Transport System Uganda brings booking, payments, safety, and live fleet visibility into one clear platform for passengers, drivers, and operations teams.</p>
+      <p style="margin-bottom:20px; max-width:320px;">A Smart Transport System Uganda brings booking, payments, safety, and live fleet visibility into one clear platform for riders, drivers, and operations teams.</p>
       <div class="ft-socials">
         <a href="https://twitter.com/SmartTransport" target="_blank"><i class="fab fa-twitter"></i></a>
         <a href="https://facebook.com/SmartTransport" target="_blank"><i class="fab fa-facebook-f"></i></a>
@@ -294,26 +294,26 @@
   <div id="chatbot-window" class="chatbot-window">
     <div class="chatbot-header">
       <div class="cb-agent">
-        <div class="cb-avatar"><i class="fas fa-robot"></i><span class="cb-status"></span></div>
+        <div class="cb-avatar"><i class="fas fa-headset"></i><span class="cb-status"></span></div>
         <div class="cb-info">
-          <h5 id="chatbot-provider-label">OpenAI STS Assistant</h5>
-          <p id="chatbot-provider-subtitle">Checking assistant status...</p>
+          <h5 id="chatbot-provider-label">STS Connect Assistant</h5>
+          <p id="chatbot-provider-subtitle">Professional Transport Support</p>
         </div>
       </div>
       <button class="cb-close" onclick="toggleChatbot()"><i class="fas fa-times"></i></button>
     </div>
     <div id="chatbot-messages" class="chatbot-messages">
       <div class="cb-msg bot">
-        <div class="cb-bubble">Hello. I am your OpenAI-powered STS assistant. Ask me about booking, pricing, safety, driver onboarding, or general questions.</div>
+        <div class="cb-bubble">Hello! I am your STS Connect Assistant. How can I help you with your transport needs today?</div>
       </div>
     </div>
     <div class="chatbot-input-area">
-      <input type="text" id="chatbot-input" placeholder="Ask the OpenAI assistant anything..." onkeypress="handleChatbotKey(event)"/>
+      <input type="text" id="chatbot-input" placeholder="Ask the STS assistant anything..." onkeypress="handleChatbotKey(event)"/>
       <button onclick="sendChatbotMessage()"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
   <button id="chatbot-toggle-btn" class="chatbot-toggle-btn" onclick="toggleChatbot()">
-    <i class="fas fa-comment-dots"></i>
+    <i class="fas fa-message"></i>
   </button>
 </div>
 
@@ -376,7 +376,7 @@
       <div style="margin-bottom:18px;">
         <label class="fl" data-i18n="label_reg_as">Registering as</label>
         <div class="role-select">
-          <div class="role-opt sel" onclick="selRegRole(this,'passenger')"><div class="role-opt-ico"><i class="fas fa-user"></i></div><div class="role-opt-lbl">Passenger</div></div>
+          <div class="role-opt sel" onclick="selRegRole(this,'passenger')"><div class="role-opt-ico"><i class="fas fa-user"></i></div><div class="role-opt-lbl">Rider</div></div>
           <div class="role-opt" onclick="selRegRole(this,'driver')"><div class="role-opt-ico"><i class="fas fa-car"></i></div><div class="role-opt-lbl">Driver</div></div>
           <div class="role-opt" onclick="selRegRole(this,'admin')"><div class="role-opt-ico"><i class="fas fa-user-shield"></i></div><div class="role-opt-lbl">Admin</div></div>
         </div>
@@ -424,8 +424,8 @@
             </select>
           </div>
           <div class="fg">
-            <label class="fl">Passenger Capacity</label>
-            <input class="fi" id="r-vehicle-capacity" type="number" min="1" value="4" oninput="markVehicleCapacityManual()"/>
+            <label class="fl">Rider Capacity</label>
+            <input class="fi" id="r-vehicle-capacity" type="number" min="1" value="14" oninput="markVehicleCapacityManual()"/>
           </div>
         </div>
         <div class="fg"><label class="fl">Plate / Registration Number</label><input class="fi" id="r-number-plate" placeholder="UAA 123A"/></div>
@@ -495,7 +495,7 @@
       <div style="margin-bottom:20px;">
         <label class="fl">Login as</label>
         <div class="role-select" style="padding:4px;">
-          <div class="role-opt sel" id="g-role-passenger" onclick="selGRole('passenger')">Passenger</div>
+          <div class="role-opt sel" id="g-role-passenger" onclick="selGRole('passenger')">Rider</div>
           <div class="role-opt" id="g-role-driver" onclick="selGRole('driver')">Driver</div>
           <div class="role-opt" id="g-role-admin" onclick="selGRole('admin')">Admin</div>
         </div>

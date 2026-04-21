@@ -40,7 +40,7 @@ user_bp = Blueprint('user_bp', __name__)
 
 
 DRIVER_VEHICLE_TYPES = {
-    'Taxi': 4,
+    'Taxi': 14,
     'Boda Boda': 1,
     'Special Hire': 4,
     'Mini Bus': 14,

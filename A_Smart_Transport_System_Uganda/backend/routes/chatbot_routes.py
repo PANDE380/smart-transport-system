@@ -22,46 +22,12 @@ def _get_chatbot_service():
 
 
 def _build_fallback_reply(message):
-    lowered = str(message or '').lower().strip()
-
-    if any(greet in lowered for greet in ['hi', 'hello', 'hey']):
-        return (
-            'Hello. The OpenAI assistant is temporarily limited right now, '
-            'but I can still help with ASTS booking, payments, safety, and driver support.'
-        )
-    if any(word in lowered for word in ['book', 'ride', 'taxi', 'boda', 'trip']):
-        return (
-            'To book a ride, open the Book a Ride page, choose your service, set pickup and destination, '
-            'then confirm the request. The driver dashboard receives pending trips in real time.'
-        )
-    if any(word in lowered for word in ['wallet', 'top up', 'topup', 'pay', 'payment', 'fare', 'price', 'cost']):
-        return (
-            'Payments are handled from the wallet and trip flow. You can top up your balance, '
-            'pay for completed trips, and review payment history from the Payments page.'
-        )
-    if any(word in lowered for word in ['safe', 'safety', 'sos', 'emergency']):
-        return (
-            'ASTS safety tools include verified drivers, live vehicle tracking, and an SOS flow '
-            'for urgent incidents. The Safety page is the best place to manage those features.'
-        )
-    if any(word in lowered for word in ['driver', 'license', 'vehicle', 'dashboard']):
-        return (
-            'Drivers can register with their licence and vehicle details, then manage live ride requests '
-            'from the driver dashboard once approved.'
-        )
-    if any(word in lowered for word in ['ussd', 'offline', 'feature phone']):
-        return (
-            'Passengers can use the USSD flow by dialing *123# to book and check transport options '
-            'without internet access.'
-        )
-    if any(word in lowered for word in ['contact', 'support', 'help']):
-        return (
-            'You can reach support at +256800123456 or use the Contact page for more help.'
-        )
-    return (
-        'The OpenAI assistant is temporarily unavailable, so I can only give limited ASTS guidance right now. '
-        'Ask about booking, payments, safety, driver onboarding, services, or support.'
-    )
+    try:
+        from ..utils.knowledge_engine import query_knowledge_engine
+    except ImportError:
+        from utils.knowledge_engine import query_knowledge_engine
+        
+    return query_knowledge_engine(message)
 
 
 @chatbot_bp.route('/', methods=['POST'])

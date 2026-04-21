@@ -52,7 +52,7 @@ def clear_session(session_id):
 
 def make_main_menu(name):
     return (
-        f"CON STS Uganda *250# — Hello, {name}!\n"
+        f"CON STS Uganda *123# — Hello, {name}!\n"
         "━━━━━━━━━━━━━━━━━━━━━━\n"
         "1. Book a Ride\n"
         "2. Check Wallet Balance\n"
@@ -93,7 +93,7 @@ def simulate_ussd():
 
     if not user:
         msg = (
-            "CON Welcome to STS Uganda *250#\n"
+            "CON Welcome to STS Uganda *123#\n"
             "Your phone number is not registered.\n"
             "Please visit our website to create\n"
             "an account and get started.\n"
@@ -162,7 +162,7 @@ def simulate_ussd():
                 return jsonify({'message': localize((
                     "END No active trip found.\n"
                     "Book a ride via the STS app\n"
-                    "or dial *250# again."
+                    "or dial *123# again."
                 ), lang)}), 200
 
         elif input_text == '4':
@@ -191,7 +191,7 @@ def simulate_ussd():
             clear_session(session_id)
             return jsonify({'message': localize((
                 "END Thank you for using\n"
-                "STS Uganda *250#\n"
+                "STS Uganda *123#\n"
                 "Safe travels!"
             ), lang)}), 200
 
