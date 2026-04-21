@@ -1,14 +1,14 @@
 import os
 from datetime import datetime, timezone
 
-try:
-    from openai import APIConnectionError, AuthenticationError, OpenAI, OpenAIError
-    from openai import RateLimitError
-    OPENAI_IMPORT_ERROR = None
-except ImportError as import_error:
-    APIConnectionError = AuthenticationError = OpenAIError = RateLimitError = Exception
-    OpenAI = None
-    OPENAI_IMPORT_ERROR = import_error
+
+class _OpenAIPlaceholderError(Exception):
+    """Fallback exception type used until the OpenAI SDK is imported."""
+
+
+APIConnectionError = AuthenticationError = OpenAIError = RateLimitError = _OpenAIPlaceholderError
+OpenAI = None
+OPENAI_IMPORT_ERROR = None
 
 
 DEFAULT_CHATBOT_MODEL = 'gpt-5.4-mini'
@@ -16,6 +16,7 @@ ERROR_COOLDOWN_SECONDS = 60
 _openai_client = None
 _last_error_message = None
 _last_error_at = None
+_openai_sdk_loaded = False
 
 
 SYSTEM_PROMPT = """
@@ -64,6 +65,7 @@ def is_web_search_enabled():
 def _get_client():
     global _openai_client
 
+    _load_openai_sdk()
     if OPENAI_IMPORT_ERROR is not None or OpenAI is None:
         raise ChatbotUnavailableError(
             'The OpenAI SDK is not installed in this environment yet.'
@@ -79,6 +81,36 @@ def _get_client():
         _openai_client = OpenAI(api_key=api_key)
 
     return _openai_client
+
+
+def _load_openai_sdk():
+    global APIConnectionError, AuthenticationError, OpenAI, OpenAIError
+    global RateLimitError, OPENAI_IMPORT_ERROR, _openai_sdk_loaded
+
+    if _openai_sdk_loaded:
+        return OpenAI
+
+    _openai_sdk_loaded = True
+
+    try:
+        from openai import (
+            APIConnectionError as _APIConnectionError,
+            AuthenticationError as _AuthenticationError,
+            OpenAI as _OpenAI,
+            OpenAIError as _OpenAIError,
+            RateLimitError as _RateLimitError
+        )
+    except ImportError as import_error:
+        OPENAI_IMPORT_ERROR = import_error
+        return None
+
+    APIConnectionError = _APIConnectionError
+    AuthenticationError = _AuthenticationError
+    OpenAI = _OpenAI
+    OpenAIError = _OpenAIError
+    RateLimitError = _RateLimitError
+    OPENAI_IMPORT_ERROR = None
+    return OpenAI
 
 
 def _set_last_error(message):
@@ -193,6 +225,10 @@ def get_chatbot_runtime_status():
     configured = bool(os.getenv('OPENAI_API_KEY', '').strip())
     cooldown_remaining = _cooldown_remaining_seconds()
 
+    sdk_loaded = False
+    if configured:
+        sdk_loaded = _load_openai_sdk() is not None
+
     if OPENAI_IMPORT_ERROR is not None:
         status = 'attention_needed'
         label = 'OpenAI SDK missing'
@@ -214,7 +250,7 @@ def get_chatbot_runtime_status():
         'provider': 'OpenAI',
         'model': get_chatbot_model(),
         'configured': configured,
-        'ready': OPENAI_IMPORT_ERROR is None and configured and cooldown_remaining == 0,
+        'ready': sdk_loaded and configured and cooldown_remaining == 0,
         'status': status,
         'status_label': label,
         'detail': detail,

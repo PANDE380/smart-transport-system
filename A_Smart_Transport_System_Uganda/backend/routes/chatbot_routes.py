@@ -1,20 +1,24 @@
 from flask import Blueprint, jsonify, request
 
-try:
-    from ..utils.openai_service import (
-        ChatbotUnavailableError,
-        generate_chatbot_reply,
-        get_chatbot_runtime_status
-    )
-except ImportError:
-    from utils.openai_service import (
-        ChatbotUnavailableError,
-        generate_chatbot_reply,
-        get_chatbot_runtime_status
-    )
-
 
 chatbot_bp = Blueprint('chatbot_routes', __name__)
+
+
+def _get_chatbot_service():
+    try:
+        from ..utils.openai_service import (
+            ChatbotUnavailableError,
+            generate_chatbot_reply,
+            get_chatbot_runtime_status
+        )
+    except ImportError:
+        from utils.openai_service import (
+            ChatbotUnavailableError,
+            generate_chatbot_reply,
+            get_chatbot_runtime_status
+        )
+
+    return ChatbotUnavailableError, generate_chatbot_reply, get_chatbot_runtime_status
 
 
 def _build_fallback_reply(message):
@@ -72,6 +76,7 @@ def chat():
     if not isinstance(history, list):
         history = []
 
+    ChatbotUnavailableError, generate_chatbot_reply, get_chatbot_runtime_status = _get_chatbot_service()
     try:
         result = generate_chatbot_reply(message, history=history, language=language)
         return jsonify({
@@ -93,4 +98,5 @@ def chat():
 
 @chatbot_bp.route('/status', methods=['GET'])
 def chatbot_status():
+    _, _, get_chatbot_runtime_status = _get_chatbot_service()
     return jsonify(get_chatbot_runtime_status()), 200

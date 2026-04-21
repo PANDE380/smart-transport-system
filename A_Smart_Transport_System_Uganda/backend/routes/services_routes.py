@@ -10,17 +10,24 @@ try:
     from ..models.trip_model import Trip
     from ..models.vehicle_model import Vehicle
     from ..models.wallet_transaction_model import WalletTransaction
-    from ..utils.openai_service import get_chatbot_runtime_status
 except ImportError:
     from models.driver_model import Driver
     from models.payment_model import Payment
     from models.trip_model import Trip
     from models.vehicle_model import Vehicle
     from models.wallet_transaction_model import WalletTransaction
-    from utils.openai_service import get_chatbot_runtime_status
 
 
 services_bp = Blueprint('services_bp', __name__)
+
+
+def _get_chatbot_runtime_status():
+    try:
+        from ..utils.openai_service import get_chatbot_runtime_status
+    except ImportError:
+        from utils.openai_service import get_chatbot_runtime_status
+
+    return get_chatbot_runtime_status
 
 
 TRANSPORT_SERVICE_TYPES = {
@@ -139,6 +146,7 @@ def _build_activity_feed(trips, topups):
 
 
 def _build_services_dashboard_payload():
+    get_chatbot_runtime_status = _get_chatbot_runtime_status()
     trips = Trip.query.order_by(Trip.created_at.desc()).all()
     vehicles = Vehicle.query.order_by(Vehicle.id.desc()).all()
     drivers = Driver.query.order_by(Driver.id.desc()).all()

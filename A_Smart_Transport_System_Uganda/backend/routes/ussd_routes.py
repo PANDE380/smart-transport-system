@@ -7,7 +7,6 @@ try:
     from ..models.trip_model import Trip
     from ..models.vehicle_model import Vehicle
     from ..models.trip_log_model import TripLog
-    from ..ai.fare_prediction import predict_fare
     from ..database import db
     from ..utils.sunbird_service import translate_text
 except ImportError:
@@ -16,7 +15,6 @@ except ImportError:
     from models.trip_model import Trip
     from models.vehicle_model import Vehicle
     from models.trip_log_model import TripLog
-    from ai.fare_prediction import predict_fare
     from database import db
     from utils.sunbird_service import translate_text
 
@@ -24,6 +22,15 @@ ussd_bp = Blueprint('ussd_bp', __name__)
 
 # In-memory session store (use Redis in production)
 sessions = {}
+
+
+def _get_predict_fare():
+    try:
+        from ..ai.fare_prediction import predict_fare
+    except ImportError:
+        from ai.fare_prediction import predict_fare
+
+    return predict_fare
 
 
 def localize(text, lang='en'):
@@ -225,6 +232,7 @@ def simulate_ussd():
         
         # 1. Calculate fare using ASTS AI Engine
         # For USSD we assume a standard 5km city hop for the estimate
+        predict_fare = _get_predict_fare()
         fare = predict_fare(distance_km=5.0, vehicle_type=vtype)
         
         # 2. Assign any active vehicle of that type (Marketplace logic)

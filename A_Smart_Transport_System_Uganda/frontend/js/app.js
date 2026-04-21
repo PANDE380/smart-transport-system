@@ -4495,8 +4495,8 @@ function updateAdminChart(passengers, drivers) {
         labels: ['Passengers Accounts', 'Driver Partners'],
         datasets: [{
             data: [passengers, drivers],
-            backgroundColor: ['#10b981', '#34d399'], // Professional Emerald and Green
-            hoverBackgroundColor: ['#059669', '#10b981'],
+            backgroundColor: ['#3b82f6', '#10b981'], // Blue for Passengers, Emerald for Drivers
+            hoverBackgroundColor: ['#2563eb', '#059669'],
             borderWidth: 0,
             hoverOffset: 4
         }]

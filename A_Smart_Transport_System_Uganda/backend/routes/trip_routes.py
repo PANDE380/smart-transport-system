@@ -12,7 +12,6 @@ try:
     from ..models.wallet_model import Wallet
     from ..models.wallet_transaction_model import WalletTransaction
     from ..database import db
-    from ..ai.fare_prediction import predict_fare
 except ImportError:
     from models.payment_model import Payment
     from models.trip_model import Trip
@@ -21,9 +20,17 @@ except ImportError:
     from models.wallet_model import Wallet
     from models.wallet_transaction_model import WalletTransaction
     from database import db
-    from ai.fare_prediction import predict_fare
 
 trip_bp = Blueprint('trip_routes', __name__)
+
+
+def _get_predict_fare():
+    try:
+        from ..ai.fare_prediction import predict_fare
+    except ImportError:
+        from ai.fare_prediction import predict_fare
+
+    return predict_fare
 
 
 def build_trip_receipt(payment, trip):
@@ -52,6 +59,7 @@ def estimate_fare():
     
     # We can also pass traffic_level and weather if the frontend provides it,
     # otherwise predict_fare will simulate them.
+    predict_fare = _get_predict_fare()
     predicted = predict_fare(
         distance_km=distance,
         vehicle_type=v_type,

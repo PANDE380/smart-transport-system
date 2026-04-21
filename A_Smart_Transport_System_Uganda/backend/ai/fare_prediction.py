@@ -1,24 +1,52 @@
-try:
-    import joblib
-    import pandas as pd
-    AI_DEPS_AVAILABLE = True
-except ImportError:
-    AI_DEPS_AVAILABLE = False
 import os
 from datetime import datetime
 import random
 
-# Load the model at module level for efficiency
 BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.join(BASE_DIR, 'fare_model.pkl')
 
 model = None
-if AI_DEPS_AVAILABLE:
+_joblib = None
+_pandas = None
+_deps_checked = False
+
+
+def _load_ai_dependencies():
+    global _joblib, _pandas, _deps_checked
+
+    if _deps_checked:
+        return _joblib, _pandas
+
+    _deps_checked = True
+
     try:
-        if os.path.exists(MODEL_PATH):
-            model = joblib.load(MODEL_PATH)
-    except Exception as e:
-        print(f"Error loading AI model: {e}")
+        import joblib as joblib_module
+        import pandas as pandas_module
+    except ImportError:
+        return None, None
+
+    _joblib = joblib_module
+    _pandas = pandas_module
+    return _joblib, _pandas
+
+
+def _load_model():
+    global model
+
+    if model is not None:
+        return model
+
+    joblib_module, _ = _load_ai_dependencies()
+    if joblib_module is None:
+        return None
+
+    if os.path.exists(MODEL_PATH):
+        try:
+            model = joblib_module.load(MODEL_PATH)
+        except Exception as error:
+            print(f"Error loading AI model: {error}")
+
+    return model
 
 def get_live_fuel_price() -> float:
     """
@@ -55,9 +83,14 @@ def predict_fare(
         
     fuel_price = get_live_fuel_price()
         
-    if model:
+    loaded_model = _load_model()
+    if loaded_model is not None:
         try:
-            input_data = pd.DataFrame([{
+            _, pandas_module = _load_ai_dependencies()
+            if pandas_module is None:
+                raise RuntimeError('pandas is not installed')
+
+            input_data = pandas_module.DataFrame([{
                 'distance_km': distance_km,
                 'fuel_price': fuel_price,
                 'hour': hour,
@@ -67,7 +100,7 @@ def predict_fare(
                 'vehicle_type': vehicle_type
             }])
             
-            prediction = model.predict(input_data)[0]
+            prediction = loaded_model.predict(input_data)[0]
             return float(round(prediction / 500) * 500)
         except Exception as e:
             print(f"AI prediction error: {e}")
