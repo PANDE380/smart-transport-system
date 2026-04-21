@@ -724,6 +724,31 @@
   </div>
 </div>
 
+<!-- MOBILE SYNC INFO MODAL -->
+<div class="mo" id="mobile-sync-m">
+  <div class="mb" style="max-width:440px; padding: 40px 32px; text-align:center;">
+    <button class="close-mo" onclick="closeM('mobile-sync-m')"><i class="fas fa-times"></i></button>
+    <div style="width:64px; height:64px; background:rgba(21,94,117,0.08); color:var(--navy); border-radius:100px; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:1.8rem;">
+      <i class="fas fa-mobile-button"></i>
+    </div>
+    <h3 style="font-size:1.4rem; font-weight:800; color:var(--navy); margin-bottom:12px;">Mobile System Sync</h3>
+    <p style="font-size:0.9rem; color:var(--text2); line-height:1.6; margin-bottom:24px;">
+      To access STS Uganda on your phone, ensure it is on the same Wi-Fi network and scan or visit the link below.
+    </p>
+    
+    <div style="background:var(--bg2); padding:16px; border-radius:12px; border:1px dashed var(--border); margin-bottom:24px;">
+      <div id="mobile-sync-qr-placeholder" style="width:120px; height:120px; background:#fff; border:1px solid #ddd; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; border-radius:8px;">
+        <i class="fas fa-qrcode" style="font-size:4rem; color:#eee;"></i>
+      </div>
+      <div style="color:var(--sts-yellow); font-family:monospace; font-weight:800; font-size:1rem; word-break:break-all;" id="mobile-sync-url">http://10.69.223.167:5001</div>
+    </div>
+    
+    <button class="btn-full" onclick="closeM('mobile-sync-m')" style="width:100%;">
+      Got it, thanks!
+    </button>
+  </div>
+</div>
+
 <div class="toast" id="toast"><span id="ticon"></span><span id="tmsg"></span></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

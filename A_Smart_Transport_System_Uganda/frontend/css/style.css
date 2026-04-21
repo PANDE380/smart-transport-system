@@ -1994,17 +1994,19 @@ ul li {
     border-left: none;
   }
   .top-bar-inner {
-    flex-direction: column;
-    gap: 6px;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 12px;
     padding: 8px 0;
-    align-items: flex-start;
+    align-items: center;
   }
   .social-links-ref {
-    order: 2;
+    order: 1;
+    width: auto;
   }
   .lang-cur-ref {
-    order: 1;
-    width: 100%;
+    order: 2;
+    width: auto;
     justify-content: flex-end;
   }
 }

@@ -1,72 +1,106 @@
 import re
+import random
 
-# Comprehensive knowledge base for ASTS Uganda
-KNOWLEDGE_BASE = {
-    'greetings': {
-        'patterns': [r'\bhi\b', r'\bhello\b', r'\bhey\b', r'\bjambo\b', r'\bolyotya\b'],
+# =================================================================
+# STS CONNECT AI - ADVANCED KNOWLEDGE INTELLIGENCE ENGINE
+# =================================================================
+
+# Define deep project-aware intents with weighted scoring
+INTENTS = [
+    {
+        'id': 'greetings',
+        'keywords': ['hi', 'hello', 'hey', 'jambo', 'olyotya', 'greetings', 'morning', 'evening', 'afternoon', 'how are you'],
         'responses': [
-            "Hello! I am your STS Connect Assistant. How can I help you with your transport needs today?",
-            "Greetings! Welcome to STS Uganda. I'm here to help with booking, payments, or safety features. What's on your mind?"
-        ]
+            "Hello! I am your **STS Connect AI**, specifically trained for the Uganda Smart Transport ecosystem. How can I facilitate your journey today?",
+            "Greetings! I'm your real-time assistant for all things STS. Whether you're booking a Boda or planning a lake crossing, I'm here to help.",
+            "Hello there! Ready for a smart trip? I can help with booking, payments, or safety features. What's on your travel agenda?"
+        ],
+        'weight': 10
     },
-    'booking': {
-        'patterns': [r'book', r'ride', r'trip', r'request', r'order'],
+    {
+        'id': 'booking',
+        'keywords': ['book', 'ride', 'trip', 'request', 'order', 'taxi', 'boda', 'bus', 'minibus', 'special hire', 'matatu', 'go to', 'pickup', 'destination'],
         'responses': [
-            "To book a ride, go to the **Book a Ride** page. Enter your pickup and destination to see a fare estimate and live vehicle matching. You can also dial **\*123#** for offline booking via USSD."
-        ]
+            "To start your journey: \n1. Go to the **Book a Ride** dashboard.\n2. Choose your preferred vehicle (Boda, Standard Taxi, Smart Bus, etc.).\n3. Set your pickup and destination on our live map.\n4. Confirm to match with the nearest verified STS driver.\n\nYou can also dial **\*123#** for offline USSD booking."
+        ],
+        'weight': 8
     },
-    'payments': {
-        'patterns': [r'pay', r'wallet', r'money', r'cost', r'price', r'fare', r'top up', r'topup', r'balance', r'ugx'],
+    {
+        'id': 'payments',
+        'keywords': ['pay', 'wallet', 'money', 'cost', r'price\b', 'fare', 'top up', 'topup', 'balance', 'momo', 'airtel', 'mtn', 'shilling', 'ugx'],
         'responses': [
-            "ASTS uses a secure **Wallet system**. You can top up your balance using MTN Mobile Money, Airtel Money, or at any STS Agent. Fares are calculated automatically based on distance and vehicle type."
-        ]
+            "The **STS Wallet** is your central payment hub. You can top up instantly via MTN Mobile Money or Airtel Money. All fares are calculated per-kilometer based on national utility standards to ensure transparency. You can check your current balance in the 'Payments' section."
+        ],
+        'weight': 8
     },
-    'marine': {
-        'patterns': [r'marine', r'boat', r'lake', r'victoria', r'kyoga', r'ferry', r'island', r'captain'],
+    {
+        'id': 'marine',
+        'keywords': ['marine', 'boat', 'lake', 'victoria', 'kyoga', r'\bship\b', 'ferry', 'island', 'ssese', 'kalangala', 'captain', 'water'],
         'responses': [
-            "Our **Marine Transport** service covers lake crossings and island routes on Lake Victoria and Lake Kyoga. Marine vessels are operated by certified **Captains**. You can check schedules and book water transport just like a road trip."
-        ]
+            "Our **Marine Fleet** provides safe crossings on Lake Victoria and Lake Kyoga. All STS vessels are operated by certified **Captains** and equipped with live GPS tracking. You can book lake journeys directly through the main booking menu—the system will automatically assign a nearby vessel."
+        ],
+        'weight': 9
     },
-    'safety': {
-        'patterns': [r'safe', r'emergency', r'sos', r'police', r'help', r'accident', r'incident', r'danger'],
+    {
+        'id': 'safety',
+        'keywords': ['safe', 'emergency', 'sos', 'police', 'help', 'accident', 'incident', 'danger', 'track', 'security', 'protection'],
         'responses': [
-            "Your safety is our priority. Use the **SOS button** in the app or USSD menu to immediately alert our emergency response team and Uganda Police with your live GPS location. All ASTS drivers are fully verified."
-        ]
+            "Your safety is non-negotiable. We provide **Live Trip Tracking** that you can share with loved ones. In case of any incident, use the **SOS button** (in-app or via \*123#) to immediately transmit your coordinates to the STS Emergency Center and Uganda Police dispatch."
+        ],
+        'weight': 10
     },
-    'vehicles': {
-        'patterns': [r'taxi', r'boda', r'bus', r'minibus', r'special hire', r'matatu'],
+    {
+        'id': 'lost_found',
+        'keywords': ['lost', 'found', 'forgot', 'item', r'\bbag\b', r'\bphone\b', 'property', 'report'],
         'responses': [
-            "STS supports multiple vehicle types: **Boda Bodas** for quick trips, **Standard Taxis (Matatus)** for shared city travel, **Smart Buses** for long distances, and **Special Hires** for private comfort."
-        ]
+            "If you've misplaced an item, please use the **STS Connect** hub to file a formal report. Include your Trip ID if possible. We coordinate directly with drivers and use our internal tracking logs to help recover lost property safely."
+        ],
+        'weight': 7
     },
-    'ussd': {
-        'patterns': [r'ussd', r'offline', r'feature phone', r'no internet', r'\*123#'],
+    {
+        'id': 'support_contact',
+        'keywords': ['contact', 'support', 'help', 'call', 'helpline', 'agent', 'office', 'talk to', 'human'],
         'responses': [
-            "No internet? No problem. Dial **\*123#** on any phone to access the STS menu. You can book rides, check your wallet balance, and use SOS features via USSD."
-        ]
+            "For direct assistance, call our 24/7 dedicated helpline at **+256 800 123456**. You can also find **STS Agents** at major transport hubs and malls across the city for SmartCard registration and wallet services."
+        ],
+        'weight': 6
     },
-    'support': {
-        'patterns': [r'contact', r'support', r'lost', r'found', r'account', r'problem', r'issue', r'complain'],
+    {
+        'id': 'taxi_capacity',
+        'keywords': ['taxi', 'passengers', 'capacity', 'many people', '14'],
         'responses': [
-            "For assistance, visit the **Contact** page or call our 24/7 helpline at **+256 800 123456**. You can also report lost items or feedback directly through the **STS Connect** hub."
-        ]
+            "Our **Standard Taxis** (commonly known as Matatus) now have an official capacity of **14 riders**. This ensures safe and comfortable travel across the city while maintaining efficiency."
+        ],
+        'weight': 8
     }
-}
+]
 
 def query_knowledge_engine(message):
     message = str(message or '').lower().strip()
-    
-    # Try to find a match in the knowledge base
-    for category, content in KNOWLEDGE_BASE.items():
-        for pattern in content['patterns']:
+    scores = {}
+
+    # Scoring Phase: Count keyword hits weighted by intent priority
+    for intent in INTENTS:
+        score = 0
+        for keyword in intent['keywords']:
+            # Use word boundaries for better precision
+            pattern = rf'\b{re.escape(keyword)}'
             if re.search(pattern, message):
-                import random
-                return random.choice(content['responses'])
-                
-    # Default fallback if no pattern matches
+                score += intent['weight']
+        
+        if score > 0:
+            scores[intent['id']] = score
+
+    # Decision Phase: Pick the highest scoring intent
+    if scores:
+        best_intent_id = max(scores, key=scores.get)
+        intent_data = next(i for i in INTENTS if i['id'] == best_intent_id)
+        return random.choice(intent_data['responses'])
+
+    # Fallback Phase: Intelligent general response
     return (
-        "I'm here to help with your STS Uganda journey! You can ask about "
-        "booking a ride (road or marine), managing your wallet payments, "
-        "safety features like SOS, or how to use our USSD service (*123#). "
-        "What would you like to know more about?"
+        "I'm here to ensure your STSUganda experience is excellent. "
+        "I'm knowledgeable about road and marine bookings, wallet payments, "
+        "safety protocols (SOS), and our transport services across Uganda. "
+        "What specific information can I provide to help you right now?"
     )

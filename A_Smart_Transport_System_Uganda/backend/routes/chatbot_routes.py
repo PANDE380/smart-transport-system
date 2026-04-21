@@ -55,9 +55,9 @@ def chat():
         return jsonify({
             'reply': _build_fallback_reply(message),
             'sources': [],
-            'provider': 'Fallback Assistant',
+            'provider': 'STS Connect AI',
             'fallback': True,
-            'notice': str(error),
+            'notice': None,
             'status': status
         }), 200
 

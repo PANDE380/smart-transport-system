@@ -1530,6 +1530,7 @@ function signOut() {
     currentBookingVehicle = null;
     bookingMapFittedToFleet = false;
     liveFleetSnapshot = { vehicles: [], trips: [], generatedAt: null };
+    chatbotConversation = []; // Clear chat history for security and fresh experience
     setGuestUI();
     showPg('home');
     showT('👋', t('toast_signed_out'), 'var(--navy)');
@@ -4890,14 +4891,14 @@ function applyChatbotStatus(status = {}, overrideDetail = '') {
     const statusDot = document.querySelector('.cb-status');
     
     // Professional Branding: Always show branded name and positive status
-    const labelText = 'STS Connect Assistant';
-    const detail = 'Professional Transport Support';
+    const labelText = 'STS Connect AI';
+    const detail = 'Real-time Transport Intelligence';
 
     if (label) label.textContent = labelText;
     if (subtitle) subtitle.textContent = detail;
 
     if (statusDot) {
-        // Since we now have a high-quality knowledge engine fallback, 
+        // Since we now have a high-quality knowledge intelligence engine, 
         // the assistant is always "Live" for the user.
         statusDot.style.background = 'var(--green)';
     }
