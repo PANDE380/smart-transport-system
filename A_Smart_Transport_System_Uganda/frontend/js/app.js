@@ -1338,11 +1338,11 @@ async function handleGoogleChoice(role) {
     closeM('auth-m');
     showT('<i class="fab fa-google"></i>', 'Authenticating with Google...', 'var(--blue)');
     
-    // Quick-switch identities for prototype demo
+    // Simulation identities for prototype verification
     const mockUsers = {
-        'passenger': { id: 1, name: 'Johnathan S.', role: 'passenger', profession: 'Passenger', email: 'johnathan.pass@gmail.com', balance: 50000 },
-        'driver': { id: 2, name: 'Musa K.', role: 'driver', profession: 'Driver', email: 'musa.pro@gmail.com', balance: 125000 },
-        'admin': { id: 3, name: 'Sarah B.', role: 'admin', profession: 'System Administrator', email: 's.bakiza@sts.ug', balance: 0 }
+        'passenger': { id: 1, name: 'Namutebi Shami', role: 'passenger', profession: 'Rider', email: 'namutebi.rider@sts.ug', balance: 50000 },
+        'driver': { id: 2, name: 'Don Keri', role: 'driver', profession: 'Professional Driver', email: 'don.keri.pro@sts.ug', balance: 125000 },
+        'admin': { id: 3, name: 'System Administrator', role: 'admin', profession: 'Operations Lead', email: 'admin@sts.ug', balance: 0 }
     };
     
     const user = mockUsers[role];
@@ -1388,7 +1388,7 @@ async function handleGoogleCustomSubmit() {
 
     setTimeout(() => {
         const name = email.split('@')[0];
-        const professions = { 'passenger': 'Passenger', 'driver': 'Driver', 'admin': 'System Administrator' };
+        const professions = { 'passenger': 'Rider', 'driver': 'Professional Driver', 'admin': 'Operations Lead' };
         const user = { 
             id: Date.now(), 
             name: name.charAt(0).toUpperCase() + name.slice(1), 
@@ -2083,9 +2083,9 @@ function needAuth(feature, cb) {
 // ══════════════════════════════════════════
 const KLA = [0.3476, 32.5825];
 const PROFESSIONAL_TILE_LAYER =
-    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'; 
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'; 
 const PROFESSIONAL_TILE_ATTRIBUTION =
-    '&copy; OpenStreetMap contributors &copy; CARTO';
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 // Helper for smooth marker interpolation (Real-time movement)
 function moveMarkerSmoothly(marker, newLatLng, duration = 4000) {
@@ -4539,114 +4539,88 @@ function renderAdminLiveActivity(trips = []) {
 }
 
 function updateAdminCharts(stats) {
-    const finCtx = document.getElementById('admin-financial-chart');
-    const distCtx = document.getElementById('admin-user-dist-chart');
-    const engCtx = document.getElementById('admin-engagement-chart');
-    
-    if (!finCtx || !distCtx || !engCtx) return;
+    // 1. Update Executive Sidebar Metrics with real and simulated data
+    const m1 = document.getElementById('exec-metric-1');
+    const m2 = document.getElementById('exec-metric-2');
+    const m4 = document.getElementById('exec-metric-4');
+    const m5 = document.getElementById('exec-metric-5');
 
-    // Add slight random fluctuation for "Live" feel if desired, 
-    // but here we primarily use the real data from stats
-    const revenue = stats.total_revenue || 0;
-    const profit = stats.estimated_profit || 0;
-    const costs = stats.operational_costs || 0;
+    if (m1) m1.textContent = (stats.total_trips || 2035683).toLocaleString();
+    if (m2) m2.textContent = (Math.floor(Math.random() * 20) + 70) + ' sec'; 
+    if (m4) m4.textContent = (Math.floor(Math.random() * 10) + 40) + '%';    
+    if (m5) m5.textContent = ((stats.total_passengers || 100) * 125).toLocaleString();
 
-    // Financial Chart: Revenue, Profit, Costs
-    if (window.stsFinChart) {
-        window.stsFinChart.data.datasets[0].data = [revenue, profit, costs];
-        window.stsFinChart.update('none'); // Update without animation for 1s frequency
-    } else {
-        window.stsFinChart = new Chart(finCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Revenue', 'Profit (Est)', 'Operational Costs'],
-                datasets: [{
-                    data: [revenue, profit, costs],
-                    backgroundColor: ['rgba(18, 58, 90, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)'],
-                    borderRadius: 8,
-                    barThickness: 40
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, ticks: { callback: v => 'UGX ' + v.toLocaleString() } }
+    // 2. Specialized Helper for Executive Charts
+    const renderExecChart = (id, type, labels, data, options) => {
+        const ctx = document.getElementById(id);
+        if (!ctx) return;
+        
+        const chartKey = 'chartInstance_' + id;
+        if (window[chartKey]) {
+            window[chartKey].data.datasets[0].data = data;
+            window[chartKey].update('none');
+        } else {
+            window[chartKey] = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        ...options.dataset
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false, ...options.legend } },
+                    ...options.scales
                 }
-            }
-        });
-    }
+            });
+        }
+    };
 
-    // User Distribution: Admins, Drivers, Passengers
-    if (window.stsDistChart) {
-        window.stsDistChart.data.datasets[0].data = [stats.total_passengers || 0, stats.total_drivers || 0, stats.total_admins || 0];
-        window.stsDistChart.update('none');
-    } else {
-        window.stsDistChart = new Chart(distCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Passengers', 'Drivers', 'Admins'],
-                datasets: [{
-                    data: [stats.total_passengers || 0, stats.total_drivers || 0, stats.total_admins || 0],
-                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
-                    borderWidth: 0,
-                    hoverOffset: 15
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
-                }
-            }
-        });
-    }
+    // Visits by Week (Line Area)
+    renderExecChart('exec-chart-visits', 'line', Array(10).fill(''), [20, 25, 22, 35, 45, 40, 50, 65, 40, 48], {
+        dataset: { borderColor: '#0284c7', backgroundColor: 'rgba(2, 132, 199, 0.1)', fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 },
+        scales: { scales: { x: { display: false }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' } } } }
+    });
 
-    // Engagement Chart: Live Activity Pulse
-    if (!window.stsEngData) {
-        window.stsEngData = [10, 15, 12, 18, 20, 25, 22, 28, 30, 35, 40, 38];
-    }
-    
-    // Shift data to the left and add a new random "pulse" for the 1s update
-    window.stsEngData.shift();
-    const lastVal = window.stsEngData[window.stsEngData.length - 1];
-    const jitter = (Math.random() - 0.5) * 5; // fluctuation
-    window.stsEngData.push(Math.max(5, Math.min(100, lastVal + jitter)));
+    // Bounce Rate by Week (Line)
+    renderExecChart('exec-chart-bounce', 'line', Array(10).fill(''), [45, 30, 40, 35, 48, 32, 45, 38, 35, 52], {
+        dataset: { borderColor: '#d97706', backgroundColor: 'transparent', fill: false, tension: 0.4, pointRadius: 3, borderWidth: 2 },
+        scales: { scales: { x: { display: false }, y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.03)' } } } }
+    });
 
-    if (window.stsEngChart) {
-        window.stsEngChart.data.datasets[0].data = window.stsEngData;
-        window.stsEngChart.update('none');
-    } else {
-        window.stsEngChart = new Chart(engCtx, {
-            type: 'line',
-            data: {
-                labels: Array(window.stsEngData.length).fill(''),
-                datasets: [{
-                    label: 'System Load',
-                    data: window.stsEngData,
-                    borderColor: '#123a5a',
-                    backgroundColor: 'rgba(18, 58, 90, 0.05)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0, // Hide points for smoother live look
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                animation: false,
-                scales: {
-                    x: { display: false },
-                    y: { beginAtZero: true, max: 100 }
-                }
-            }
-        });
-    }
+    // Traffic Sources (Pie)
+    renderExecChart('exec-chart-sources', 'pie', ['Direct', 'Organic', 'Social', 'Referral', 'Email'], [30, 45, 10, 8, 7], {
+        dataset: { backgroundColor: ['#0284c7', '#059669', '#d97706', '#dc2626', '#4b5563'], borderWidth: 2, borderColor: '#fff' },
+        legend: { display: true, position: 'right', labels: { boxWidth: 12, font: { size: 10 } } }
+    });
+
+    // Visitors by User Type (Bar)
+    renderExecChart('exec-chart-users', 'bar', ['New Users', 'Returning'], [85, 40], {
+        dataset: { backgroundColor: ['#0284c7', '#10b981'], borderRadius: 6, barThickness: 45 },
+        scales: { scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.03)' } } } }
+    });
+
+    // Horizontal Bars for Conversion
+    const hBarOpt = { 
+        indexAxis: 'y', 
+        scales: { x: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.03)' } }, y: { grid: { display: false } } } 
+    };
+
+    renderExecChart('exec-chart-c1', 'bar', ['Direct', 'Social', 'Email'], [75, 60, 50], {
+        dataset: { backgroundColor: ['#0284c7', '#059669', '#d97706'], borderRadius: 4, barThickness: 15 },
+        scales: hBarOpt
+    });
+    renderExecChart('exec-chart-c2', 'bar', ['Promo A', 'Promo B', 'Promo C'], [80, 55, 45], {
+        dataset: { backgroundColor: ['#0284c7', '#059669', '#d97706'], borderRadius: 4, barThickness: 15 },
+        scales: hBarOpt
+    });
+    renderExecChart('exec-chart-c3', 'bar', ['Web', 'iOS', 'Android'], [90, 70, 30], {
+        dataset: { backgroundColor: ['#0284c7', '#059669', '#d97706'], borderRadius: 4, barThickness: 15 },
+        scales: hBarOpt
+    });
 }
 
 async function loadAdminDashboard() {
@@ -4791,6 +4765,36 @@ async function resetSystemActivity() {
 // ══════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════
+function openProfessionalID() {
+    if (!currentUser) {
+        showT('⚠️', 'Please sign in to view your professional identity.', 'var(--red)');
+        return;
+    }
+    
+    // Populate Card with live user data
+    const nameEl = document.getElementById('id-card-name');
+    const profEl = document.getElementById('id-card-profession');
+    const idEl = document.getElementById('id-card-id');
+    const photoEl = document.getElementById('id-card-photo');
+    
+    if (nameEl) nameEl.textContent = currentUser.full_name || currentUser.username;
+    if (profEl) profEl.textContent = (currentUser.profession || currentUser.role).toUpperCase();
+    
+    // Use a truncated version of the user ID for the professional look
+    const displayId = currentUser.id ? currentUser.id.substring(0, 8).toUpperCase() : 'STSU-829';
+    if (idEl) idEl.textContent = 'UID: ' + displayId;
+    
+    if (photoEl) {
+        if (currentUser.profile_photo_url) {
+            photoEl.innerHTML = `<img src="${currentUser.profile_photo_url}" alt="Profile" style="width:100%; height:100%; border-radius:18px; object-fit:cover;">`;
+        } else {
+            photoEl.innerHTML = `<i class="fas fa-user-tie"></i>`;
+        }
+    }
+    
+    openM('professional-id-m');
+}
+
 function openM(id) {
     const modal = document.getElementById(id);
     if (modal) modal.classList.add('show');
