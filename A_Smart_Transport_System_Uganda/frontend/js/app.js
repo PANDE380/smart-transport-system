@@ -98,7 +98,7 @@ const DRIVER_VEHICLE_CONFIG = {
     },
     'Mini Bus': {
         label: 'Mini Bus',
-        capacity: 14,
+        capacity: 30,
         platePlaceholder: 'UBQ 234M'
     },
     Bus: {

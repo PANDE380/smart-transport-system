@@ -43,7 +43,7 @@ DRIVER_VEHICLE_TYPES = {
     'Taxi': 14,
     'Boda Boda': 1,
     'Special Hire': 4,
-    'Mini Bus': 14,
+    'Mini Bus': 30,
     'Bus': 60,
     'Marine': 100
 }
