@@ -266,6 +266,27 @@ def reject_trip(trip_id):
     }), 200
 
 
+@trip_bp.route('/<int:trip_id>/cancel', methods=['POST'])
+def cancel_trip(trip_id):
+    trip = db.get_or_404(Trip, trip_id)
+    if trip.status not in {'pending', 'scheduled'}:
+        return jsonify({'error': 'Only pending or scheduled trips can be cancelled'}), 400
+
+    trip.status = 'cancelled'
+    
+    # PLATFORM REFLEX: Log cancellation interaction
+    passenger_name = trip.passenger.name if trip.passenger else "Passenger"
+    log_msg = f"{passenger_name} cancelled their trip request to {trip.end_location}."
+    db.session.add(TripLog(trip_id=trip.id, event_type='CANCELLATION', message=log_msg))
+
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Booking terminated successfully.',
+        'trip': trip.to_dict()
+    }), 200
+
+
 @trip_bp.route('/<int:trip_id>/sos', methods=['POST'])
 def trigger_sos(trip_id):
     trip = db.get_or_404(Trip, trip_id)

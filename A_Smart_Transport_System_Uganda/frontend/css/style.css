@@ -1037,7 +1037,6 @@ ul li {
   align-items: stretch;
 }
 
-#services-page .services-hero-copy,
 #services-page .services-highlight-card,
 #services-page .services-metric-card,
 #services-page .services-panel,
@@ -1059,10 +1058,6 @@ ul li {
   padding: 10px 16px;
   border-radius: 999px;
   border: 1px solid #d9e4f2;
-  background: #f8fbff;
-  color: #0f172a;
-  font-size: 0.82rem;
-  font-weight: 700;
 }
 
 #services-page .services-live-dot {
@@ -1079,10 +1074,9 @@ ul li {
   font-size: clamp(2.3rem, 4vw, 3.4rem);
   line-height: 1.04;
   letter-spacing: -0.04em;
-  color: #0f172a;
 }
 
-#services-page .services-hero-copy p,
+
 #services-page .services-highlight-card p,
 #services-page .services-metric-card p,
 #services-page .services-empty-state,
@@ -1105,14 +1099,14 @@ ul li {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  transition: var(--tr);
   border: 1px solid #d6deea;
   border-radius: 999px;
-  background: #ffffff;
   padding: 10px 14px;
   font-family: 'Inter', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #344054;
   cursor: pointer;
   transition: var(--tr);
 }

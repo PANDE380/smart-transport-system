@@ -2883,8 +2883,6 @@ function calcRoute() {
         document.getElementById('frt').textContent = 'Predicting...';
         fetchAIFare().then(fare => {
             document.getElementById('frt').textContent = formatUGX(fare);
-            const aiLabel = document.getElementById('ai-label');
-            if (aiLabel) aiLabel.style.display = 'inline-block';
         });
 
         document.getElementById('frm').textContent = selModeV;
@@ -3472,7 +3470,11 @@ async function legacyLoadBookingSummary() {
                         <div style="font-size: .8rem; color: var(--text3); margin-bottom:10px;">to ${t.end_location}</div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <b style="color: var(--yellow); font-size: .9rem;">${t.fare.toLocaleString()} UGX</b>
-                            <button class="btn-ghost" style="padding: 4px 10px; font-size: .7rem; border-color:var(--yellow); color:var(--text);" onclick="rebook('${t.start_location}', '${t.end_location}')">Rebook</button>
+                            <div style="display:flex; gap: 8px;">
+                                ${['pending', 'scheduled', 'registered'].includes((t.status || '').toLowerCase().trim()) ? 
+                                    `<button class="btn-ghost" style="padding:4px 10px; font-size:.7rem; border-color:#f87171; color:#ef4444;" onclick="cancelTrip(${t.id})">Terminate</button>` : ''}
+                                <button class="btn-ghost" style="padding: 4px 10px; font-size: .7rem; border-color:var(--yellow); color:var(--text);" onclick="rebook('${t.start_location}', '${t.end_location}')">Rebook</button>
+                            </div>
                         </div>
                     </div>
                 `).join('');
@@ -3576,6 +3578,17 @@ function setRating(n) {
     }
 }
 
+async function cancelTrip(tripId) {
+    if(!confirm("Are you sure you want to terminate this booking?")) return;
+    try {
+        const res = await apiRequest(`/trips/${tripId}/cancel`, { method: 'POST' });
+        showT('❌', res.message || "Booking terminated", "var(--red)");
+        loadBookingSummary();
+        legacyLoadBookingSummary();
+    } catch(e) {
+        showT('❌', "Failed to terminate booking", "var(--red)");
+    }
+}
 function rebook(p, d) {
     document.getElementById('pickup').value = p;
     document.getElementById('dropoff').value = d;
@@ -3672,7 +3685,11 @@ async function loadBookingSummary() {
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
                         <b style="color:#b7791f; font-size:.96rem;">${formatUGX(trip.fare)}</b>
-                        <button class="btn-ghost" style="padding:4px 10px; font-size:.72rem; border-color:#d6deea; color:#344054;" onclick='rebook(${JSON.stringify(trip.start_location)}, ${JSON.stringify(trip.end_location)})'>Rebook</button>
+                        <div style="display:flex; gap: 8px;">
+                            ${['pending', 'scheduled', 'registered'].includes((trip.status || '').toLowerCase().trim()) ? 
+                                `<button class="btn-ghost" style="padding:4px 10px; font-size:.72rem; border-color:#f87171; color:#ef4444;" onclick='cancelTrip(${trip.id})'>Terminate</button>` : ''}
+                            <button class="btn-ghost" style="padding:4px 10px; font-size:.72rem; border-color:#d6deea; color:#344054;" onclick='rebook(${JSON.stringify(trip.start_location)}, ${JSON.stringify(trip.end_location)})'>Rebook</button>
+                        </div>
                     </div>
                 </article>
             `).join('');

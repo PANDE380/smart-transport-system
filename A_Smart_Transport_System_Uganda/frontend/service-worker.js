@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sts-uganda-cache-v7';
+const CACHE_NAME = 'sts-uganda-cache-v12';
 const URLS_TO_CACHE = [
   '/',
   '/views/index.html',
