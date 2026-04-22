@@ -133,6 +133,12 @@
     background: #fff;
 }
 
+/* Touch targets & Mobile Resets */
+button, a, input, select, textarea {
+    touch-action: manipulation; /* Disable double-tap zoom */
+    -webkit-tap-highlight-color: transparent;
+}
+
 /* --- Mobile Adaptations (< 768px) --- */
 @media (max-width: 767px) {
     /* NAVIGATION */
@@ -169,6 +175,8 @@
         flex-direction: column;
         box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         color: #fff;
+        padding-bottom: env(safe-area-inset-bottom, 20px);
+        padding-top: env(safe-area-inset-top, 0px);
     }
     .mobile-nav-drawer.is-open {
         right: 0;
@@ -257,7 +265,8 @@
         display: flex !important;
         gap: 10px;
     }
-    #driver-panel-map {
+    #driver-panel-map,
+    #admin-panel-map {
         display: none; /* Map hidden by default on mobile list-view */
     }
     .page-section {
@@ -3174,7 +3183,8 @@ textarea {
     right: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    pointer-events: none; /* Let clicks pass through to things behind if not on btn or win */
+    overflow-x: hidden; 
+    pointer-events: none;
   }
   .chatbot-toggle-btn {
     width: 50px;
@@ -3187,7 +3197,7 @@ textarea {
     pointer-events: auto;
   }
   .chatbot-window {
-    width: calc(100vw - 32px) !important;
+    width: calc(100% - 32px) !important;
     height: 70vh;
     left: 16px;
     right: 16px;

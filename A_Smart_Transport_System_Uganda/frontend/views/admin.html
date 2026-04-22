@@ -46,8 +46,18 @@
     </article>
   </section>
 
+  <!-- Mobile View Toggle -->
+  <div class="mobile-view-toggle admin-mobile-toggle" style="margin: 0 20px 20px; display: none;">
+    <button onclick="toggleAdminMobView('list')" id="adm-toggle-list" class="btn-full">
+      <i class="fas fa-list"></i> View Logs
+    </button>
+    <button onclick="toggleAdminMobView('map')" id="adm-toggle-map" class="btn-out">
+      <i class="fas fa-map"></i> View Map
+    </button>
+  </div>
+
   <section class="alyt" aria-label="Analytics">
-    <article class="dashboard-panel" aria-labelledby="network-surveillance" style="padding:0; overflow:hidden;">
+    <article class="dashboard-panel" id="admin-panel-map" aria-labelledby="network-surveillance" style="padding:0; overflow:hidden;">
       <div class="sh" style="display:flex; justify-content:space-between; align-items:center; padding: 24px;">
         <h2 id="network-surveillance" style="margin:0;"><i class="fas fa-satellite"></i> Network surveillance map</h2>
         <span class="chip" style="margin:0;"><i class="fas fa-location-crosshairs"></i>Tracking active</span>
@@ -55,7 +65,7 @@
       <div id="admin-map" style="width:100%; flex: 1; min-height:450px; border-radius:0;"></div>
     </article>
 
-    <div class="stack">
+    <div class="stack" id="admin-panel-stack">
       <article class="dashboard-panel" aria-labelledby="live-platform-activity">
         <div class="sh" style="display:flex; justify-content:space-between; align-items:center;">
           <h2 id="live-platform-activity"><i class="fas fa-tower-broadcast"></i> Live platform activity</h2>

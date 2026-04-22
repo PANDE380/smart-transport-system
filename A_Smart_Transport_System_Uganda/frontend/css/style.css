@@ -1,3 +1,11 @@
+* { box-sizing: border-box; }
+html, body { 
+  overflow-x: hidden; 
+  width: 100%; 
+  position: relative;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
 /* Visually hidden skip link until focused for accessibility */
 .skip-link {
   position: absolute;
@@ -2009,4 +2017,20 @@ ul li {
     width: auto;
     justify-content: flex-end;
   }
+  .sc-card {
+    padding: 16px;
+    gap: 12px;
+  }
+  .sc-bal {
+    font-size: 1.3rem;
+  }
+  .tb-res-wrap {
+    width: auto;
+  }
+}
+
+/* Global focus stability */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
 }

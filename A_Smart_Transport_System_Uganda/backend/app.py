@@ -1,4 +1,5 @@
 import os
+import socket
 from datetime import datetime, timezone
 from flask import Flask, send_from_directory, make_response, jsonify
 from flask_cors import CORS
@@ -169,6 +170,26 @@ def create_app():
     @app.route('/api/health')
     def health_check():
         return {'status': 'healthy', 'message': 'STS Uganda API is running'}
+
+    def get_local_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.255.255.255', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
+
+    @app.route('/api/system-info')
+    def system_info():
+        return {
+            'local_ip': get_local_ip(),
+            'port': int(os.getenv('PORT', 5001)),
+            'server_time': datetime.now(timezone.utc).isoformat()
+        }
 
     @app.errorhandler(Exception)
     def handle_global_exception(e):

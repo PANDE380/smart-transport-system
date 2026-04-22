@@ -67,8 +67,10 @@ BOOK_MENU = (
     "Select vehicle type:\n"
     "1. Standard Taxi\n"
     "2. Boda Boda\n"
-    "3. Smart Bus\n"
-    "4. Special Hire\n"
+    "3. Mini Bus\n"
+    "4. Smart Bus\n"
+    "5. Special Hire\n"
+    "6. Marine\n"
     "0. Back to Main Menu"
 )
 
@@ -200,7 +202,7 @@ def simulate_ussd():
 
     # ─── BOOKING SUBMENU (Step 1: Vehicle Type) ─────────────────────────
     if state == 'BOOK_MENU':
-        vehicle_map = {'1': 'Taxi', '2': 'Boda Boda', '3': 'Bus', '4': 'Special Hire'}
+        vehicle_map = {'1': 'Taxi', '2': 'Boda Boda', '3': 'Mini Bus', '4': 'Bus', '5': 'Special Hire', '6': 'Marine'}
         if input_text == '0':
             sess['state'] = 'MAIN_MENU'
             return jsonify({'message': localize(make_main_menu(sess['name']), lang)}), 200
@@ -269,7 +271,7 @@ def simulate_ussd():
         return jsonify({'message': localize((
             f"END Request Sent Successfully!\n"
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"Mode:   {vtype} (AI Guided)\n"
+            f"Mode:   {vtype}\n"
             f"Pickup: {pickup}\n"
             f"Drop:   {destination}\n"
             f"Driver: {driver_name}\n"

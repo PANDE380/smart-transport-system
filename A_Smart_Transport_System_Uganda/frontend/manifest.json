@@ -1,0 +1,22 @@
+{
+  "name": "STS Uganda Smart Transport",
+  "short_name": "STS Uganda",
+  "description": "Connected travel across road and water in Uganda",
+  "start_url": "/views/index.html",
+  "display": "standalone",
+  "background_color": "#0a2740",
+  "theme_color": "#0a2740",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/images/logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/images/logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

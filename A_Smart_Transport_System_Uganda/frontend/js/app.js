@@ -922,6 +922,30 @@ function toggleDriverMobView(view) {
     }
 }
 
+function toggleAdminMobView(view) {
+    const mapPanel  = document.getElementById('admin-panel-map');
+    const stackPanel = document.getElementById('admin-panel-stack');
+    const listBtn   = document.getElementById('adm-toggle-list');
+    const mapBtn    = document.getElementById('adm-toggle-map');
+
+    if (!stackPanel || !mapPanel) return;
+
+    if (view === 'map') {
+        stackPanel.style.display = 'none';
+        mapPanel.style.display = 'block';
+        listBtn.className = 'btn-out';
+        mapBtn.className = 'btn-full';
+        if (typeof admMap !== 'undefined' && admMap) {
+            setTimeout(() => admMap.invalidateSize(), 50);
+        }
+    } else {
+        stackPanel.style.display = 'flex';
+        mapPanel.style.display = 'none';
+        listBtn.className = 'btn-full';
+        mapBtn.className = 'btn-out';
+    }
+}
+
 function toggleMobAccordion(triggerBtn) {
     const body     = triggerBtn.nextElementSibling;
     const isOpen   = body.classList.contains('is-open');
@@ -1941,22 +1965,22 @@ function showPg(name, btn) {
 
     // Initialize page functionalities for ALL users (Unblocked)
     if (name === 'booking') {
-        setTimeout(initHomeMap, 200);
+        setTimeout(() => { initHomeMap(); if (typeof map !== 'undefined' && map) map.invalidateSize(); }, 200);
         loadBookingSummary();
         syncBookingLiveUI();
     }
     if (name === 'services') {
         loadServicesDashboard();
         startServicesDashboardStream();
-        setTimeout(() => servicesCoverageMap?.invalidateSize(), 220);
+        setTimeout(() => { if (typeof servicesCoverageMap !== 'undefined' && servicesCoverageMap) servicesCoverageMap.invalidateSize(); }, 220);
     }
     if (name === 'driver') {
-        setTimeout(initDrvMap, 200);
+        setTimeout(() => { initDrvMap(); if (typeof drvMap !== 'undefined' && drvMap) drvMap.invalidateSize(); }, 200);
         loadDriverDashboard();
         startDriverDashboardStream();
     }
     if (name === 'admin') {
-        setTimeout(initAdmMap, 200);
+        setTimeout(() => { initAdmMap(); if (typeof admMap !== 'undefined' && admMap) admMap.invalidateSize(); }, 200);
         loadAdminDashboard();
     }
     if (name === 'history') loadHistory();
@@ -5038,7 +5062,7 @@ function addChatMessage(text, sender, options = {}) {
 // ══════════════════════════════════════════
 // USSD LOGIC
 // ══════════════════════════════════════════
-let ussdState = 0; // 0: Start, 1: Main Menu, 2: Booking, 3: Fares, 4: Wallet
+let ussdSessionId = null;
 
 function appendUSSD(char) {
     const inp = document.getElementById('uinp');
@@ -5053,78 +5077,63 @@ function clearUSSD() {
 }
 
 function resetUSSDScreen() {
-    ussdState = 0;
+    ussdSessionId = null;
     const scr = document.getElementById('uscr');
     const inp = document.getElementById('uinp');
     if (scr) scr.innerHTML = "A Smart Transport System Uganda<br>Dial *123# to begin";
     if (inp) inp.value = "";
 }
 
-function sendUSSD() {
+async function sendUSSD() {
     const inp = document.getElementById('uinp');
     const scr = document.getElementById('uscr');
     if (!inp || !scr) return;
 
     const val = inp.value.trim();
-    if (!val) {
-        // If empty and they click OK, just flash it or do nothing
+    if (!val && ussdSessionId) {
         return;
     }
 
     inp.value = '';
 
     if (val === '*123#') {
-        ussdState = 1;
-        scr.innerHTML = "STS Uganda<br>1. Book a Ride<br>2. Check Fares<br>3. Wallet Balance<br>4. About & Contact<br><br>Type choice (1-4) and Send:";
-        return;
-    }
-
-    if (ussdState === 0) {
+        ussdSessionId = 'USSD_' + Math.random().toString(36).substring(7);
+    } else if (!ussdSessionId) {
         scr.innerHTML = "Invalid Code.<br>A Smart Transport System Uganda<br>Dial *123# to begin";
         return;
     }
 
-    if (ussdState === 1) {
-        if (val === '1') {
-            ussdState = 2;
-            scr.innerHTML = "=== BOOK A RIDE ===<br>1. Standard Taxi<br>2. Boda Boda<br>3. Mini Bus<br>0. Back";
-        } else if (val === '2') {
-            ussdState = 3;
-            scr.innerHTML = "=== FARES ===<br>Base Rate: 500 UGX/km<br>Standard Taxi: Base x 1<br>Boda Boda: Base x 0.7<br>Bus: Fixed Rate<br>0. Back";
-        } else if (val === '3') {
-            ussdState = 4;
-            scr.innerHTML = `=== WALLET ===<br>SmartCard Balance:<br>${currentUser ? formatUGX(balance) : 'Please sign in first'}<br><br>0. Back`;
-        } else if (val === '4') {
-            ussdState = 1;
-            scr.innerHTML = "=== CONTACT ===<br>Help: +256800123456<br>Email: support@sts.ug<br><br>0. Back";
-        } else {
-            scr.innerHTML = "Invalid choice.<br>1. Book a Ride<br>2. Check Fares<br>3. Wallet Balance<br>4. About & Contact";
-        }
-        return;
-    }
+    // Default to a dummy phone if not signed in so backend still works
+    const phone = currentUser ? currentUser.phone : '+256700000000';
+    const textToSend = val === '*123#' ? '' : val;
 
-    if (ussdState === 2) {
-        if (val === '0') {
-            ussdState = 1;
-            scr.innerHTML = "STS Uganda<br>1. Book a Ride<br>2. Check Fares<br>3. Wallet Balance<br>4. About & Contact<br><br>Type choice (1-4) and Send:";
-        } else if (['1','2','3'].includes(val)) {
-            scr.innerHTML = "Booking request received.<br>Driver assigned via SMS.<br><br>Thank you for using STS!<br>(Session Ended)";
-            ussdState = 0;
-            setTimeout(resetUSSDScreen, 4000);
-        } else {
-            scr.innerHTML = "Invalid choice.<br>1. Standard Taxi<br>2. Boda Boda<br>3. Mini Bus<br>0. Back";
-        }
-        return;
-    }
+    scr.innerHTML = "<i>Connecting...</i>";
 
-    if (ussdState === 3 || ussdState === 4) {
-        if (val === '0') {
-            ussdState = 1;
-            scr.innerHTML = "STS Uganda<br>1. Book a Ride<br>2. Check Fares<br>3. Wallet Balance<br>4. About & Contact<br><br>Type choice (1-4) and Send:";
-        } else {
-            // Keep same state if invalid input on these pages except 0
-            scr.innerHTML = scr.innerHTML.split('<br>0. Back')[0] + "<br>(Invalid) 0. Back";
+    try {
+        const response = await apiRequest('/ussd/simulate', {
+            method: 'POST',
+            body: JSON.stringify({
+                phone: phone,
+                text: textToSend,
+                session_id: ussdSessionId
+            })
+        });
+
+        let msg = response.message || '';
+        // Convert backend line breaks to HTML breaks for the UI
+        msg = msg.replace(/\n/g, '<br>');
+
+        if (msg.startsWith('CON ')) {
+            msg = msg.substring(4);
+        } else if (msg.startsWith('END ')) {
+            msg = msg.substring(4);
+            ussdSessionId = null;
         }
+
+        scr.innerHTML = msg;
+    } catch (e) {
+        scr.innerHTML = "Connection Failed.<br>Dial *123# to begin";
+        ussdSessionId = null;
     }
 }
 
@@ -5162,6 +5171,14 @@ function initSyncMonitoring() {
         try {
             const resp = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
             updateSyncUI(resp.ok);
+            
+            // Fetch system info for dynamic IP display
+            fetch(`${API_BASE_URL}/system-info`).then(r => r.json()).then(data => {
+                const urlElem = document.getElementById('mobile-sync-url');
+                if (urlElem && data.local_ip && data.port) {
+                    urlElem.innerHTML = `http://${data.local_ip}:${data.port}`;
+                }
+            }).catch(e => {});
         } catch (e) {
             updateSyncUI(false);
         }
@@ -5190,3 +5207,12 @@ document.addEventListener('click', function(e) {
         dropdowns.forEach(d => d.classList.remove('open'));
     }
 });
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('ServiceWorker registration successful with scope: ', reg.scope))
+      .catch(err => console.log('ServiceWorker registration failed: ', err));
+  });
+}
