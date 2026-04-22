@@ -59,7 +59,7 @@ r = ussd('0', 'sid7')
 ok = 'END' in r and 'Safe' in r
 print(f"{'PASS' if ok else 'FAIL'}: Exit | {r[:60]}")
 
-# Test 8: Invalid *250# gate - wrong code
+# Test 8: Invalid fallback gate - wrong code
 from unittest.mock import patch
 print()
 print("DONE - All critical paths tested.")

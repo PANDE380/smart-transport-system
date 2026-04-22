@@ -5080,7 +5080,7 @@ function resetUSSDScreen() {
     ussdSessionId = null;
     const scr = document.getElementById('uscr');
     const inp = document.getElementById('uinp');
-    if (scr) scr.innerHTML = "A Smart Transport System Uganda<br>Dial *123# to begin";
+    if (scr) scr.innerHTML = "A Smart Transport System Uganda<br>Enter service code to begin";
     if (inp) inp.value = "";
 }
 
@@ -5099,7 +5099,7 @@ async function sendUSSD() {
     if (val === '*123#') {
         ussdSessionId = 'USSD_' + Math.random().toString(36).substring(7);
     } else if (!ussdSessionId) {
-        scr.innerHTML = "Invalid Code.<br>A Smart Transport System Uganda<br>Dial *123# to begin";
+        scr.innerHTML = "Invalid Code.<br>A Smart Transport System Uganda<br>Enter service code to begin";
         return;
     }
 
@@ -5128,11 +5128,22 @@ async function sendUSSD() {
         } else if (msg.startsWith('END ')) {
             msg = msg.substring(4);
             ussdSessionId = null;
+            
+            msg += "<br><br><span style='color: #64748b; font-size: 0.85em;'><i>Returning to main menu in 3s...</i></span>";
+            
+            // Automatically return to main menu after a short delay
+            setTimeout(() => {
+                const autoInp = document.getElementById('uinp');
+                if (autoInp) {
+                    autoInp.value = '*123#';
+                    sendUSSD();
+                }
+            }, 3500);
         }
 
         scr.innerHTML = msg;
     } catch (e) {
-        scr.innerHTML = "Connection Failed.<br>Dial *123# to begin";
+        scr.innerHTML = "Connection Failed.<br>Enter service code to begin";
         ussdSessionId = null;
     }
 }

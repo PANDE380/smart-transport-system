@@ -52,7 +52,7 @@ def clear_session(session_id):
 
 def make_main_menu(name):
     return (
-        f"CON STS Uganda *123# — Hello, {name}!\n"
+        f"CON STS Uganda — Hello, {name}!\n"
         "━━━━━━━━━━━━━━━━━━━━━━\n"
         "1. Book a Ride\n"
         "2. Check Wallet Balance\n"
@@ -324,5 +324,5 @@ def simulate_ussd():
     clear_session(session_id)
     return jsonify({'message': localize((
         "END Session expired.\n"
-        "Dial *250# to start again."
+        "Enter service code to start again."
     ), lang)}), 200
