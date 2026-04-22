@@ -3227,3 +3227,48 @@ textarea {
   50%  { opacity: 0.4; transform: scale(1.2); }
   100% { opacity: 1; transform: scale(1); }
 }
+
+/* === Admin Dashboard: Responsive Table === */
+@media (max-width: 991px) {
+  .admin-queue-table thead {
+    display: none;
+  }
+  .admin-queue-table, 
+  .admin-queue-table tbody, 
+  .admin-queue-table tr, 
+  .admin-queue-table td {
+    display: block;
+    width: 100%;
+  }
+  .admin-queue-table tr {
+    margin-bottom: 20px;
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    padding: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  }
+  .admin-queue-table td {
+    text-align: right;
+    padding: 10px 16px;
+    position: relative;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .admin-queue-table td:last-child {
+    border-bottom: none;
+    text-align: center;
+    padding-top: 18px;
+  }
+  .admin-queue-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 800;
+    color: var(--muted-strong);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}

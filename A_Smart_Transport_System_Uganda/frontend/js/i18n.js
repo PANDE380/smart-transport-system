@@ -70,7 +70,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Open booking', btn_open_wallet:'Open wallet',
     btn_try_ussd:'Try USSD', btn_view_history:'View history',
     btn_sos_open:'Open SOS', btn_read_safety:'Read safety guidance',
-    verified:'STS Verified',
+    verified:'',
   },
 
   sw: {
@@ -127,7 +127,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Fungua uhifadhi', btn_open_wallet:'Fungua pochi',
     btn_try_ussd:'Jaribu USSD', btn_view_history:'Tazama historia',
     btn_sos_open:'Fungua SOS', btn_read_safety:'Soma mwongozo wa usalama',
-    verified:'Imethibitishwa na STS',
+    verified:'',
   },
 
   lg: {
@@ -184,7 +184,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Fungula kutegeka', btn_open_wallet:'Fungula esaawa',
     btn_try_ussd:'Gezaako USSD', btn_view_history:'Laba ebyafaayo',
     btn_sos_open:'Fungula SOS', btn_read_safety:'Soma eby\'obuwanguzi',
-    verified:'STS Yakakasibwa',
+    verified:'',
   },
 
   nk: {
@@ -240,7 +240,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Fungura okuteereka', btn_open_wallet:'Fungura esaawa',
     btn_try_ussd:'Gezaako USSD', btn_view_history:'Raba ebyashaho',
     btn_sos_open:'Fungura SOS', btn_read_safety:'Soma ebikwata obumwe',
-    verified:'STS Yakakasibwa',
+    verified:'',
   },
 
   ls: {
@@ -295,7 +295,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Fungula', btn_open_wallet:'Fungula esaawa',
     btn_try_ussd:'Gezaako USSD', btn_view_history:'Laba ebyafayo',
     btn_sos_open:'Fungula SOS', btn_read_safety:'Soma eby\'obuwanguzi',
-    verified:'STS Yakakasibwa',
+    verified:'',
   },
 
   ac: {
@@ -348,7 +348,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Yab cok wot', btn_open_wallet:'Yab lim',
     btn_try_ussd:'Tem USSD', btn_view_history:'Nen ticme',
     btn_sos_open:'Yab SOS', btn_read_safety:'Tyen ngec me maber',
-    verified:'STS Omoko',
+    verified:'',
   },
 
   at: {
@@ -402,7 +402,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Yab ŋol ejalang', btn_open_wallet:'Yab lim',
     btn_try_ussd:'Tem USSD', btn_view_history:'Nen itai',
     btn_sos_open:'Yab SOS', btn_read_safety:'Som akwap obuto',
-    verified:'STS Omoko',
+    verified:'',
   },
 
   lb: {
@@ -456,7 +456,7 @@ const STS_TRANSLATIONS = {
     btn_open_booking:'Yab rova adri', btn_open_wallet:'Yab lim',
     btn_try_ussd:'Tem USSD', btn_view_history:'Nen ayivu',
     btn_sos_open:'Yab SOS', btn_read_safety:'Som adri awe obuto',
-    verified:'STS Omoko',
+    verified:'',
   }
 };
 

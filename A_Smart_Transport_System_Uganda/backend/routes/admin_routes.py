@@ -97,11 +97,14 @@ def _get_admin_dashboard_payload():
             'total_users': total_users,
             'total_passengers': total_passengers,
             'total_drivers': total_drivers,
+            'total_admins': User.query.filter_by(role='admin').count(),
             'active_trips': active_trips,
             'completed_trips': completed_trips,
             'sos_alerts_count': len(sos_alerts),
             'pending_drivers_count': len(pending_drivers),
             'total_revenue': total_revenue,
+            'estimated_profit': total_revenue * 0.25, # 25% Platform Fee
+            'operational_costs': total_revenue * 0.05, # 5% Server/API costs
             'streamed_at': datetime.now(timezone.utc).isoformat()
         },
         'sos_alerts': [t.to_dict() for t in sos_alerts],
@@ -162,7 +165,7 @@ def admin_dashboard_stream():
                     yield f'event: heartbeat\ndata: {heartbeat}\n\n'
                     last_heartbeat_at = time.monotonic()
 
-                time.sleep(3) # check every 3 seconds
+                time.sleep(1) # check every 1 second
         except GeneratorExit:
             return
 

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STS Uganda | Pitch Deck</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/professional-refresh.css">
+  <style>
+    :root {
+      --pitch-bg: #030a12;
+      --accent: #3b82f6;
+    }
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--pitch-bg);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+    .slide-deck {
+      height: 100vh;
+      display: flex;
+      transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .slide {
+      min-width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      box-sizing: border-box;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(3, 10, 18, 0.85);
+      z-index: 1;
+    }
+    .slide-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+    }
+    .slide h1 {
+      font-size: 5rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .slide h2 {
+      font-size: 3rem;
+      color: var(--accent);
+      margin-bottom: 30px;
+    }
+    .slide p {
+      font-size: 1.5rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .feat-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 24px;
+      backdrop-filter: blur(10px);
+    }
+    .feat-card i {
+      font-size: 3rem;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .controls {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      z-index: 100;
+      display: flex;
+      gap: 15px;
+    }
+    .ctrl-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+    .ctrl-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+    .progress-bar {
+      position: fixed;
+      bottom: 0; left: 0;
+      height: 6px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="p-bar" style="width: 14.28%;"></div>
+
+  <div class="slide-deck" id="deck">
+    <!-- Slide 1 -->
+    <section class="slide" style="background-image: url('../assets/images/city-bg.jpg');">
+      <div class="slide-content">
+        <h1>STS UGANDA</h1>
+        <h2>The Future of Mobility</h2>
+        <p>A Unified Intelligence Platform for the Next Generation of East African Transport.</p>
+        <div style="margin-top:40px;">
+          <span class="chip" style="background:var(--accent); color:#fff; font-size:1rem; padding:12px 24px;">Smart City Initiative 2026</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2 -->
+    <section class="slide">
+      <div class="slide-content">
+        <h2>01. The Problem</h2>
+        <div class="feature-grid">
+          <div class="feat-card">
+            <i class="fas fa-traffic-light"></i>
+            <h3>Congestion</h3>
+            <p>Unpredictable urban flow causing economic drain.</p>
+          </div>
+          <div class="feat-card">
+            <i class="fas fa-shield-virus"></i>
+            <h3>Safety Gaps</h3>
+            <p>Lack of real-time monitoring and emergency response.</p>
+          </div>
+          <div class="feat-card">
+            <i class="fas fa-money-bill-transfer"></i>
+            <h3>Revenue Leak</h3>
+            <p>Manual, cash-heavy systems with zero transparency.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3 -->
+    <section class="slide">
+      <div class="slide-content">
+        <h2>02. Our Solution</h2>
+        <p style="max-width: 800px; margin: 0 auto;">An all-in-one ecosystem connecting passengers, drivers, and regulators through AI-driven intelligence.</p>
+        <div class="feature-grid" style="margin-top: 40px;">
+          <div class="feat-card">
+            <i class="fas fa-satellite"></i>
+            <h3>Live Map</h3>
+            <p>Precise fleet surveillance and routing.</p>
+          </div>
+          <div class="feat-card">
+            <i class="fas fa-robot"></i>
+            <h3>AI Pricing</h3>
+            <p>Dynamic, fair fares based on live conditions.</p>
+          </div>
+          <div class="feat-card">
+            <i class="fas fa-wallet"></i>
+            <h3>Smart Settlement</h3>
+            <p>Cashless payments settling instantly to Admin.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4 -->
+    <section class="slide">
+      <div class="slide-content">
+        <h2>03. Safety & SOS</h2>
+        <p>Security is not an option; it's the foundation.</p>
+        <div style="display:flex; gap:40px; justify-content:center; margin-top:50px;">
+           <div style="text-align:left; max-width:400px;">
+             <h3 style="color:var(--accent); font-size:1.8rem; margin-bottom:15px;">Forensic SOS</h3>
+             <p>Instant emergency alerts with photo evidence and GPS triangulation. Direct link to monitoring centers.</p>
+           </div>
+           <div style="text-align:left; max-width:400px;">
+             <h3 style="color:var(--accent); font-size:1.8rem; margin-bottom:15px;">Verified Matching</h3>
+             <p>Every driver partner is KYC-verified through a rigorous system-level approval queue.</p>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5 -->
+    <section class="slide">
+      <div class="slide-content">
+        <h2>04. Financial Intelligence</h2>
+        <p>A robust revenue engine designed for scale.</p>
+        <div class="feature-grid">
+          <div class="feat-card" style="background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3);">
+            <div style="font-size:3rem; font-weight:900; color:#10b981; margin-bottom:10px;">25%</div>
+            <h3>Platform Fee</h3>
+            <p>Sustainable commission on every transaction.</p>
+          </div>
+          <div class="feat-card">
+             <i class="fas fa-bolt"></i>
+             <h3>1s Sync</h3>
+             <p>Real-time P&L tracking for total transparency.</p>
+          </div>
+          <div class="feat-card" style="background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.3);">
+            <i class="fas fa-globe"></i>
+            <h3>Massive Scale</h3>
+            <p>Designed for Uganda's million-trip daily market.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6 -->
+    <section class="slide">
+      <div class="slide-content">
+        <h2>05. Strategic Roadmap</h2>
+        <div style="display:flex; flex-direction:column; gap:20px; align-items:flex-start; max-width:600px; margin:0 auto; text-align:left;">
+          <div style="border-left:4px solid var(--accent); padding-left:20px;">
+            <b style="color:var(--accent);">Q2 2026:</b> Launch Kampala Pilot (1,000 Vehicles)
+          </div>
+          <div style="border-left:4px solid rgba(255,255,255,0.3); padding-left:20px;">
+            <b>Q4 2026:</b> USSD & Offline Integration
+          </div>
+          <div style="border-left:4px solid rgba(255,255,255,0.3); padding-left:20px;">
+            <b>2027:</b> National Expansion & AI Predictive Rerouting
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7 -->
+    <section class="slide">
+      <div class="slide-content">
+        <h1>Transforming Uganda</h1>
+        <h2>One Ride at a Time</h2>
+        <p>Join us in building the most advanced transport network in Africa.</p>
+        <button class="btn-full" style="margin-top:40px; padding: 18px 36px; font-size:1.2rem;" onclick="location.href='index.html'">
+          Enter System Dashboard
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" onclick="prev()"><i class="fas fa-chevron-left"></i></button>
+    <button class="ctrl-btn" onclick="next()"><i class="fas fa-chevron-right"></i></button>
+  </div>
+
+  <script>
+    let cur = 0;
+    const total = 7;
+    const deck = document.getElementById('deck');
+    const pbar = document.getElementById('p-bar');
+
+    function update() {
+      deck.style.transform = `translateX(-${cur * 100}vw)`;
+      pbar.style.width = `${((cur + 1) / total) * 100}%`;
+    }
+
+    function next() {
+      if (cur < total - 1) { cur++; update(); }
+    }
+    function prev() {
+      if (cur > 0) { cur--; update(); }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') next();
+      if (e.key === 'ArrowLeft') prev();
+    });
+  </script>
+</body>
+</html>

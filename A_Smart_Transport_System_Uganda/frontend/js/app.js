@@ -243,7 +243,7 @@ const SERVICES_DASHBOARD_CARDS = [
         title: 'AI Smart Routing',
         badge: 'OpenAI enabled',
         icon: 'fas fa-robot',
-        description: 'Routing intelligence and assistant health are surfaced here from the backend.',
+        description: 'Routing intelligence and assistant health are surfaced here from the system.',
         action: 'open-chatbot',
         buttonLabel: 'Open assistant'
     },
@@ -261,7 +261,7 @@ const SERVICES_DASHBOARD_CARDS = [
         title: 'Verified Driver Matching',
         badge: 'Compliance',
         icon: 'fas fa-id-card',
-        description: 'Driver approval and matching readiness are updated from live backend records.',
+        description: 'Driver approval and matching readiness are updated from live system records.',
         action: 'open-driver-matching',
         buttonLabel: 'Match driver'
     },
@@ -349,7 +349,7 @@ const UI_COPY = {
         nav_about: 'ABOUT US', nav_contact: 'CONTACT', nav_ussd: 'USSD',
         nav_history: 'HISTORY', nav_dashboard: 'DASHBOARD',
         btn_sign_in: 'Sign In', btn_register: 'Register',
-        role_passenger: 'Rider', role_driver: 'Driver', role_captain: 'Captain',
+        role_passenger: 'Passenger', role_driver: 'Driver', role_captain: 'Captain',
         role_admin: 'Admin', role_traffic_officer: 'Traffic Officer',
         toast_signed_out: 'Signed out successfully.',
         currency: 'Currency', language: 'Language', connectSupport: 'Connect & Support'
@@ -468,6 +468,7 @@ function t(key) {
 
 function getUserRoleLabel(user) {
     if (!user) return '';
+    if (user.profession) return user.profession;
     if (user.role === 'passenger') return t('role_passenger');
     if (user.role === 'driver') {
         const type = user.vehicle_type || '';
@@ -1299,7 +1300,7 @@ async function doLogin() {
 
             loginSuccess(result.user);
             closeM('auth-m');
-            showT('👋', `Welcome back, ${result.user.name}!`, 'var(--orange)');
+            showT('👋', `Welcome back, ${result.user.profession || 'User'} ${result.user.name}!`, 'var(--orange)');
         } else {
             showLoginErr(result.error || result.message || 'Invalid credentials');
             throw new Error(result.error || result.message || 'Invalid credentials');
@@ -1339,9 +1340,9 @@ async function handleGoogleChoice(role) {
     
     // Quick-switch identities for prototype demo
     const mockUsers = {
-        'passenger': { id: 1, name: 'Johnathan S.', role: 'passenger', email: 'johnathan.pass@gmail.com', balance: 50000 },
-        'driver': { id: 2, name: 'Musa K.', role: 'driver', email: 'musa.pro@gmail.com', balance: 125000 },
-        'admin': { id: 3, name: 'Sarah B.', role: 'admin', email: 's.bakiza@sts.ug', balance: 0 }
+        'passenger': { id: 1, name: 'Johnathan S.', role: 'passenger', profession: 'Passenger', email: 'johnathan.pass@gmail.com', balance: 50000 },
+        'driver': { id: 2, name: 'Musa K.', role: 'driver', profession: 'Driver', email: 'musa.pro@gmail.com', balance: 125000 },
+        'admin': { id: 3, name: 'Sarah B.', role: 'admin', profession: 'System Administrator', email: 's.bakiza@sts.ug', balance: 0 }
     };
     
     const user = mockUsers[role];
@@ -1387,15 +1388,17 @@ async function handleGoogleCustomSubmit() {
 
     setTimeout(() => {
         const name = email.split('@')[0];
+        const professions = { 'passenger': 'Passenger', 'driver': 'Driver', 'admin': 'System Administrator' };
         const user = { 
             id: Date.now(), 
             name: name.charAt(0).toUpperCase() + name.slice(1), 
             role: selectedGRole, 
+            profession: professions[selectedGRole] || 'User',
             email: email, 
             balance: selectedGRole === 'driver' ? 125000 : 50000 
         };
         loginSuccess(user);
-        showT('👋', `Welcome back, ${user.name}! (Logged in with custom email)`, 'var(--navy)');
+        showT('👋', `Welcome back, ${user.profession || 'User'} ${user.name}! (Logged in with custom email)`, 'var(--navy)');
     }, 900);
 }
 
@@ -1908,13 +1911,32 @@ const AUTH_REQUIRED = new Set(['booking', 'history', 'payment', 'admin', 'driver
 
 // Helper: show/hide hamburger nav links based on role
 function syncMobileNav(role) {
+    const prof = currentUser?.profession || 'Driver';
+    
+    // Desktop link text update
+    const deskDriver = document.getElementById('nav-driver-link');
+    if (deskDriver) {
+        deskDriver.textContent = prof.toUpperCase();
+    }
+
     // Admin link — admin only
     const mobAdmin = document.getElementById('mob-nav-admin-link');
     if (mobAdmin) mobAdmin.style.display = role === 'admin' ? 'flex' : 'none';
 
-    // Driver link — driver only
+    // Driver link — driver only (Mobile)
     const mobDriver = document.getElementById('mob-nav-driver-link');
-    if (mobDriver) mobDriver.style.display = role === 'driver' ? 'flex' : 'none';
+    if (mobDriver) {
+        mobDriver.style.display = role === 'driver' ? 'flex' : 'none';
+        // Preserve the icon and update the text
+        const icon = mobDriver.querySelector('i');
+        if (icon) {
+            mobDriver.innerHTML = '';
+            mobDriver.appendChild(icon);
+            mobDriver.appendChild(document.createTextNode(` ${prof.toUpperCase()}`));
+        } else {
+            mobDriver.textContent = prof.toUpperCase();
+        }
+    }
 }
 
 
@@ -2466,7 +2488,7 @@ function updateServicesLiveState() {
     }
 
     if (syncDetail) {
-        syncDetail.textContent = `Last backend sync: ${formattedTime}. The page reconnects automatically if the stream drops.`;
+        syncDetail.textContent = `Last system sync: ${formattedTime}. The page reconnects automatically if the stream drops.`;
     }
 }
 
@@ -2580,7 +2602,7 @@ function renderServicesCards(services = {}) {
             `).join('')
             : `
                 <div class="service-metric-item">
-                    <span>Backend status</span>
+                    <span>System status</span>
                     <strong>Waiting</strong>
                 </div>
             `;
@@ -2589,7 +2611,6 @@ function renderServicesCards(services = {}) {
             <article class="service-card ${config.img ? 'has-img' : ''}">
                 ${config.img ? `
                     <div class="service-card-img-wrap">
-                        <div class="service-card-sts-badge"><i class="fas fa-certificate"></i> STS Verified</div>
                         <img src="${config.img}" alt="${escapeHtml(config.title)}" class="service-card-img">
                     </div>` : ''}
                 <div class="service-card-body">
@@ -2663,7 +2684,7 @@ function applyServicesDashboardSnapshot(data) {
         openAIState.textContent = chatbot.status_label || 'OpenAI status unavailable';
     }
     if (openAIDetail) {
-        openAIDetail.textContent = chatbot.detail || 'No chatbot runtime details were returned by the backend.';
+        openAIDetail.textContent = chatbot.detail || 'No chatbot runtime details were returned by the system.';
     }
 
     updateServicesLiveState();
@@ -3340,7 +3361,7 @@ async function calcFare() {
             `${currentBookingVehicle.driver_name || 'Verified driver'} is ready for your ${selModeV} request.`
         );
         syncBookingLiveUI();
-        showT('🚕', 'Driver found from the live backend fleet. Confirm to book.', 'var(--yellow)');
+        showT('🚕', 'Driver found from the live system fleet. Confirm to book.', 'var(--yellow)');
     } catch (e) {
         showT('❌', e.message || 'Unable to fetch an active vehicle right now.', 'var(--red)');
     }
@@ -3618,7 +3639,7 @@ function renderTransactions(filter = 'all') {
                 <div class="txic"><i class="fas fa-clock"></i></div>
                 <div class="txd">
                     <div class="txtt">No ${filter === 'all' ? '' : filter + ' '}transactions yet</div>
-                    <div class="txdt">Your backend transaction history will appear here.</div>
+                    <div class="txdt">Your system transaction history will appear here.</div>
                 </div>
             </div>`;
         return;
@@ -3931,7 +3952,7 @@ async function trigSOS() {
 
     try {
         await apiRequest(`/trips/${tripId}/sos`, { method: 'POST' });
-        showT('🚨', 'SOS alert sent to the backend monitoring center.', 'var(--red)');
+        showT('🚨', 'SOS alert sent to the system monitoring center.', 'var(--red)');
         closeM('sos-m');
         if (currentUser?.role === 'admin') {
             loadAdminDashboard();
@@ -4127,7 +4148,8 @@ function applyDriverDashboardSnapshot(data) {
         const activeVehicleCount = stats.active_vehicle_count ?? 0;
         const pendingCount = pendingTrips.length;
         const availableBalance = formatUGX(stats.available_earnings ?? 0);
-        welcome.textContent = `Welcome back${data.driver?.name ? `, ${data.driver.name}` : ''}. ${activeVehicleCount} active vehicle${activeVehicleCount === 1 ? '' : 's'} and ${pendingCount} pending request${pendingCount === 1 ? '' : 's'} are synced here. Available payout balance: ${availableBalance}.`;
+        const prof = data.driver?.profession || 'Driver';
+        welcome.textContent = `Welcome back, ${prof} ${data.driver?.name || ''}. ${activeVehicleCount} active vehicle${activeVehicleCount === 1 ? '' : 's'} and ${pendingCount} pending request${pendingCount === 1 ? '' : 's'} are synced here. Available payout balance: ${availableBalance}.`;
     }
 
     if (document.getElementById('driver-rides-today')) {
@@ -4165,7 +4187,7 @@ async function loadDriverDashboard() {
         const welcome = document.getElementById('driver-welcome');
         const container = document.getElementById('rreqs');
 
-        if (chip) chip.textContent = 'Backend unavailable';
+        if (chip) chip.textContent = 'System unavailable';
         if (welcome) {
             welcome.textContent = 'We could not sync your assigned trips just now. Automatic retry is still running.';
         }
@@ -4359,7 +4381,7 @@ function renderAdminAlerts(alerts = []) {
         container.innerHTML = `
             <div class="alert-c danger" style="border: 1.5px solid #ff4444; border-radius:12px; padding:20px; background:rgba(255,68,68,0.05); margin-bottom:16px;">
                 <div class="at-t" style="color:#ff4444; font-weight:800; font-size:1rem; margin-bottom:4px;"><i class="fas fa-shield-heart"></i> No active SOS alerts</div>
-                <div class="at-d" style="font-size:.8rem; color:var(--text2);">The backend has not reported any emergency trips right now.</div>
+                <div class="at-d" style="font-size:.8rem; color:var(--text2);">The system has not reported any emergency trips right now.</div>
             </div>`;
         return;
     }
@@ -4381,24 +4403,27 @@ function renderPendingDrivers(drivers = []) {
     if (!drivers.length) {
         body.innerHTML = `
             <tr style="border-bottom:1px solid var(--border);">
-                <td colspan="7" style="padding:18px; text-align:center; color:var(--text3);">No pending driver approvals are waiting in the backend queue.</td>
+                <td colspan="7" style="padding:18px; text-align:center; color:var(--text3);">No pending driver approvals are waiting in the system queue.</td>
             </tr>`;
         return;
     }
 
     body.innerHTML = drivers.map(driver => {
         const vehicle = driver.vehicles?.[0];
+        const appliedOn = driver.created_at ? formatDateTime(driver.created_at) : 'N/A';
         return `
             <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:14px;"><b style="font-size:1rem;">${escapeHtml(driver.name)}</b></td>
-                <td style="padding:14px;">${escapeHtml(driver.license_number)}</td>
-                <td style="padding:14px;">${escapeHtml(vehicle?.number_plate || 'No vehicle yet')}</td>
-                <td style="padding:14px;">${escapeHtml(vehicle?.vehicle_type || 'Pending assignment')}</td>
-                <td style="padding:14px;"><span class="chip cm" style="background:#e5e7eb; color:#4b5563;">Pending</span></td>
-                <td style="padding:14px;">${driver.created_at ? formatDateTime(driver.created_at) : 'N/A'}</td>
-                <td style="padding:14px; text-align:center;">
-                    <button onclick="appDrv(${driver.id})" style="background:#10b981; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; margin-right:4px;"><i class="fas fa-check"></i> Approve</button>
-                    <button onclick="rejDrv(${driver.id})" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px;"><i class="fas fa-times"></i> Reject</button>
+                <td data-label="Driver partner" style="padding:14px;"><b style="font-size:1rem;">${escapeHtml(driver.name)}</b></td>
+                <td data-label="License" style="padding:14px;">${escapeHtml(driver.license_number)}</td>
+                <td data-label="Vehicle data" style="padding:14px;">${escapeHtml(vehicle?.number_plate || 'No vehicle yet')}</td>
+                <td data-label="Service" style="padding:14px;">${escapeHtml(vehicle?.vehicle_type || 'Pending assignment')}</td>
+                <td data-label="Status" style="padding:14px;"><span class="chip cm" style="background:#e5e7eb; color:#4b5563;">Pending</span></td>
+                <td data-label="Applied On" style="padding:14px;">${appliedOn}</td>
+                <td data-label="Action" style="padding:14px; text-align:center;">
+                    <div style="display:flex; gap:8px; justify-content:center;">
+                        <button onclick="appDrv(${driver.id})" class="btn-full" style="background:#10b981; padding:8px 16px; font-size:0.75rem;"><i class="fas fa-check"></i> Approve</button>
+                        <button onclick="rejDrv(${driver.id})" class="btn-full" style="background:#ef4444; padding:8px 16px; font-size:0.75rem;"><i class="fas fa-times"></i> Reject</button>
+                    </div>
                 </td>
             </tr>`;
     }).join('');
@@ -4513,6 +4538,117 @@ function renderAdminLiveActivity(trips = []) {
     }).join('');
 }
 
+function updateAdminCharts(stats) {
+    const finCtx = document.getElementById('admin-financial-chart');
+    const distCtx = document.getElementById('admin-user-dist-chart');
+    const engCtx = document.getElementById('admin-engagement-chart');
+    
+    if (!finCtx || !distCtx || !engCtx) return;
+
+    // Add slight random fluctuation for "Live" feel if desired, 
+    // but here we primarily use the real data from stats
+    const revenue = stats.total_revenue || 0;
+    const profit = stats.estimated_profit || 0;
+    const costs = stats.operational_costs || 0;
+
+    // Financial Chart: Revenue, Profit, Costs
+    if (window.stsFinChart) {
+        window.stsFinChart.data.datasets[0].data = [revenue, profit, costs];
+        window.stsFinChart.update('none'); // Update without animation for 1s frequency
+    } else {
+        window.stsFinChart = new Chart(finCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Revenue', 'Profit (Est)', 'Operational Costs'],
+                datasets: [{
+                    data: [revenue, profit, costs],
+                    backgroundColor: ['rgba(18, 58, 90, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                    borderRadius: 8,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => 'UGX ' + v.toLocaleString() } }
+                }
+            }
+        });
+    }
+
+    // User Distribution: Admins, Drivers, Passengers
+    if (window.stsDistChart) {
+        window.stsDistChart.data.datasets[0].data = [stats.total_passengers || 0, stats.total_drivers || 0, stats.total_admins || 0];
+        window.stsDistChart.update('none');
+    } else {
+        window.stsDistChart = new Chart(distCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passengers', 'Drivers', 'Admins'],
+                datasets: [{
+                    data: [stats.total_passengers || 0, stats.total_drivers || 0, stats.total_admins || 0],
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                    borderWidth: 0,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                }
+            }
+        });
+    }
+
+    // Engagement Chart: Live Activity Pulse
+    if (!window.stsEngData) {
+        window.stsEngData = [10, 15, 12, 18, 20, 25, 22, 28, 30, 35, 40, 38];
+    }
+    
+    // Shift data to the left and add a new random "pulse" for the 1s update
+    window.stsEngData.shift();
+    const lastVal = window.stsEngData[window.stsEngData.length - 1];
+    const jitter = (Math.random() - 0.5) * 5; // fluctuation
+    window.stsEngData.push(Math.max(5, Math.min(100, lastVal + jitter)));
+
+    if (window.stsEngChart) {
+        window.stsEngChart.data.datasets[0].data = window.stsEngData;
+        window.stsEngChart.update('none');
+    } else {
+        window.stsEngChart = new Chart(engCtx, {
+            type: 'line',
+            data: {
+                labels: Array(window.stsEngData.length).fill(''),
+                datasets: [{
+                    label: 'System Load',
+                    data: window.stsEngData,
+                    borderColor: '#123a5a',
+                    backgroundColor: 'rgba(18, 58, 90, 0.05)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0, // Hide points for smoother live look
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                animation: false,
+                scales: {
+                    x: { display: false },
+                    y: { beginAtZero: true, max: 100 }
+                }
+            }
+        });
+    }
+}
+
 async function loadAdminDashboard() {
     if (currentUser?.role !== 'admin') return;
 
@@ -4531,13 +4667,13 @@ async function loadAdminDashboard() {
         if (document.getElementById('admin-routing-note')) {
             document.getElementById('admin-routing-note').textContent = stats.sos_alerts_count
                 ? `${stats.sos_alerts_count} SOS alerts need attention on the live map.`
-                : 'No emergency routing conflicts are currently flagged by the backend.';
+                : 'No emergency routing conflicts are currently flagged by the system.';
         }
         if (document.getElementById('admin-revenue-note')) {
             document.getElementById('admin-revenue-note').textContent = `${formatUGX(stats.total_revenue ?? 0)} has been collected from completed rides.`;
         }
 
-        updateAdminChart(stats.total_passengers ?? 0, stats.total_drivers ?? 0);
+        updateAdminCharts(stats);
 
         initAdmMap();
         renderAdminVehiclesOnMap(vehicles);
@@ -4834,7 +4970,7 @@ function initAdminStream() {
             if (document.getElementById('admin-drivers')) document.getElementById('admin-drivers').textContent = data.stats.total_drivers;
             if (document.getElementById('admin-revenue')) document.getElementById('admin-revenue').textContent = formatUGX(data.stats.total_revenue);
             
-            updateAdminChart(data.stats.total_passengers ?? 0, data.stats.total_drivers ?? 0);
+            updateAdminCharts(data.stats);
         }
         
         if (data.live_trips) renderAdminLiveActivity(data.live_trips);
@@ -5137,7 +5273,7 @@ async function sendUSSD() {
         });
 
         let msg = response.message || '';
-        // Convert backend line breaks to HTML breaks for the UI
+        // Convert system line breaks to HTML breaks for the UI
         msg = msg.replace(/\n/g, '<br>');
 
         if (msg.startsWith('CON ')) {

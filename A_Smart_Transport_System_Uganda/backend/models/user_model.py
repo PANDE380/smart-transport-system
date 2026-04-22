@@ -53,12 +53,31 @@ class User(db.Model):
             if vehicle:
                 vehicle_type = vehicle.vehicle_type
 
+        # Determine professional title
+        profession = "User"
+        if self.role == 'passenger':
+            profession = "Passenger"
+        elif self.role == 'admin':
+            profession = "System Administrator"
+        elif self.role == 'driver':
+            if vehicle_type in ['Marine', 'Marine Transport']:
+                profession = "Captain"
+            elif vehicle_type in ['Boda Boda', 'Boda']:
+                profession = "Rider"
+            elif vehicle_type in ['Standard Taxi', 'Taxi']:
+                profession = "Taxi Driver"
+            elif vehicle_type in ['Smart Bus', 'Bus']:
+                profession = "Bus Pilot"
+            else:
+                profession = "Driver"
+
         return {
             'id': self.id,
             'name': self.name,
             'email': self.email,
             'phone': self.phone,
             'role': self.role,
+            'profession': profession,
             'vehicle_type': vehicle_type,
             'preferred_language': self.preferred_language,
             'profile_image_url': (

@@ -57,8 +57,6 @@ def estimate_fare():
     distance = float(data['distance_km'])
     v_type = data.get('vehicle_type', 'Taxi')
     
-    # We can also pass traffic_level and weather if the frontend provides it,
-    # otherwise predict_fare will simulate them.
     predict_fare = _get_predict_fare()
     predicted = predict_fare(
         distance_km=distance,
@@ -84,8 +82,6 @@ def book_trip():
     if not all(field in data for field in required_fields):
         return jsonify({'error': 'Missing required fields for booking'}), 400
 
-    # basic check
-    # Assuming vehicle_id refers to a Vehicle
     vehicle = db.session.get(Vehicle, data['vehicle_id'])
     if not vehicle:
         return jsonify({'error': 'Vehicle not found'}), 404
@@ -93,7 +89,6 @@ def book_trip():
     if vehicle.current_passengers >= vehicle.capacity:
         return jsonify({'error': 'Vehicle is full'}), 400
 
-    # REQ-28: Scheduled rides
     scheduled_at = None
     trip_status = 'pending'
     if data.get('scheduled_at'):
@@ -103,7 +98,6 @@ def book_trip():
         except (TypeError, ValueError):
             return jsonify({'error': 'Invalid scheduled date/time format'}), 400
 
-    # Start trip as pending or scheduled, awaiting driver approval
     new_trip = Trip(
         passenger_id=data['passenger_id'],
         vehicle_id=data['vehicle_id'],
@@ -115,10 +109,9 @@ def book_trip():
     )
 
     db.session.add(new_trip)
-    db.session.flush() # Get ID for log
+    db.session.flush()
 
-    # PLATFORM REFLEX: Log booking interaction
-    log_msg = f"Passenger {new_trip.passenger.name} requested a {new_trip.vehicle.vehicle_type} ride to {new_trip.end_location}."
+    log_msg = f"Passenger {new_trip.passenger.name if new_trip.passenger else 'User'} requested a {new_trip.vehicle.vehicle_type if new_trip.vehicle else 'Vehicle'} ride to {new_trip.end_location}."
     db.session.add(TripLog(trip_id=new_trip.id, event_type='REQUEST', message=log_msg))
     
     db.session.commit()
@@ -143,11 +136,8 @@ def approve_trip(trip_id):
     if trip.status not in {'pending', 'scheduled'}:
         return jsonify({'error': 'Trip is not awaiting approval'}), 400
 
-    # Claiming logic: If a different driver approves, reassign the vehicle
     target_vehicle = trip.vehicle
     if driver_user_id:
-        # We use the relationship to get the User model via Trip -> Passenger -> __class__ ? 
-        # Better: just import User at the top or locally.
         try:
             from ..models.user_model import User
         except ImportError:
@@ -155,7 +145,6 @@ def approve_trip(trip_id):
             
         driver_user = db.session.get(User, driver_user_id)
         if driver_user and driver_user.driver_profile:
-            # Match by vehicle type
             desired_type = trip.vehicle.vehicle_type
             new_vehicle = next((v for v in driver_user.driver_profile.vehicles 
                               if v.vehicle_type == desired_type and v.is_active), None)
@@ -169,16 +158,21 @@ def approve_trip(trip_id):
     trip.status = 'active'
     target_vehicle.current_passengers += 1
     
-    # PLATFORM REFLEX: Log approval interaction
-    log_msg = f"Driver {target_vehicle.driver.user.name} accepted the trip request to {trip.end_location} (Vehicle: {target_vehicle.number_plate})."
+    driver_name = target_vehicle.driver.user.name if (target_vehicle.driver and target_vehicle.driver.user) else "A driver"
+    log_msg = f"Driver {driver_name} accepted the trip request to {trip.end_location} (Vehicle: {target_vehicle.number_plate})."
     db.session.add(TripLog(trip_id=trip.id, event_type='APPROVAL', message=log_msg))
 
     db.session.commit()
     current_app.logger.info(f"Trip {trip.id} approved by Driver")
 
     return jsonify({
-        'message': 'Trip approved and started!',
-        'trip': trip.to_dict()
+        'message': f'Trip approved! A notification has been sent to Passenger {trip.passenger.name if trip.passenger else "User"} and the System Operations center.',
+        'trip': trip.to_dict(),
+        'notification': {
+            'type': 'APPROVAL_SUCCESS',
+            'recipients': ['passenger', 'admin'],
+            'content': f'Ride to {trip.end_location} has been confirmed by {driver_name}.'
+        }
     }), 200
 
 
@@ -187,6 +181,7 @@ def complete_trip(trip_id):
     trip = db.get_or_404(Trip, trip_id)
     passenger_name = trip.passenger.name if trip.passenger else "Passenger"
     driver_name = trip.vehicle.driver.user.name if (trip.vehicle and trip.vehicle.driver and trip.vehicle.driver.user) else "Driver"
+    
     if trip.status != 'active':
         return jsonify({'error': 'Trip is not currently active'}), 400
 
@@ -205,6 +200,26 @@ def complete_trip(trip_id):
             }), 400
 
         passenger_wallet.balance -= trip.fare
+
+        # SETTLE ON ADMIN ACCOUNT: Transfer funds to the primary admin wallet
+        try:
+            from ..models.user_model import User
+        except ImportError:
+            from models.user_model import User
+            
+        admin_user = User.query.filter_by(role='admin').first()
+        if admin_user:
+            admin_wallet = Wallet.query.filter_by(user_id=admin_user.id).first()
+            if admin_wallet:
+                admin_wallet.balance += trip.fare
+                db.session.add(WalletTransaction(
+                    user_id=admin_user.id,
+                    trip_id=trip.id,
+                    amount=trip.fare,
+                    transaction_type='ride_revenue',
+                    payment_method='System_Internal_Transfer',
+                    reference=f'REV_{uuid.uuid4().hex[:10].upper()}'
+                ))
 
         payment = Payment(
             trip_id=trip.id,
@@ -229,7 +244,6 @@ def complete_trip(trip_id):
 
     trip.status = 'completed'
 
-    # PLATFORM REFLEX: Log completion interaction
     log_msg = f"Trip completed successfully. {driver_name} dropped off {passenger_name} at {trip.end_location}."
     db.session.add(TripLog(trip_id=trip.id, event_type='COMPLETION', message=log_msg))
 
@@ -252,9 +266,7 @@ def reject_trip(trip_id):
         return jsonify({'error': 'Trip is not pending approval'}), 400
 
     trip.status = 'cancelled'
-    
-    # PLATFORM REFLEX: Log rejection interaction
-    actor = "Driver" # Usually driver rejects pending
+    actor = "Driver"
     log_msg = f"{actor} declined the trip request to {trip.end_location}."
     db.session.add(TripLog(trip_id=trip.id, event_type='REJECTION', message=log_msg))
 
@@ -273,8 +285,6 @@ def cancel_trip(trip_id):
         return jsonify({'error': 'Only pending or scheduled trips can be cancelled'}), 400
 
     trip.status = 'cancelled'
-    
-    # PLATFORM REFLEX: Log cancellation interaction
     passenger_name = trip.passenger.name if trip.passenger else "Passenger"
     log_msg = f"{passenger_name} cancelled their trip request to {trip.end_location}."
     db.session.add(TripLog(trip_id=trip.id, event_type='CANCELLATION', message=log_msg))
@@ -292,7 +302,6 @@ def trigger_sos(trip_id):
     trip = db.get_or_404(Trip, trip_id)
     trip.is_sos = True
     
-    # Process forensic evidence if provided
     evidence_desc = request.form.get('description', '').strip()
     if evidence_desc:
         trip.sos_description = evidence_desc
@@ -307,8 +316,7 @@ def trigger_sos(trip_id):
             photo.save(photo_path)
             trip.sos_evidence_url = f"/static/evidence/{filename}"
 
-    # PLATFORM REFLEX: Log SOS interaction
-    log_msg = f"🚨 SOS ALERT triggered by Passenger {trip.passenger.name} for ride to {trip.end_location}!"
+    log_msg = f"🚨 SOS ALERT triggered by Passenger {trip.passenger.name if trip.passenger else 'User'} for ride to {trip.end_location}!"
     db.session.add(TripLog(trip_id=trip.id, event_type='SOS', message=log_msg))
 
     db.session.commit()
@@ -339,8 +347,7 @@ def rate_trip(trip_id):
     trip.rating = rating_val
     trip.feedback = str(data.get('feedback', '')).strip()
     
-    # PLATFORM REFLEX: Log rating interaction
-    log_msg = f"Passenger {trip.passenger.name} rated the experience {rating_val} stars."
+    log_msg = f"Passenger {trip.passenger.name if trip.passenger else 'User'} rated the experience {rating_val} stars."
     db.session.add(TripLog(trip_id=trip.id, event_type='RATE', message=log_msg))
 
     db.session.commit()

@@ -1,5 +1,9 @@
 import os
+import sys
 from datetime import datetime, timezone
+
+# Ensure the system-installed OpenAI SDK is available even if not in the .venv
+sys.path.append(r'C:\Users\Captain\AppData\Roaming\Python\Python314\site-packages')
 
 
 class _OpenAIPlaceholderError(Exception):
